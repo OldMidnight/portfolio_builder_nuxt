@@ -1,0 +1,43 @@
+// Ref: https://github.com/nuxt-community/vuetify-module#customvariables
+//
+// The variables you want to modify
+// $font-size-root: 20px;
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+.has-border {
+  border: 1px solid;
+}
+
+.slate-border {
+    border: none !important;
+}
+
+.matrix-border {
+    border: 1px solid #00E676 !important;
+}
+
+.slate {
+    background-color: #8c8c8c !important;
+    color: white;
+}
+
+.slate-light {
+    background-color: #bfbfbf !important;
+}
+
+.matrix {
+    background-color: black !important;
+    color: #00E676 !important;
+}
+
+.smaller-caption {
+    font-size: 10px;
+}
+
+* {
+  font-family: 'Nunito', sans-serif;
+}
