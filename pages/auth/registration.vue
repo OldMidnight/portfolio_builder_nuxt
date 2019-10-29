@@ -1,6 +1,11 @@
 <script>
 import { mapActions } from 'vuex'
 export default {
+  name: 'registration',
+  transitions: {
+    enterActiveClass: 'animated fadeInLeft fast',
+    leaveActiveClass: 'animated fadeOutRight fast'
+  },
   auth: false,
   middleware: 'available_route_check',
   layout: 'auth_layout',
@@ -85,13 +90,14 @@ export default {
 
 <template>
   <v-layout column align-center>
-    <div v-if="!domainEntry">
-      <div>Create Your Account</div>
+    <div v-if="!domainEntry" class="pa-2 d-flex flex-column align-center">
+      <div class="headline mb-4">Create Your Account</div>
       <v-text-field
         ref="f_name"
         v-model="f_name"
         label="First Name"
         :rules="[rules.required]"
+        class="auth-input"
         outlined
       >
       </v-text-field>
@@ -100,6 +106,7 @@ export default {
         v-model="s_name"
         label="Last Name"
         :rules="[rules.required]"
+        class="auth-input"
         outlined
       >
       </v-text-field>
@@ -109,6 +116,7 @@ export default {
         label="Email"
         type="email"
         :rules="[rules.required, rules.email]"
+        class="auth-input"
         outlined
       >
       </v-text-field>
@@ -117,12 +125,13 @@ export default {
         v-model="password"
         label="Password"
         :type="show_password ? 'text' : 'password'"
-        :append-icon="show_password ? 'visibility' : 'visibility_off'"
+        :append-icon="show_password ? 'mdi-eye' : 'visibilmdi-eye-offity_off'"
         :rules="[
           rules.required,
           () => (!!password && password.length >= 8) || 'Min 8 characters',
           () => (!!password && password.length <= 25) || 'Max 25 characters'
         ]"
+        class="auth-input"
         outlined
         @click:append="show_password = !show_password"
       >
@@ -140,17 +149,30 @@ export default {
           () => (!!domain && domain.length >= 3) || 'Min 3 characters',
           () => (!!domain && domain.length <= 20) || 'Max 20 characters'
         ]"
+        class="auth-input"
         outlined
         @click="domainValid = null"
       >
       </v-text-field>
       <v-btn color="success" @click="validateDomain()">Submit</v-btn>
     </div>
-    <v-flex>
-      <span>Already have an account?</span>
-      <nuxt-link to="/auth/login">Login</nuxt-link>
+    <v-flex class="d-flex flex-column align-center auth-link">
+      <span class="caption">Already have an account?</span>
+      <nuxt-link to="/auth/login" class="caption auth-link">Login</nuxt-link>
     </v-flex>
   </v-layout>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.form-wrap {
+  width: 50%;
+}
+
+.auth-input {
+  width: 90%;
+}
+
+.auth-link {
+  color: #777;
+}
+</style>

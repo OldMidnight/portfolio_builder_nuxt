@@ -38,9 +38,58 @@ export const state = () => ({
     projects_page_1_inputs: {},
     projects_page_2_inputs: {},
     projects_page_3_inputs: {},
-    resume_page_1_inputs: {},
-    resume_page_2_inputs: {},
-    resume_page_3_inputs: {},
+    resume_page_inputs: {
+      info_section: {
+        name: null,
+        phone: '0811111111',
+        email: null,
+        address: {
+          line_1: 'Bag End',
+          line_2: '1 Bagshot Row',
+          line_3: 'Hobbiton',
+          line_4: 'The Shire'
+        }
+      },
+      description_section: {
+        value:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+      },
+      education_section: {
+        schools: [
+          {
+            id: 0,
+            name: 'Hogwarts School of Witchcraft and Wizadry',
+            address: {
+              line_1: 'Hogwarts Castle',
+              line_2: 'Highlands',
+              line_3: 'Scotland',
+              line_4: 'Great Britain'
+            },
+            years_attended: {
+              from: '2001-01',
+              till: null
+            }
+          },
+          {
+            id: 1,
+            name: 'Hogwarts School of Witchcraft and Wizadry',
+            address: {
+              line_1: 'Hogwarts Castle',
+              line_2: 'Highlands',
+              line_3: 'Scotland',
+              line_4: 'Great Britain'
+            },
+            years_attended: {
+              from: '2001-01',
+              till: null
+            }
+          }
+        ]
+      },
+      experience_component: {},
+      grades_component: {},
+      interests_component: {}
+    },
     homePages: [],
     projectsPages: [],
     resumePages: []
@@ -205,6 +254,26 @@ export const mutations = {
   },
   setDomain(state, payload) {
     state.domain = payload.domain
+  },
+  setResumeSection(state, payload) {
+    if (payload.section_type === 'education') {
+      if (payload.prop === 'address') {
+        // eslint-disable-next-line prettier/prettier
+        state.site_props.resume_page_inputs.education_section.schools[payload.id].address['line_' + payload.address_line] = payload.value
+      } else if (payload.prop === 'years_attended') {
+        // eslint-disable-next-line prettier/prettier
+        state.site_props.resume_page_inputs.education_section.schools[payload.id].years_attended[payload.type] = payload.value
+      } else {
+        // eslint-disable-next-line prettier/prettier
+        state.site_props.resume_page_inputs.education_section.schools[payload.id][payload.prop] = payload.value
+      }
+    } else if (payload.prop === 'address') {
+      // eslint-disable-next-line prettier/prettier
+      state.site_props.resume_page_inputs[payload.section_type + '_section'].address['line_' + payload.address_line] = payload.value
+    } else {
+      // eslint-disable-next-line prettier/prettier
+      state.site_props.resume_page_inputs[payload.section_type + '_section'][payload.prop] = payload.value
+    }
   }
 }
 

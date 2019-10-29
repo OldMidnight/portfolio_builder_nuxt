@@ -1,6 +1,11 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 export default {
+  name: 'login',
+  transitions: {
+    enterActiveClass: 'animated fadeInLeft',
+    leaveActiveClass: 'animated fadeOutRight'
+  },
   middleware: 'available_route_check',
   layout: 'auth_layout',
   props: {
@@ -51,14 +56,15 @@ export default {
 </script>
 
 <template>
-  <div>
-    <div>Login</div>
+  <div class="pa-2 d-flex flex-column align-center">
+    <span class="headline mb-4">Login</span>
     <v-text-field
       ref="email"
       v-model="email"
       label="Email"
       type="email"
       :rules="[rules.required, rules.email]"
+      class="auth-input"
       outlined
     >
     </v-text-field>
@@ -67,21 +73,33 @@ export default {
       v-model="password"
       label="Password"
       :type="show_password ? 'text' : 'password'"
-      :append-icon="show_password ? 'visibility' : 'visibility_off'"
+      :append-icon="show_password ? 'mdi-eye' : 'mdi-eye-off'"
       :rules="[
         rules.required,
         () => (!!password && password.length >= 8) || 'Min 8 characters',
         () => (!!password && password.length <= 25) || 'Max 25 characters'
       ]"
+      class="auth-input"
       outlined
       @click:append="show_password = !show_password"
     >
     </v-text-field>
     <v-btn color="success" @click="validateInfo()">Submit</v-btn>
-    <v-flex>
-      <nuxt-link to="/auth/registration">Create an account</nuxt-link>
+    <v-flex class="mt-2 auth-link d-flex flex-column align-center">
+      <span class="caption">New to Kreoh?</span>
+      <nuxt-link to="/auth/registration" class="auth-link caption">
+        Create an account
+      </nuxt-link>
     </v-flex>
   </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.auth-input {
+  width: 90%;
+}
+
+.auth-link {
+  color: #777;
+}
+</style>

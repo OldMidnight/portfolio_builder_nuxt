@@ -1,5 +1,5 @@
 export const actions = {
-  async nuxtServerInit({ commit }, { req, $axios, route, store }) {
+  async nuxtServerInit({ commit }, { req, $axios }) {
     // console.log('asfdsafsdaasdf', req.hostname.split('.').length)
     if (req.hostname.split('.').length === 2) {
       commit('creator/setIsSubdomain')

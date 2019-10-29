@@ -207,12 +207,13 @@ export default {
       >
         <p
           v-if="!options.preview && !options.live"
+          class="pre-model"
           contenteditable="true"
           @input="updateInput($event, 'para_1', 300)"
         >
           {{ para_1_model }}
         </p>
-        <p v-else>
+        <p v-else class="pre-model">
           {{ para_1_model }}
         </p>
       </div>
@@ -237,12 +238,13 @@ export default {
       >
         <p
           v-if="!options.preview && !options.live"
+          class="pre-model"
           contenteditable="true"
           @input="updateInput($event, 'para_2', 300)"
         >
           {{ para_2_model }}
         </p>
-        <p v-else>
+        <p v-else class="pre-model">
           {{ para_2_model }}
         </p>
       </div>
@@ -546,5 +548,10 @@ export default {
   opacity: 0.2;
   transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
+}
+
+.pre-model {
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 </style>

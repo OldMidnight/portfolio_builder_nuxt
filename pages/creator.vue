@@ -523,18 +523,12 @@ export default {
     ])
     inputDict = 'projects_page_1_inputs'
 
-    let today = new Date()
-    let date =
-      today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
-    let time =
-      today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds()
-    let dateTime = date + '_' + time
     this.setInputDictValues({
       inputDict,
       input_dict_values: {
         projects: [
           {
-            id: dateTime,
+            id: Date.now(),
             title: 'Project Title Here',
             description:
               'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
@@ -551,18 +545,12 @@ export default {
 
     inputDict = 'projects_page_2_inputs'
 
-    today = new Date()
-    date =
-      today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
-    time =
-      today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds()
-    dateTime = date + '_' + time
     this.setInputDictValues({
       inputDict,
       input_dict_values: {
         projects: [
           {
-            id: dateTime,
+            id: Date.now(),
             title: 'Project Title Here',
             description:
               'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
@@ -574,7 +562,7 @@ export default {
             link: null
           },
           {
-            id: dateTime + '_2',
+            id: Date.now() + '_2',
             title: 'Project Title Here',
             description:
               'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
@@ -593,6 +581,22 @@ export default {
       // { id: #, component: () => import(COMPONENT_PATH) }
       { id: 1, page_num: 1, component: 'resume_sections/resume_index' }
     ])
+
+    // SET RESUME NAME AND EMAIL INPUTS
+    this.setResumeSection({
+      section_type: 'info',
+      prop: 'name',
+      value:
+        this.$store.state.auth.user.f_name +
+        ' ' +
+        this.$store.state.auth.user.s_name
+    })
+
+    this.setResumeSection({
+      section_type: 'info',
+      prop: 'email',
+      value: this.$store.state.auth.user.email
+    })
   },
   methods: {
     ...mapMutations({
@@ -628,7 +632,8 @@ export default {
       clearAllChanges: 'creator/clearAllChanges',
       modifyComponent: 'creator/modifyComponent',
       setSiteProps: 'creator/setSiteProps',
-      restoreSiteProps: 'creator/restoreSiteProps'
+      restoreSiteProps: 'creator/restoreSiteProps',
+      setResumeSection: 'creator/setResumeSection'
     }),
     ...mapActions({
       registerWebsite: 'creator/registerWebsite'
@@ -897,436 +902,399 @@ export default {
     class="creation-step-layout"
     :class="{ 'extra-padding-site-name': checkStepCount(2) }"
   >
-    <v-flex v-show="checkStepCount(0)" class="creation-step">
-      <v-flex xs12 class="creation-step-header">
-        <div>Select a layout!</div>
+    <transition
+      enter-active-class="animated fadeIn faster"
+      leave-active-class="animated fadeOut faster"
+      mode="out-in"
+    >
+      <v-flex v-if="checkStepCount(0)" key="0" class="creation-step">
+        <v-flex xs12 class="creation-step-header">
+          <div>Select a layout!</div>
+        </v-flex>
+
+        <v-layout row wrap class="creation-step-content">
+          <v-flex
+            v-for="i in layouts"
+            :id="'layout-' + i.id"
+            :key="i.id"
+            xs4
+            class="layout-item-container"
+            :class="{ 'layout-selected': site_props.layout === i.name }"
+            @click="selectLayout($event)"
+          >
+            <div
+              class="layout-item"
+              :class="{ 'layout-selected-2': site_props.layout === i.name }"
+            ></div>
+            <p>this is layout {{ i.name }}</p>
+          </v-flex>
+        </v-layout>
       </v-flex>
 
-      <v-layout row wrap class="creation-step-content">
-        <v-flex
-          v-for="i in layouts"
-          :id="'layout-' + i.id"
-          :key="i.id"
-          xs4
-          class="layout-item-container"
-          :class="{ 'layout-selected': site_props.layout === i.name }"
-          @click="selectLayout($event)"
-        >
-          <div
-            class="layout-item"
-            :class="{ 'layout-selected-2': site_props.layout === i.name }"
-          ></div>
-          <p>this is layout {{ i.name }}</p>
-        </v-flex>
-      </v-layout>
-    </v-flex>
+      <v-layout
+        v-else-if="checkStepCount(1)"
+        key="1"
+        class="creation-step preview-edit"
+      >
+        <v-flex class="preview-edit-window creation-step-edit-options">
+          <div class="title">Customize Your Website</div>
 
-    <v-layout v-show="checkStepCount(1)" class="creation-step preview-edit">
-      <v-flex class="preview-edit-window creation-step-edit-options">
-        <div class="title">Customize Your Website</div>
+          <v-row align="center" class="edit_options_panels">
+            <v-expansion-panels focusable>
+              <!-- NAVIGATION TAB -->
 
-        <v-row align="center" class="edit_options_panels">
-          <v-expansion-panels focusable>
-            <!-- NAVIGATION TAB -->
-
-            <v-expansion-panel>
-              <v-expansion-panel-header>Navigation</v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-flex>
-                  <v-radio-group v-model="site_nav" @change="hideNextStep()">
-                    <v-radio
-                      v-for="nav in nav_types"
-                      :key="nav.id"
-                      :label="nav.name"
-                      :value="nav.id"
-                    >
-                    </v-radio>
-                  </v-radio-group>
-                </v-flex>
-                <v-item-group
-                  v-model="navigation_style"
-                  value="1"
-                  mandatory
-                  @change="hideNextStep()"
-                >
-                  <p>Navigation Style</p>
-                  <v-container>
-                    <v-row>
-                      <v-col cols="12" md="4">
-                        <v-item v-slot:default="{ active, toggle }" value="1">
-                          <v-card
-                            class="d-flex align-center flex-column"
-                            height="100"
-                            @click="toggle"
-                          >
-                            <v-icon class="align-self-end">{{
-                              active ? 'mdi-check' : 'mdi-plus'
-                            }}</v-icon>
-
-                            <v-btn
-                              :icon="site_props.textify"
-                              color="info ml-1"
-                              fab
-                            >
-                              <v-icon class="x2">mdi-chevron-right</v-icon>
-                            </v-btn>
-                          </v-card>
-                        </v-item>
-                      </v-col>
-                      <v-col cols="12" md="4">
-                        <v-item v-slot:default="{ active, toggle }" value="2">
-                          <v-card
-                            class="d-flex align-center flex-column"
-                            height="100"
-                            @click="toggle"
-                          >
-                            <v-icon class="align-self-end">{{
-                              active ? 'mdi-check' : 'mdi-plus'
-                            }}</v-icon>
-
-                            <v-btn
-                              color="info ml-1"
-                              class="mt-2"
-                              :outlined="!site_props.textify"
-                              :text="site_props.textify"
-                            >
-                              Next
-                            </v-btn>
-                          </v-card>
-                        </v-item>
-                      </v-col>
-                      <v-col cols="12" md="4">
-                        <v-item v-slot:default="{ active, toggle }" value="3">
-                          <v-card
-                            class="d-flex align-center flex-column"
-                            height="100"
-                            @click="toggle"
-                          >
-                            <v-icon class="align-self-end">{{
-                              active ? 'mdi-check' : 'mdi-plus'
-                            }}</v-icon>
-
-                            <v-btn
-                              color="info ml-1"
-                              class="mt-2"
-                              :rounded="!site_props.textify"
-                              :text="site_props.textify"
-                            >
-                              Next
-                            </v-btn>
-                          </v-card>
-                        </v-item>
-                      </v-col>
-                    </v-row>
-                  </v-container>
-                </v-item-group>
-                <v-switch
-                  v-model="textify"
-                  label="Textify Navigation"
-                  inset
-                  @change="hideNextStep()"
-                ></v-switch>
-                <v-switch
-                  v-model="show_nav_color_customiser"
-                  label="Customise Colors"
-                  :disabled="site_props.selected_theme !== null"
-                  hint="Disable theme to change colors"
-                  :persistent-hint="site_props.selected_theme !== null"
-                  inset
-                  @change="hideNextStep()"
-                  @click.native="reset_color()"
-                >
-                </v-switch>
-                <v-card
-                  v-if="show_nav_color_customiser"
-                  class="d-flex flex-column pa-3"
-                >
-                  <p class="align-self-center">Colors</p>
-                  <v-color-picker
-                    v-model="navigation_color"
-                    mode="hex"
-                    hide-inputs
-                    class="preview-color-pick"
-                    @input="hideNextStep()"
-                  >
-                  </v-color-picker>
-                  <v-flex class="mt-3">
-                    <p>Text Color</p>
-                    <v-radio-group
-                      v-model="navigation_text_color"
-                      @change="hideNextStep()"
-                    >
-                      <v-radio label="White" value="white"></v-radio>
-                      <v-radio label="Black" value="black"></v-radio>
-                      <v-radio label="Custom" value="custom"></v-radio>
+              <v-expansion-panel>
+                <v-expansion-panel-header>Navigation</v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-flex>
+                    <v-radio-group v-model="site_nav" @change="hideNextStep()">
+                      <v-radio
+                        v-for="nav in nav_types"
+                        :key="nav.id"
+                        :label="nav.name"
+                        :value="nav.id"
+                      >
+                      </v-radio>
                     </v-radio-group>
                   </v-flex>
-                </v-card>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-
-            <!-- TABS CUSTOMISATIONS -->
-
-            <v-expansion-panel>
-              <v-expansion-panel-header>Tabs</v-expansion-panel-header>
-              <v-expansion-panel-content class="nav_titles_container">
-                <v-flex pt-3>
-                  <p
-                    v-show="site_props.selected_theme !== null"
-                    style="font-size: 12px; color: #b6b6b6; width: 100%; text-align: center;"
-                  >
-                    Disable theme to change colors
-                  </p>
-
-                  <v-card class="d-flex flex-column pa-3 my-4" elevation="2">
-                    <p class="align-self-center">Home Tab</p>
-                    <v-text-field
-                      v-model="nav_title_home"
-                      :rules="[
-                        () =>
-                          (!!nav_title_home && nav_title_home.length >= 2) ||
-                          'Min 2 characters',
-                        () =>
-                          (!!nav_title_home && nav_title_home.length <= 12) ||
-                          'Max 12 characters'
-                      ]"
-                      label="Change Text"
-                      outlined
-                      @change="hideNextStep()"
-                    >
-                    </v-text-field>
-                    <p class="align-self-center">Tab Color</p>
-                    <v-color-picker
-                      v-model="tab_colors.home"
-                      :disabled="site_props.selected_theme !== null"
-                      mode="hex"
-                      hide-inputs
-                      class="preview-color-pick"
-                      @input="hideNextStep()"
-                    >
-                    </v-color-picker>
-                    <v-flex class="mt-3">
-                      <p>Text Color</p>
-                      <v-radio-group
-                        v-model="tab_text_color"
-                        :disabled="site_props.text_border_color"
-                        @change="hideNextStep()"
-                      >
-                        <v-radio label="White" value="white"></v-radio>
-                        <v-radio label="Black" value="black"></v-radio>
-                      </v-radio-group>
-                    </v-flex>
-                  </v-card>
-
-                  <v-card class="d-flex flex-column pa-3 my-4" elevation="2">
-                    <p class="align-self-center">Projects Tab</p>
-                    <v-text-field
-                      v-model="nav_title_projects"
-                      :rules="[
-                        () =>
-                          (!!nav_title_projects &&
-                            nav_title_projects.length >= 2) ||
-                          'Min 2 characters',
-                        () =>
-                          (!!nav_title_projects &&
-                            nav_title_projects.length <= 12) ||
-                          'Max 12 characters'
-                      ]"
-                      label="Change Text"
-                      outlined
-                      @change="hideNextStep()"
-                    >
-                    </v-text-field>
-                    <p class="align-self-center">Tab Color</p>
-                    <v-color-picker
-                      v-model="tab_colors.projects"
-                      :disabled="site_props.selected_theme !== null"
-                      mode="hex"
-                      hide-inputs
-                      class="preview-color-pick"
-                      @input="hideNextStep()"
-                    >
-                    </v-color-picker>
-                    <v-flex class="mt-3">
-                      <p>Text Color</p>
-                      <v-radio-group
-                        v-model="tab_text_color"
-                        :disabled="site_props.text_border_color"
-                        @change="hideNextStep()"
-                      >
-                        <v-radio label="White" value="white"></v-radio>
-                        <v-radio label="Black" value="black"></v-radio>
-                      </v-radio-group>
-                    </v-flex>
-                  </v-card>
-
-                  <v-card class="d-flex flex-column pa-3 my-4" elevation="2">
-                    <p class="align-self-center">Resume Tab</p>
-                    <v-text-field
-                      v-model="nav_title_resume"
-                      :rules="[
-                        () =>
-                          (!!nav_title_resume &&
-                            nav_title_resume.length >= 2) ||
-                          'Min 2 characters',
-                        () =>
-                          (!!nav_title_resume &&
-                            nav_title_resume.length <= 12) ||
-                          'Max 12 characters'
-                      ]"
-                      label="Change Text"
-                      outlined
-                      @change="hideNextStep()"
-                    >
-                    </v-text-field>
-                    <p class="align-self-center">Tab Color</p>
-                    <v-color-picker
-                      v-model="tab_colors.resume"
-                      :disabled="site_props.selected_theme !== null"
-                      mode="hex"
-                      hide-inputs
-                      class="preview-color-pick"
-                      @input="hideNextStep()"
-                    >
-                    </v-color-picker>
-                    <v-flex class="mt-3">
-                      <p>Text Color</p>
-                      <v-radio-group
-                        v-model="tab_text_color"
-                        :disabled="site_props.text_border_color"
-                        @change="hideNextStep()"
-                      >
-                        <v-radio label="White" value="white"></v-radio>
-                        <v-radio label="Black" value="black"></v-radio>
-                      </v-radio-group>
-                    </v-flex>
-                  </v-card>
-                </v-flex>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-
-            <!-- PAGES TAB -->
-
-            <v-expansion-panel>
-              <v-expansion-panel-header>Pages</v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-flex class="pt-3">
-                  <v-select
-                    v-model="page_option"
-                    :items="page_customise_select"
-                    label="Select option..."
-                    solo
+                  <v-item-group
+                    v-model="navigation_style"
+                    value="1"
+                    mandatory
                     @change="hideNextStep()"
                   >
-                  </v-select>
-                </v-flex>
-                <v-flex v-if="page_option === 1">
-                  <transition
-                    name="preview-page"
-                    enter-active-class="animated fadeIn faster"
-                    leave-active-class="animated fadeOut faster"
-                    mode="out-in"
+                    <p>Navigation Style</p>
+                    <v-container>
+                      <v-row>
+                        <v-col cols="12" md="4">
+                          <v-item v-slot:default="{ active, toggle }" value="1">
+                            <v-card
+                              class="d-flex align-center flex-column"
+                              height="100"
+                              @click="toggle"
+                            >
+                              <v-icon class="align-self-end">{{
+                                active ? 'mdi-check' : 'mdi-plus'
+                              }}</v-icon>
+
+                              <v-btn
+                                :icon="site_props.textify"
+                                color="info ml-1"
+                                fab
+                              >
+                                <v-icon class="x2">mdi-chevron-right</v-icon>
+                              </v-btn>
+                            </v-card>
+                          </v-item>
+                        </v-col>
+                        <v-col cols="12" md="4">
+                          <v-item v-slot:default="{ active, toggle }" value="2">
+                            <v-card
+                              class="d-flex align-center flex-column"
+                              height="100"
+                              @click="toggle"
+                            >
+                              <v-icon class="align-self-end">{{
+                                active ? 'mdi-check' : 'mdi-plus'
+                              }}</v-icon>
+
+                              <v-btn
+                                color="info ml-1"
+                                class="mt-2"
+                                :outlined="!site_props.textify"
+                                :text="site_props.textify"
+                              >
+                                Next
+                              </v-btn>
+                            </v-card>
+                          </v-item>
+                        </v-col>
+                        <v-col cols="12" md="4">
+                          <v-item v-slot:default="{ active, toggle }" value="3">
+                            <v-card
+                              class="d-flex align-center flex-column"
+                              height="100"
+                              @click="toggle"
+                            >
+                              <v-icon class="align-self-end">{{
+                                active ? 'mdi-check' : 'mdi-plus'
+                              }}</v-icon>
+
+                              <v-btn
+                                color="info ml-1"
+                                class="mt-2"
+                                :rounded="!site_props.textify"
+                                :text="site_props.textify"
+                              >
+                                Next
+                              </v-btn>
+                            </v-card>
+                          </v-item>
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-item-group>
+                  <v-switch
+                    v-model="textify"
+                    label="Textify Navigation"
+                    inset
+                    @change="hideNextStep()"
+                  ></v-switch>
+                  <v-switch
+                    v-model="show_nav_color_customiser"
+                    label="Customise Colors"
+                    :disabled="site_props.selected_theme !== null"
+                    hint="Disable theme to change colors"
+                    :persistent-hint="site_props.selected_theme !== null"
+                    inset
+                    @change="hideNextStep()"
+                    @click.native="reset_color()"
                   >
-                    <v-card
-                      v-for="theme in page_theme_options"
-                      :key="theme.id"
-                      class="mx-auto"
-                      min-height="380"
+                  </v-switch>
+                  <v-card
+                    v-if="show_nav_color_customiser"
+                    class="d-flex flex-column pa-3"
+                  >
+                    <p class="align-self-center">Colors</p>
+                    <v-color-picker
+                      v-model="navigation_color"
+                      mode="hex"
+                      hide-inputs
+                      class="preview-color-pick"
+                      @input="hideNextStep()"
                     >
-                      <v-img class="black--text" height="200px" src="#">
-                        <v-card-title class="align-end fill-height">{{
-                          theme.title
-                        }}</v-card-title>
-                      </v-img>
-                      <v-card-text>
-                        <span>{{ theme.small_desc }}</span
-                        ><br />
-                        <span class="text--primary">
-                          <span>{{ theme.desc }}</span
-                          ><br />
-                        </span>
-                      </v-card-text>
-                      <v-card-actions>
-                        <v-btn color="success" @click="selectTheme(theme.id)">
-                          <v-icon
-                            v-if="theme.id === site_props.selected_theme"
-                            left
-                            >mdi-pencil</v-icon
-                          >
-                          {{ themeSelected(theme.id) }}
-                        </v-btn>
-                        <v-btn text color="orange" @click="nextTheme('right')"
-                          >Next</v-btn
+                    </v-color-picker>
+                    <v-flex class="mt-3">
+                      <p>Text Color</p>
+                      <v-radio-group
+                        v-model="navigation_text_color"
+                        @change="hideNextStep()"
+                      >
+                        <v-radio label="White" value="white"></v-radio>
+                        <v-radio label="Black" value="black"></v-radio>
+                        <v-radio label="Custom" value="custom"></v-radio>
+                      </v-radio-group>
+                    </v-flex>
+                  </v-card>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+
+              <!-- TABS CUSTOMISATIONS -->
+
+              <v-expansion-panel>
+                <v-expansion-panel-header>Tabs</v-expansion-panel-header>
+                <v-expansion-panel-content class="nav_titles_container">
+                  <v-flex pt-3>
+                    <p
+                      v-show="site_props.selected_theme !== null"
+                      style="font-size: 12px; color: #b6b6b6; width: 100%; text-align: center;"
+                    >
+                      Disable theme to change colors
+                    </p>
+
+                    <v-card class="d-flex flex-column pa-3 my-4" elevation="2">
+                      <p class="align-self-center">Home Tab</p>
+                      <v-text-field
+                        v-model="nav_title_home"
+                        :rules="[
+                          () =>
+                            (!!nav_title_home && nav_title_home.length >= 2) ||
+                            'Min 2 characters',
+                          () =>
+                            (!!nav_title_home && nav_title_home.length <= 12) ||
+                            'Max 12 characters'
+                        ]"
+                        label="Change Text"
+                        outlined
+                        @change="hideNextStep()"
+                      >
+                      </v-text-field>
+                      <p class="align-self-center">Tab Color</p>
+                      <v-color-picker
+                        v-model="tab_colors.home"
+                        :disabled="site_props.selected_theme !== null"
+                        mode="hex"
+                        hide-inputs
+                        class="preview-color-pick"
+                        @input="hideNextStep()"
+                      >
+                      </v-color-picker>
+                      <v-flex class="mt-3">
+                        <p>Text Color</p>
+                        <v-radio-group
+                          v-model="tab_text_color"
+                          :disabled="site_props.text_border_color"
+                          @change="hideNextStep()"
                         >
-                        <v-btn text color="orange" @click="nextTheme('left')"
-                          >Previous</v-btn
-                        >
-                      </v-card-actions>
+                          <v-radio label="White" value="white"></v-radio>
+                          <v-radio label="Black" value="black"></v-radio>
+                        </v-radio-group>
+                      </v-flex>
                     </v-card>
-                  </transition>
-                </v-flex>
-                <v-flex v-if="page_option === 2">
-                  <v-switch
-                    v-model="custom_background"
-                    :disabled="site_props.selected_theme !== null"
-                    label="Site Background"
-                    inset
-                    @change="hideNextStep()"
-                  ></v-switch>
 
-                  <v-flex
-                    v-if="custom_background"
-                    class="d-flex flex-column align-center justify-center"
-                  >
-                    <p>Select Color</p>
-                    <v-color-picker
-                      v-model="customise_background_color"
-                      hide-inputs
-                      mode="hex"
-                      show-swatches
-                      class="preview-color-pick"
-                      @change="hideNextStep()"
-                    ></v-color-picker>
+                    <v-card class="d-flex flex-column pa-3 my-4" elevation="2">
+                      <p class="align-self-center">Projects Tab</p>
+                      <v-text-field
+                        v-model="nav_title_projects"
+                        :rules="[
+                          () =>
+                            (!!nav_title_projects &&
+                              nav_title_projects.length >= 2) ||
+                            'Min 2 characters',
+                          () =>
+                            (!!nav_title_projects &&
+                              nav_title_projects.length <= 12) ||
+                            'Max 12 characters'
+                        ]"
+                        label="Change Text"
+                        outlined
+                        @change="hideNextStep()"
+                      >
+                      </v-text-field>
+                      <p class="align-self-center">Tab Color</p>
+                      <v-color-picker
+                        v-model="tab_colors.projects"
+                        :disabled="site_props.selected_theme !== null"
+                        mode="hex"
+                        hide-inputs
+                        class="preview-color-pick"
+                        @input="hideNextStep()"
+                      >
+                      </v-color-picker>
+                      <v-flex class="mt-3">
+                        <p>Text Color</p>
+                        <v-radio-group
+                          v-model="tab_text_color"
+                          :disabled="site_props.text_border_color"
+                          @change="hideNextStep()"
+                        >
+                          <v-radio label="White" value="white"></v-radio>
+                          <v-radio label="Black" value="black"></v-radio>
+                        </v-radio-group>
+                      </v-flex>
+                    </v-card>
+
+                    <v-card class="d-flex flex-column pa-3 my-4" elevation="2">
+                      <p class="align-self-center">Resume Tab</p>
+                      <v-text-field
+                        v-model="nav_title_resume"
+                        :rules="[
+                          () =>
+                            (!!nav_title_resume &&
+                              nav_title_resume.length >= 2) ||
+                            'Min 2 characters',
+                          () =>
+                            (!!nav_title_resume &&
+                              nav_title_resume.length <= 12) ||
+                            'Max 12 characters'
+                        ]"
+                        label="Change Text"
+                        outlined
+                        @change="hideNextStep()"
+                      >
+                      </v-text-field>
+                      <p class="align-self-center">Tab Color</p>
+                      <v-color-picker
+                        v-model="tab_colors.resume"
+                        :disabled="site_props.selected_theme !== null"
+                        mode="hex"
+                        hide-inputs
+                        class="preview-color-pick"
+                        @input="hideNextStep()"
+                      >
+                      </v-color-picker>
+                      <v-flex class="mt-3">
+                        <p>Text Color</p>
+                        <v-radio-group
+                          v-model="tab_text_color"
+                          :disabled="site_props.text_border_color"
+                          @change="hideNextStep()"
+                        >
+                          <v-radio label="White" value="white"></v-radio>
+                          <v-radio label="Black" value="black"></v-radio>
+                        </v-radio-group>
+                      </v-flex>
+                    </v-card>
                   </v-flex>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
 
-                  <v-switch
-                    v-model="custom_foreground"
-                    :disabled="site_props.selected_theme !== null"
-                    label="Site Foreground"
-                    inset
-                    @change="hideNextStep()"
-                  ></v-switch>
+              <!-- PAGES TAB -->
 
-                  <v-flex
-                    v-if="custom_foreground"
-                    class="d-flex flex-column align-center justify-center"
-                  >
-                    <p>Select Color</p>
-                    <v-color-picker
-                      v-model="customise_foreground_color"
-                      hide-inputs
-                      mode="hex"
-                      show-swatches
-                      class="preview-color-pick"
+              <v-expansion-panel>
+                <v-expansion-panel-header>Pages</v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-flex class="pt-3">
+                    <v-select
+                      v-model="page_option"
+                      :items="page_customise_select"
+                      label="Select option..."
+                      solo
                       @change="hideNextStep()"
-                    ></v-color-picker>
+                    >
+                    </v-select>
                   </v-flex>
-                  <v-flex v-if="custom_foreground">
-                    <!-- <p>Text and border colors</p> -->
+                  <v-flex v-if="page_option === 1">
+                    <transition
+                      name="preview-page"
+                      enter-active-class="animated fadeIn faster"
+                      leave-active-class="animated fadeOut faster"
+                      mode="out-in"
+                    >
+                      <v-card
+                        v-for="theme in page_theme_options"
+                        :key="theme.id"
+                        class="mx-auto"
+                        min-height="380"
+                      >
+                        <v-img class="black--text" height="200px" src="#">
+                          <v-card-title class="align-end fill-height">{{
+                            theme.title
+                          }}</v-card-title>
+                        </v-img>
+                        <v-card-text>
+                          <span>{{ theme.small_desc }}</span
+                          ><br />
+                          <span class="text--primary">
+                            <span>{{ theme.desc }}</span
+                            ><br />
+                          </span>
+                        </v-card-text>
+                        <v-card-actions>
+                          <v-btn color="success" @click="selectTheme(theme.id)">
+                            <v-icon
+                              v-if="theme.id === site_props.selected_theme"
+                              left
+                              >mdi-pencil</v-icon
+                            >
+                            {{ themeSelected(theme.id) }}
+                          </v-btn>
+                          <v-btn text color="orange" @click="nextTheme('right')"
+                            >Next</v-btn
+                          >
+                          <v-btn text color="orange" @click="nextTheme('left')"
+                            >Previous</v-btn
+                          >
+                        </v-card-actions>
+                      </v-card>
+                    </transition>
+                  </v-flex>
+                  <v-flex v-if="page_option === 2">
                     <v-switch
-                      v-model="text_border_color"
+                      v-model="custom_background"
                       :disabled="site_props.selected_theme !== null"
-                      label="Text and border colors"
+                      label="Site Background"
                       inset
                       @change="hideNextStep()"
                     ></v-switch>
+
                     <v-flex
-                      v-if="text_border_color"
+                      v-if="custom_background"
                       class="d-flex flex-column align-center justify-center"
                     >
                       <p>Select Color</p>
                       <v-color-picker
-                        v-model="text_border_color_value"
+                        v-model="customise_background_color"
                         hide-inputs
                         mode="hex"
                         show-swatches
@@ -1334,480 +1302,214 @@ export default {
                         @change="hideNextStep()"
                       ></v-color-picker>
                     </v-flex>
-                  </v-flex>
-                </v-flex>
-                <v-flex class="mt-3">
-                  <p>Pages</p>
-                  <v-select
-                    v-model="customise_page_option"
-                    :items="currentTabs"
-                    label="Select Tab..."
-                    solo
-                  >
-                  </v-select>
 
-                  <v-select
-                    v-if="customise_page_option !== null"
-                    v-model="customise_page_option_number"
-                    :items="currentPages"
-                    label="Select Page..."
-                    solo
-                    @change="gotoPage()"
-                  ></v-select>
-                  <v-sheet
-                    v-if="customise_page_option_number !== null"
-                    class="mx-auto"
-                    elevation="8"
-                    max-width="800"
-                  >
-                    <v-slide-group
-                      v-model="page_template_model"
-                      class="pa-4"
-                      show-arrows
+                    <v-switch
+                      v-model="custom_foreground"
+                      :disabled="site_props.selected_theme !== null"
+                      label="Site Foreground"
+                      inset
                       @change="hideNextStep()"
+                    ></v-switch>
+
+                    <v-flex
+                      v-if="custom_foreground"
+                      class="d-flex flex-column align-center justify-center"
                     >
-                      <v-slide-item
-                        v-for="template in pageTemplates"
-                        :key="template.id"
-                        v-slot:default="{ active, toggle }"
-                        :value="template.id"
-                      >
-                        <v-card
-                          class="ma-4 d-flex flex-column"
-                          width="270"
-                          height="300"
-                          @click="toggle"
-                        >
-                          <v-btn
-                            style="height: 10%;"
-                            icon
-                            :color="active ? 'info' : ''"
-                            class="align-self-end"
-                          >
-                            <v-icon size="26">{{
-                              active ? 'mdi-check' : 'mdi-plus'
-                            }}</v-icon>
-                          </v-btn>
-                          <client-only placeholder="loading">
-                            <LoadableComponent
-                              :component-name="template.component"
-                              :options="{
-                                input_dict_name:
-                                  activeNav +
-                                  '_page_' +
-                                  activeNav_index +
-                                  '_inputs',
-                                show_theme: false,
-                                preview: true,
-                                height: 100,
-                                width: 100
-                              }"
-                            ></LoadableComponent>
-                          </client-only>
-                        </v-card>
-                      </v-slide-item>
-                    </v-slide-group>
-
-                    <v-flex class="d-flex justify-center align-center">
-                      <v-btn
-                        color="error"
-                        class="mr-2"
-                        :disabled="activeNav === 'resume'"
-                        @click="deletePage()"
-                      >
-                        <v-icon>mdi-delete</v-icon>
-                      </v-btn>
-                      <v-btn
-                        color="success"
-                        class="ml-2"
-                        :disabled="activeNav === 'resume'"
-                        @click="addPage()"
-                      >
-                        <v-icon>mdi-plus</v-icon>
-                      </v-btn>
+                      <p>Select Color</p>
+                      <v-color-picker
+                        v-model="customise_foreground_color"
+                        hide-inputs
+                        mode="hex"
+                        show-swatches
+                        class="preview-color-pick"
+                        @change="hideNextStep()"
+                      ></v-color-picker>
                     </v-flex>
-                  </v-sheet>
-                </v-flex>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
-        </v-row>
-        <v-flex
-          class="save-btn-container d-flex justify-center align-center mt-3"
-        >
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                large=""
-                rounded
-                color="success"
-                class="mr-3"
-                v-on="on"
-                @click="saveChanges()"
-              >
-                <v-icon>mdi-content-save</v-icon>
-              </v-btn>
-            </template>
-            <span>Save Changes</span>
-          </v-tooltip>
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                large
-                rounded
-                color="error"
-                class="ml-3"
-                v-on="on"
-                @click="clearChanges()"
-              >
-                <v-icon>mdi-delete-forever</v-icon>
-              </v-btn>
-            </template>
-            <span>Delete All Changes</span>
-          </v-tooltip>
+                    <v-flex v-if="custom_foreground">
+                      <!-- <p>Text and border colors</p> -->
+                      <v-switch
+                        v-model="text_border_color"
+                        :disabled="site_props.selected_theme !== null"
+                        label="Text and border colors"
+                        inset
+                        @change="hideNextStep()"
+                      ></v-switch>
+                      <v-flex
+                        v-if="text_border_color"
+                        class="d-flex flex-column align-center justify-center"
+                      >
+                        <p>Select Color</p>
+                        <v-color-picker
+                          v-model="text_border_color_value"
+                          hide-inputs
+                          mode="hex"
+                          show-swatches
+                          class="preview-color-pick"
+                          @change="hideNextStep()"
+                        ></v-color-picker>
+                      </v-flex>
+                    </v-flex>
+                  </v-flex>
+                  <v-flex class="mt-3">
+                    <p>Pages</p>
+                    <v-select
+                      v-model="customise_page_option"
+                      :items="currentTabs"
+                      label="Select Tab..."
+                      solo
+                    >
+                    </v-select>
+
+                    <v-select
+                      v-if="customise_page_option !== null"
+                      v-model="customise_page_option_number"
+                      :items="currentPages"
+                      label="Select Page..."
+                      solo
+                      @change="gotoPage()"
+                    ></v-select>
+                    <v-sheet
+                      v-if="customise_page_option_number !== null"
+                      class="mx-auto"
+                      elevation="8"
+                      max-width="800"
+                    >
+                      <v-slide-group
+                        v-model="page_template_model"
+                        class="pa-4"
+                        show-arrows
+                        @change="hideNextStep()"
+                      >
+                        <v-slide-item
+                          v-for="template in pageTemplates"
+                          :key="template.id"
+                          v-slot:default="{ active, toggle }"
+                          :value="template.id"
+                        >
+                          <v-card
+                            class="ma-4 d-flex flex-column"
+                            width="270"
+                            height="300"
+                            @click="toggle"
+                          >
+                            <v-btn
+                              style="height: 10%;"
+                              icon
+                              :color="active ? 'info' : ''"
+                              class="align-self-end"
+                            >
+                              <v-icon size="26">{{
+                                active ? 'mdi-check' : 'mdi-plus'
+                              }}</v-icon>
+                            </v-btn>
+                            <client-only placeholder="loading">
+                              <LoadableComponent
+                                :component-name="template.component"
+                                :options="{
+                                  input_dict_name:
+                                    activeNav +
+                                    '_page_' +
+                                    activeNav_index +
+                                    '_inputs',
+                                  show_theme: false,
+                                  preview: true,
+                                  height: 100,
+                                  width: 100
+                                }"
+                              ></LoadableComponent>
+                            </client-only>
+                          </v-card>
+                        </v-slide-item>
+                      </v-slide-group>
+
+                      <v-flex class="d-flex justify-center align-center">
+                        <v-btn
+                          color="error"
+                          class="mr-2"
+                          :disabled="activeNav === 'resume'"
+                          @click="deletePage()"
+                        >
+                          <v-icon>mdi-delete</v-icon>
+                        </v-btn>
+                        <v-btn
+                          color="success"
+                          class="ml-2"
+                          :disabled="activeNav === 'resume'"
+                          @click="addPage()"
+                        >
+                          <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+                      </v-flex>
+                    </v-sheet>
+                  </v-flex>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </v-row>
+          <v-flex
+            class="save-btn-container d-flex justify-center align-center mt-3"
+          >
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  large=""
+                  rounded
+                  color="success"
+                  class="mr-3"
+                  v-on="on"
+                  @click="saveChanges()"
+                >
+                  <v-icon>mdi-content-save</v-icon>
+                </v-btn>
+              </template>
+              <span>Save Changes</span>
+            </v-tooltip>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  large
+                  rounded
+                  color="error"
+                  class="ml-3"
+                  v-on="on"
+                  @click="clearChanges()"
+                >
+                  <v-icon>mdi-delete-forever</v-icon>
+                </v-btn>
+              </template>
+              <span>Delete All Changes</span>
+            </v-tooltip>
+          </v-flex>
         </v-flex>
-      </v-flex>
-
-      <v-layout
-        id="creation-step-preview"
-        align-center
-        class="preview-edit-window creation-step-preview"
-        :class="{
-          'slate-light': site_props.selected_theme === 1,
-          matrix: site_props.selected_theme === 3
-        }"
-        column
-      >
-        <v-system-bar window dark class="preview-window-bar">
-          <v-icon>mdi-google-chrome</v-icon>
-          <div class="flex-grow-1"></div>
-          <v-icon>mdi-minus</v-icon>
-          <v-icon>mdi-checkbox-blank-outline</v-icon>
-          <v-icon>mdi-close</v-icon>
-        </v-system-bar>
-        <!-- <v-flex class="preview-username-container">Your Name Here</v-flex> -->
-        <v-layout align-center class="preview-page-wrapper">
-          <v-btn
-            v-if="site_props.navigation === 1"
-            :icon="site_props.textify && site_props.navigation_style === '1'"
-            :text="site_props.textify"
-            :color="getThemeColor('back')"
-            :outlined="site_props.navigation_style === '2'"
-            :rounded="site_props.navigation_style === '3'"
-            :fab="site_props.navigation_style === '1'"
-            class="preview-sidenav-btn-left"
-            @click="changePreviewPage('left')"
-          >
-            <v-icon
-              v-if="site_props.navigation_style === '1'"
-              :color="site_props.navigation_text_color"
-              class="x2"
-              >mdi-chevron-left</v-icon
-            >
-            <p
-              v-else
-              :class="{
-                'dark-nav-text': site_props.navigation_text_color === 'black',
-                'white-nav-text': site_props.navigation_text_color === 'white'
-              }"
-              class="ma-0"
-            >
-              Back
-            </p>
-          </v-btn>
-
-          <!-- PREVIEW CONTAINER -->
-
-          <v-layout
-            v-if="site_props.layout === layouts[0].name"
-            column
-            class="preview-1-page-container"
-            :style="check_color_style"
-            :class="{
-              'preview-extra-width': site_props.navigation === 2,
-              'has-border':
-                site_props.text_border_color &&
-                site_props.selected_theme === null
-            }"
-          >
-            <v-flex
-              class="preview-1-top-nav preview-nav-bar"
-              :class="{ 'matrix-card-opp': site_props.selected_theme === 3 }"
-            >
-              <!-- NAV ITEMS -->
-              <v-flex
-                class="preview-1-top-nav-item nav-home d-flex justify-center"
-                :style="check_color_style"
-                :class="{
-                  active:
-                    (activeNav === 'home' && !site_props.text_border_color) ||
-                    site_props.selected_theme !== null,
-                  customActive:
-                    activeNav === 'home' &&
-                    site_props.text_border_color &&
-                    site_props.selected_theme === null,
-                  'nav-1-item-slate': site_props.selected_theme === 1,
-                  'nav-1-item-matrix': site_props.selected_theme === 3,
-                  'dark-nav-text': site_props.tab_text_color === 'black',
-                  'white-nav-text': site_props.tab_text_color === 'white'
-                }"
-                @click="changeActiveNav('home')"
-              >
-                <p class="align-self-center ma-0">
-                  {{ site_props.nav_titles.home }}
-                </p>
-              </v-flex>
-
-              <v-flex
-                class="preview-1-top-nav-item nav-projects d-flex justify-center"
-                :style="check_color_style"
-                :class="{
-                  active:
-                    activeNav === 'projects' && !site_props.text_border_color,
-                  customActive:
-                    activeNav === 'projects' &&
-                    site_props.text_border_color &&
-                    site_props.selected_theme === null,
-                  'nav-1-item-slate': site_props.selected_theme === 1,
-                  'nav-1-item-matrix': site_props.selected_theme === 3,
-                  'dark-nav-text': site_props.tab_text_color === 'black',
-                  'white-nav-text': site_props.tab_text_color === 'white'
-                }"
-                @click="changeActiveNav('projects')"
-              >
-                <p class="align-self-center ma-0">
-                  {{ site_props.nav_titles.projects }}
-                </p>
-              </v-flex>
-
-              <v-flex
-                class="preview-1-top-nav-item nav-resume d-flex justify-center"
-                :style="check_color_style"
-                :class="{
-                  active:
-                    activeNav === 'resume' && !site_props.text_border_color,
-                  customActive:
-                    activeNav === 'resume' &&
-                    site_props.text_border_color &&
-                    site_props.selected_theme === null,
-                  'nav-1-item-slate': site_props.selected_theme === 1,
-                  'nav-1-item-matrix': site_props.selected_theme === 3,
-                  'dark-nav-text': site_props.tab_text_color === 'black',
-                  'white-nav-text': site_props.tab_text_color === 'white'
-                }"
-                @click="changeActiveNav('resume')"
-              >
-                <p class="align-self-center ma-0">
-                  {{ site_props.nav_titles.resume }}
-                </p>
-              </v-flex>
-            </v-flex>
-            <v-flex
-              class="preview-1-content-body content-body"
-              :class="{
-                slate: site_props.selected_theme === 1,
-                'matrix-card': site_props.selected_theme === 3
-              }"
-            >
-              <v-flex
-                v-if="activeNav === 'home'"
-                class="preview-1-content preview-1-home-content"
-                :class="{
-                  slate: site_props.selected_theme === 1,
-                  matrix: site_props.selected_theme === 3
-                }"
-              >
-                <transition
-                  name="preview-page"
-                  enter-active-class="animated fadeIn faster"
-                  leave-active-class="animated fadeOut faster"
-                  mode="out-in"
-                >
-                  <v-flex
-                    v-for="preview_page in home_pages"
-                    :key="preview_page.id"
-                    class="preview-1-page"
-                    :class="{
-                      slate: site_props.selected_theme === 1,
-                      matrix: site_props.selected_theme === 3
-                    }"
-                  >
-                    <LoadableComponent
-                      :component-name="preview_page.component"
-                      :options="{
-                        input_dict_name:
-                          activeNav + '_page_' + activeNav_index + '_inputs',
-                        preview: false,
-                        height: '150',
-                        width: '150'
-                      }"
-                      @update="updateInput($event)"
-                    ></LoadableComponent>
-                  </v-flex>
-                </transition>
-              </v-flex>
-              <v-flex
-                v-if="activeNav === 'projects'"
-                class="preview-1-content preview-1-projects-content"
-                :class="{
-                  slate: site_props.selected_theme === 1,
-                  matrix: site_props.selected_theme === 3
-                }"
-              >
-                <transition
-                  name="preview-page"
-                  enter-active-class="animated fadeIn faster"
-                  leave-active-class="animated fadeOut faster"
-                  mode="out-in"
-                >
-                  <v-flex
-                    v-for="preview_page in projects_pages"
-                    :key="preview_page.id"
-                    class="preview-1-page"
-                    :class="{
-                      slate: site_props.selected_theme === 1,
-                      matrix: site_props.selected_theme === 3
-                    }"
-                  >
-                    <LoadableComponent
-                      :component-name="preview_page.component"
-                      :options="{
-                        input_dict_name:
-                          activeNav + '_page_' + activeNav_index + '_inputs',
-                        preview: false,
-                        height: '150',
-                        width: '150'
-                      }"
-                      @update="updateInput($event)"
-                    ></LoadableComponent>
-                  </v-flex>
-                </transition>
-              </v-flex>
-              <v-flex
-                v-if="activeNav === 'resume'"
-                class="preview-1-content preview-1-resume-content"
-                :class="{
-                  slate: site_props.selected_theme === 1,
-                  matrix: site_props.selected_theme === 3
-                }"
-              >
-                <transition
-                  name="preview-page"
-                  enter-active-class="animated fadeIn faster"
-                  leave-active-class="animated fadeOut faster"
-                  mode="out-in"
-                >
-                  <v-flex
-                    v-for="preview_page in resume_pages"
-                    :key="preview_page.id"
-                    class="preview-1-page"
-                    :class="{
-                      slate: site_props.selected_theme === 1,
-                      matrix: site_props.selected_theme === 3
-                    }"
-                  >
-                    <LoadableComponent
-                      :component-name="preview_page.component"
-                      :options="{
-                        input_dict_name:
-                          activeNav + '_page_' + activeNav_index + '_inputs',
-                        preview: false,
-                        height: '150',
-                        width: '150'
-                      }"
-                      @update="updateInput($event)"
-                    ></LoadableComponent>
-                  </v-flex>
-                </transition>
-              </v-flex>
-            </v-flex>
-          </v-layout>
-
-          <v-layout
-            v-if="site_props.layout === layouts[1].name"
-            class="preview-2-page-container"
-          >
-            <v-layout column class="preview-2-sidenav">
-              <v-flex
-                v-for="page in mandatory_page_options"
-                :key="page.id"
-                class="preview-2-sidenav-item sidenav-item"
-              ></v-flex>
-              <v-flex
-                class="preview-2-sidenav-custom-btn sidenav-item"
-              ></v-flex>
-            </v-layout>
-            <v-flex class="preview-2-content-body"></v-flex>
-          </v-layout>
-
-          <v-layout
-            v-if="site_props.layout === layouts[2].name"
-            column
-            align-center
-            :class="{
-              'preview-3-page-container': site_props.navigation === 0,
-              'preview-3-page-container-sidenav': site_props.navigation === 1
-            }"
-          >
-            <v-layout class="preview-3-content-body"></v-layout>
-            <v-layout class="preview-3-bottom-nav">
-              <v-flex
-                v-for="page in mandatory_page_options"
-                :key="page.id"
-                class="preview-3-bottom-nav-item"
-                :class="{
-                  'round-corner-bottom-right':
-                    page.id === mandatory_page_options.length,
-                  'round-corner-bottom-left': page.id === 1
-                }"
-              ></v-flex>
-            </v-layout>
-          </v-layout>
-
-          <v-btn
-            v-if="site_props.navigation === 1"
-            :icon="site_props.textify && site_props.navigation_style === '1'"
-            :text="site_props.textify"
-            :color="getThemeColor('next')"
-            :outlined="site_props.navigation_style === '2'"
-            :rounded="site_props.navigation_style === '3'"
-            :fab="site_props.navigation_style === '1'"
-            class="preview-sidenav-btn-right"
-            @click="changePreviewPage('right')"
-          >
-            <v-icon
-              v-if="site_props.navigation_style === '1'"
-              :color="site_props.navigation_text_color"
-              class="x2"
-              >mdi-chevron-right</v-icon
-            >
-            <p
-              v-else
-              :class="{
-                'dark-nav-text': site_props.navigation_text_color === 'black',
-                'white-nav-text': site_props.navigation_text_color === 'white'
-              }"
-              class="ma-0"
-            >
-              Next
-            </p>
-          </v-btn>
-        </v-layout>
 
         <v-layout
-          v-if="site_props.navigation === 0"
-          class="preview-bottom-nav-arrows"
+          id="creation-step-preview"
+          align-center
+          class="preview-edit-window creation-step-preview"
+          :class="{
+            'slate-light': site_props.selected_theme === 1,
+            matrix: site_props.selected_theme === 3
+          }"
+          column
         >
-          <v-flex>
+          <v-system-bar window dark class="preview-window-bar">
+            <v-icon>mdi-google-chrome</v-icon>
+            <div class="flex-grow-1"></div>
+            <v-icon>mdi-minus</v-icon>
+            <v-icon>mdi-checkbox-blank-outline</v-icon>
+            <v-icon>mdi-close</v-icon>
+          </v-system-bar>
+          <!-- <v-flex class="preview-username-container">Your Name Here</v-flex> -->
+          <v-layout align-center class="preview-page-wrapper">
             <v-btn
-              v-if="site_props.navigation === 0"
+              v-if="site_props.navigation === 1"
               :icon="site_props.textify && site_props.navigation_style === '1'"
               :text="site_props.textify"
               :color="getThemeColor('back')"
               :outlined="site_props.navigation_style === '2'"
               :rounded="site_props.navigation_style === '3'"
               :fab="site_props.navigation_style === '1'"
-              class="preview-bottom-nav-btn-left"
+              class="preview-sidenav-btn-left"
               @click="changePreviewPage('left')"
             >
               <v-icon
@@ -1827,17 +1529,264 @@ export default {
                 Back
               </p>
             </v-btn>
-          </v-flex>
-          <v-flex class="d-flex justify-end">
+
+            <!-- PREVIEW CONTAINER -->
+
+            <v-layout
+              v-if="site_props.layout === layouts[0].name"
+              column
+              class="preview-1-page-container"
+              :style="check_color_style"
+              :class="{
+                'preview-extra-width': site_props.navigation === 2,
+                'has-border':
+                  site_props.text_border_color &&
+                  site_props.selected_theme === null
+              }"
+            >
+              <v-flex
+                class="preview-1-top-nav preview-nav-bar"
+                :class="{ 'matrix-card-opp': site_props.selected_theme === 3 }"
+              >
+                <!-- NAV ITEMS -->
+                <v-flex
+                  class="preview-1-top-nav-item nav-home d-flex justify-center"
+                  :style="check_color_style"
+                  :class="{
+                    active:
+                      (activeNav === 'home' && !site_props.text_border_color) ||
+                      site_props.selected_theme !== null,
+                    customActive:
+                      activeNav === 'home' &&
+                      site_props.text_border_color &&
+                      site_props.selected_theme === null,
+                    'nav-1-item-slate': site_props.selected_theme === 1,
+                    'nav-1-item-matrix': site_props.selected_theme === 3,
+                    'dark-nav-text': site_props.tab_text_color === 'black',
+                    'white-nav-text': site_props.tab_text_color === 'white'
+                  }"
+                  @click="changeActiveNav('home')"
+                >
+                  <p class="align-self-center ma-0">
+                    {{ site_props.nav_titles.home }}
+                  </p>
+                </v-flex>
+
+                <v-flex
+                  class="preview-1-top-nav-item nav-projects d-flex justify-center"
+                  :style="check_color_style"
+                  :class="{
+                    active:
+                      activeNav === 'projects' && !site_props.text_border_color,
+                    customActive:
+                      activeNav === 'projects' &&
+                      site_props.text_border_color &&
+                      site_props.selected_theme === null,
+                    'nav-1-item-slate': site_props.selected_theme === 1,
+                    'nav-1-item-matrix': site_props.selected_theme === 3,
+                    'dark-nav-text': site_props.tab_text_color === 'black',
+                    'white-nav-text': site_props.tab_text_color === 'white'
+                  }"
+                  @click="changeActiveNav('projects')"
+                >
+                  <p class="align-self-center ma-0">
+                    {{ site_props.nav_titles.projects }}
+                  </p>
+                </v-flex>
+
+                <v-flex
+                  class="preview-1-top-nav-item nav-resume d-flex justify-center"
+                  :style="check_color_style"
+                  :class="{
+                    active:
+                      activeNav === 'resume' && !site_props.text_border_color,
+                    customActive:
+                      activeNav === 'resume' &&
+                      site_props.text_border_color &&
+                      site_props.selected_theme === null,
+                    'nav-1-item-slate': site_props.selected_theme === 1,
+                    'nav-1-item-matrix': site_props.selected_theme === 3,
+                    'dark-nav-text': site_props.tab_text_color === 'black',
+                    'white-nav-text': site_props.tab_text_color === 'white'
+                  }"
+                  @click="changeActiveNav('resume')"
+                >
+                  <p class="align-self-center ma-0">
+                    {{ site_props.nav_titles.resume }}
+                  </p>
+                </v-flex>
+              </v-flex>
+              <v-flex
+                class="preview-1-content-body content-body"
+                :class="{
+                  slate: site_props.selected_theme === 1,
+                  'matrix-card': site_props.selected_theme === 3
+                }"
+              >
+                <v-flex
+                  v-if="activeNav === 'home'"
+                  class="preview-1-content preview-1-home-content"
+                  :class="{
+                    slate: site_props.selected_theme === 1,
+                    matrix: site_props.selected_theme === 3
+                  }"
+                >
+                  <transition
+                    name="preview-page"
+                    enter-active-class="animated fadeIn faster"
+                    leave-active-class="animated fadeOut faster"
+                    mode="out-in"
+                  >
+                    <v-flex
+                      v-for="preview_page in home_pages"
+                      :key="preview_page.id"
+                      class="preview-1-page"
+                      :class="{
+                        slate: site_props.selected_theme === 1,
+                        matrix: site_props.selected_theme === 3
+                      }"
+                    >
+                      <LoadableComponent
+                        :component-name="preview_page.component"
+                        :options="{
+                          input_dict_name:
+                            activeNav + '_page_' + activeNav_index + '_inputs',
+                          preview: false,
+                          height: '150',
+                          width: '150'
+                        }"
+                        @update="updateInput($event)"
+                      ></LoadableComponent>
+                    </v-flex>
+                  </transition>
+                </v-flex>
+                <v-flex
+                  v-if="activeNav === 'projects'"
+                  class="preview-1-content preview-1-projects-content"
+                  :class="{
+                    slate: site_props.selected_theme === 1,
+                    matrix: site_props.selected_theme === 3
+                  }"
+                >
+                  <transition
+                    name="preview-page"
+                    enter-active-class="animated fadeIn faster"
+                    leave-active-class="animated fadeOut faster"
+                    mode="out-in"
+                  >
+                    <v-flex
+                      v-for="preview_page in projects_pages"
+                      :key="preview_page.id"
+                      class="preview-1-page"
+                      :class="{
+                        slate: site_props.selected_theme === 1,
+                        matrix: site_props.selected_theme === 3
+                      }"
+                    >
+                      <LoadableComponent
+                        :component-name="preview_page.component"
+                        :options="{
+                          input_dict_name:
+                            activeNav + '_page_' + activeNav_index + '_inputs',
+                          preview: false,
+                          height: '150',
+                          width: '150'
+                        }"
+                        @update="updateInput($event)"
+                      ></LoadableComponent>
+                    </v-flex>
+                  </transition>
+                </v-flex>
+                <v-flex
+                  v-if="activeNav === 'resume'"
+                  class="preview-1-content preview-1-resume-content"
+                  :class="{
+                    slate: site_props.selected_theme === 1,
+                    matrix: site_props.selected_theme === 3
+                  }"
+                >
+                  <transition
+                    name="preview-page"
+                    enter-active-class="animated fadeIn faster"
+                    leave-active-class="animated fadeOut faster"
+                    mode="out-in"
+                  >
+                    <v-flex
+                      v-for="preview_page in resume_pages"
+                      :key="preview_page.id"
+                      class="preview-1-page"
+                      :class="{
+                        slate: site_props.selected_theme === 1,
+                        matrix: site_props.selected_theme === 3
+                      }"
+                    >
+                      <LoadableComponent
+                        :component-name="preview_page.component"
+                        :options="{
+                          input_dict_name:
+                            activeNav + '_page_' + activeNav_index + '_inputs',
+                          preview: false,
+                          height: '150',
+                          width: '150'
+                        }"
+                        @update="updateInput($event)"
+                      ></LoadableComponent>
+                    </v-flex>
+                  </transition>
+                </v-flex>
+              </v-flex>
+            </v-layout>
+
+            <v-layout
+              v-if="site_props.layout === layouts[1].name"
+              class="preview-2-page-container"
+            >
+              <v-layout column class="preview-2-sidenav">
+                <v-flex
+                  v-for="page in mandatory_page_options"
+                  :key="page.id"
+                  class="preview-2-sidenav-item sidenav-item"
+                ></v-flex>
+                <v-flex
+                  class="preview-2-sidenav-custom-btn sidenav-item"
+                ></v-flex>
+              </v-layout>
+              <v-flex class="preview-2-content-body"></v-flex>
+            </v-layout>
+
+            <v-layout
+              v-if="site_props.layout === layouts[2].name"
+              column
+              align-center
+              :class="{
+                'preview-3-page-container': site_props.navigation === 0,
+                'preview-3-page-container-sidenav': site_props.navigation === 1
+              }"
+            >
+              <v-layout class="preview-3-content-body"></v-layout>
+              <v-layout class="preview-3-bottom-nav">
+                <v-flex
+                  v-for="page in mandatory_page_options"
+                  :key="page.id"
+                  class="preview-3-bottom-nav-item"
+                  :class="{
+                    'round-corner-bottom-right':
+                      page.id === mandatory_page_options.length,
+                    'round-corner-bottom-left': page.id === 1
+                  }"
+                ></v-flex>
+              </v-layout>
+            </v-layout>
+
             <v-btn
-              v-if="site_props.navigation === 0"
+              v-if="site_props.navigation === 1"
               :icon="site_props.textify && site_props.navigation_style === '1'"
               :text="site_props.textify"
               :color="getThemeColor('next')"
               :outlined="site_props.navigation_style === '2'"
               :rounded="site_props.navigation_style === '3'"
               :fab="site_props.navigation_style === '1'"
-              class="preview-bottom-nav-btn-right"
+              class="preview-sidenav-btn-right"
               @click="changePreviewPage('right')"
             >
               <v-icon
@@ -1849,55 +1798,129 @@ export default {
               <p
                 v-else
                 :class="{
-                  'dark-nav-text':
-                    site_props.navigation_text_color === 'black' &&
-                    site_props.selected_theme === null,
-                  'white-nav-text':
-                    site_props.navigation_text_color === 'white' &&
-                    site_props.selected_theme === null
+                  'dark-nav-text': site_props.navigation_text_color === 'black',
+                  'white-nav-text': site_props.navigation_text_color === 'white'
                 }"
                 class="ma-0"
               >
                 Next
               </p>
             </v-btn>
-          </v-flex>
+          </v-layout>
+
+          <v-layout
+            v-if="site_props.navigation === 0"
+            class="preview-bottom-nav-arrows"
+          >
+            <v-flex>
+              <v-btn
+                v-if="site_props.navigation === 0"
+                :icon="
+                  site_props.textify && site_props.navigation_style === '1'
+                "
+                :text="site_props.textify"
+                :color="getThemeColor('back')"
+                :outlined="site_props.navigation_style === '2'"
+                :rounded="site_props.navigation_style === '3'"
+                :fab="site_props.navigation_style === '1'"
+                class="preview-bottom-nav-btn-left"
+                @click="changePreviewPage('left')"
+              >
+                <v-icon
+                  v-if="site_props.navigation_style === '1'"
+                  :color="site_props.navigation_text_color"
+                  class="x2"
+                  >mdi-chevron-left</v-icon
+                >
+                <p
+                  v-else
+                  :class="{
+                    'dark-nav-text':
+                      site_props.navigation_text_color === 'black',
+                    'white-nav-text':
+                      site_props.navigation_text_color === 'white'
+                  }"
+                  class="ma-0"
+                >
+                  Back
+                </p>
+              </v-btn>
+            </v-flex>
+            <v-flex class="d-flex justify-end">
+              <v-btn
+                v-if="site_props.navigation === 0"
+                :icon="
+                  site_props.textify && site_props.navigation_style === '1'
+                "
+                :text="site_props.textify"
+                :color="getThemeColor('next')"
+                :outlined="site_props.navigation_style === '2'"
+                :rounded="site_props.navigation_style === '3'"
+                :fab="site_props.navigation_style === '1'"
+                class="preview-bottom-nav-btn-right"
+                @click="changePreviewPage('right')"
+              >
+                <v-icon
+                  v-if="site_props.navigation_style === '1'"
+                  :color="site_props.navigation_text_color"
+                  class="x2"
+                  >mdi-chevron-right</v-icon
+                >
+                <p
+                  v-else
+                  :class="{
+                    'dark-nav-text':
+                      site_props.navigation_text_color === 'black' &&
+                      site_props.selected_theme === null,
+                    'white-nav-text':
+                      site_props.navigation_text_color === 'white' &&
+                      site_props.selected_theme === null
+                  }"
+                  class="ma-0"
+                >
+                  Next
+                </p>
+              </v-btn>
+            </v-flex>
+          </v-layout>
         </v-layout>
       </v-layout>
-    </v-layout>
 
-    <v-layout
-      v-show="checkStepCount(2)"
-      class="creation-step justify-center creation-site-name-wrapper"
-      align-center
-    >
-      <div class="creation-name pa-5 elevation-2">
-        <v-flex class="">
-          <div class="title-2">Your Site Name</div>
-          <div class="subtitle-2">Your site in your browser tabs</div>
-        </v-flex>
+      <v-layout
+        v-else-if="checkStepCount(2)"
+        key="2"
+        class="creation-step justify-center creation-site-name-wrapper"
+        align-center
+      >
+        <div class="creation-name pa-5 elevation-2">
+          <v-flex class="">
+            <div class="title-2">Your Site Name</div>
+            <div class="subtitle-2">Your site in your browser tabs</div>
+          </v-flex>
 
-        <v-flex class="">
-          <v-text-field
-            ref="site_name"
-            v-model="site_name"
-            label="Name"
-            placeholder="John Doe: My Site"
-            :rules="[
-              rules.required,
-              () =>
-                (!!site_props.site_name && site_props.site_name.length <= 20) ||
-                'Max 20 characters'
-            ]"
-            outline
-          >
-          </v-text-field>
-          <v-btn v-if="!validating" color="info" @click="validateName()"
-            >Submit</v-btn
-          >
-        </v-flex>
-      </div>
-    </v-layout>
+          <v-flex class="">
+            <v-text-field
+              ref="site_name"
+              v-model="site_name"
+              label="Name"
+              placeholder="John Doe: My Site"
+              :rules="[
+                rules.required,
+                () =>
+                  (!!site_props.site_name &&
+                    site_props.site_name.length <= 20) ||
+                  'Max 20 characters'
+              ]"
+              outline
+            >
+            </v-text-field>
+            <v-btn v-if="!validating" color="info" @click="validateName()"
+              >Submit</v-btn
+            >
+          </v-flex>
+        </div>
+      </v-layout>
+    </transition>
     <v-snackbar v-model="show_page_add_error" left color="error">
       No more pages can be added!
       <v-btn icon @click="show_page_add_error = false">

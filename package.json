@@ -13,11 +13,12 @@
     "test": "jest"
   },
   "dependencies": {
-    "@nuxtjs/axios": "^5.6.0",
+    "@nuxtjs/axios": "^5.8.0",
     "animate.css": "^3.7.2",
     "cross-env": "^6.0.3",
     "express": "^4.17.1",
-    "nuxt": "^2.10.1"
+    "nuxt": "^2.10.2",
+    "vue-the-mask": "^0.11.1"
   },
   "devDependencies": {
     "@mdi/font": "^4.5.95",
@@ -27,12 +28,12 @@
     "@vue/test-utils": "^1.0.0-beta.27",
     "babel-eslint": "^10.0.3",
     "babel-jest": "^24.9.0",
-    "eslint": "^6.5.1",
-    "eslint-config-prettier": "^6.4.0",
+    "eslint": "^6.6.0",
+    "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-nuxt": ">=0.4.3",
     "eslint-plugin-prettier": "^3.1.1",
     "jest": "^24.9.0",
-    "nodemon": "^1.19.3",
+    "nodemon": "^1.19.4",
     "prettier": "^1.18.2",
     "vue-jest": "^4.0.0-0"
   }

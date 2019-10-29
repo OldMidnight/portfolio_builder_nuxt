@@ -32,7 +32,11 @@ module.exports = {
   /*
    ** Global CSS
    */
-  css: ['animate.css/animate.min.css'],
+  css: [
+    'animate.css/animate.min.css',
+    '~/assets/main.css',
+    '~/assets/variables.scss'
+  ],
   /*
    ** Plugins to load before mounting the App
    */
@@ -106,6 +110,10 @@ module.exports = {
    */
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
+    defaultAssets: {
+      font: false
+    },
+    treeshake: true,
     theme: {
       dark: false,
       themes: {
@@ -141,5 +149,13 @@ module.exports = {
         })
       }
     }
+  },
+  pageTransition: {
+    enterActiveClass: 'animated fadeIn fast',
+    leaveActiveClass: 'animated fadeOut fast'
+  },
+  layoutTransition: {
+    enterActiveClass: 'animated fadeIn',
+    leaveActiveClass: 'animated fadeOut'
   }
 }

@@ -1,5 +1,7 @@
 <script>
+import LoadableComponent from '@/components/helpers/loadable_component'
 export default {
+  components: { LoadableComponent },
   props: {
     options: {
       type: Object,
@@ -8,6 +10,7 @@ export default {
   },
   data() {
     return {
+      transitioning: false,
       info_components: [],
       description_components: [],
       education_components: [],
@@ -17,26 +20,87 @@ export default {
       resume_wizard_dialog: false,
       resume_wizard_step: 0,
       wizard_layout_list: [
-        { id: 0, name: 'Info', text: 'This section contains information such as your name, address and how others can get in touch with you.' },
-        { id: 1, name: 'Description', text: 'This section will contain a short paragraph about yourself, and how much of an amazing person you are!' },
-        { id: 2, name: 'Education', text: 'This section will display any places of education you have attended.' },
-        { id: 3, name: 'Experience', text: 'This section will show your past and current work experiences.' },
-        { id: 4, name: 'Grades', text: 'This section will show your grades/score for any certificaton you have acheived.' },
-        { id: 5, name: 'Interest', text: 'Here you can run wild with all your interests and hobbies that keep you occupied in your free time.' }
+        {
+          id: 0,
+          name: 'Info',
+          text:
+            'This section contains information such as your name, address and how others can get in touch with you.'
+        },
+        {
+          id: 1,
+          name: 'Description',
+          text:
+            'This section will contain a short paragraph about yourself, and how much of an amazing person you are!'
+        },
+        {
+          id: 2,
+          name: 'Education',
+          text:
+            'This section will display any places of education you have attended.'
+        },
+        {
+          id: 3,
+          name: 'Experience',
+          text: 'This section will show your past and current work experiences.'
+        },
+        {
+          id: 4,
+          name: 'Grades',
+          text:
+            'This section will show your grades/score for any certificaton you have acheived.'
+        },
+        {
+          id: 5,
+          name: 'Interests',
+          text:
+            'Here you can run wild with all your interests and hobbies that keep you occupied in your free time.'
+        }
       ],
-      available_sections: []
+      available_sections: [],
+      section_component: {
+        info_component: null,
+        description_component: null,
+        education_component: null,
+        experience_component: null,
+        grades_component: null,
+        interests_component: null
+      }
+    }
+  },
+  computed: {
+    component_list() {
+      const vm = this
+      return function(name) {
+        return vm[name.toLowerCase() + '_components']
+      }
+    },
+    wizard_layout_list_customise() {
+      // Add +3 to the id's of wizard_layout_list items so they coincide with the wizard step
+      let sectionList = []
+      for (const section of this.wizard_layout_list) {
+        if (section.id + 3 === this.resume_wizard_step) {
+          sectionList = [section]
+        }
+      }
+      return sectionList
+    },
+    is_last_section() {
+      const vm = this
+      return function(id) {
+        return id === vm.wizard_layout_list[vm.wizard_layout_list.length - 1].id
+      }
     }
   },
   created() {
     // highest = The value of the list of components which has the highest number of components
-    const highest = 1
+    const highest = 3
 
-    const infoComponentsNum = 1
-    const descriptionComponentsNum = 1
-    const educationComponentsNum = 1
-    const experienceComponentsNum = 1
-    const gradesComponentsNum = 1
-    const interestsComponentsNum = 1
+    const infoComponentsNum = 3
+    const descriptionComponentsNum = 3
+    const educationComponentsNum = 3
+    const experienceComponentsNum = 3
+    const gradesComponentsNum = 3
+    const interestsComponentsNum = 3
 
     for (let i = 1; i <= highest; i++) {
       if (i <= infoComponentsNum) {
@@ -85,8 +149,8 @@ export default {
   },
   methods: {
     moveUp(id) {
-      let layout = this.wizard_layout_list.splice(id, 1)[0]
-      let vm = this
+      const layout = this.wizard_layout_list.splice(id, 1)[0]
+      const vm = this
       setTimeout(function() {
         vm.wizard_layout_list.splice(id - 1, 0, layout)
         for (let i = 0; i < vm.wizard_layout_list.length; i++) {
@@ -95,8 +159,8 @@ export default {
       }, 500)
     },
     moveDown(id) {
-      let layout = this.wizard_layout_list.splice(id, 1)[0]
-      let vm = this
+      const layout = this.wizard_layout_list.splice(id, 1)[0]
+      const vm = this
       setTimeout(function() {
         vm.wizard_layout_list.splice(id + 1, 0, layout)
         for (let i = 0; i < vm.wizard_layout_list.length; i++) {
@@ -104,9 +168,19 @@ export default {
         }
       }, 500)
     },
-    deleteLayout(id) {
+    deleteSection(id) {
       this.available_sections.push(this.wizard_layout_list[id])
+      for (let i = 0; i < this.available_sections.length; i++) {
+        this.available_sections[i].id = i
+      }
       this.wizard_layout_list.splice(id, 1)
+    },
+    addSection(id) {
+      this.wizard_layout_list.push(this.available_sections[id])
+      this.available_sections.splice(id, 1)
+      for (let i = 0; i < this.wizard_layout_list.length; i++) {
+        this.wizard_layout_list[i].id = i
+      }
     }
   }
 }
@@ -122,7 +196,7 @@ export default {
       persistent
       width="800"
     >
-      <v-card height="600">
+      <v-card height="600" class="wizard-dialog">
         <v-card-title class="d-flex flex-column">
           <span class="display-1 align-self-center">
             Resume Creation Wizard
@@ -133,6 +207,8 @@ export default {
             <transition
               enter-active-class="animated fadeInLeft fast"
               leave-active-class="animated fadeOutRight fast"
+              @before-leave="transitioning = true"
+              @after-leave="transitioning = false"
               mode="out-in"
             >
               <v-layout
@@ -158,58 +234,203 @@ export default {
                   </v-btn>
                 </div>
               </v-layout>
-              <v-layout v-if="resume_wizard_step === 1" key="1" class="wizard-step layout-step d-flex flex-column">
+              <v-layout
+                v-if="resume_wizard_step === 1"
+                key="1"
+                class="wizard-step layout-step d-flex flex-column"
+              >
                 <div class="layout-editor-desc d-flex flex-column align-center">
                   <span class="headline">Layout editor</span>
-                  <span>below you can edit the layout of how your resume will be displayed on your website.</span>
+                  <span>
+                    Below you can edit the layout of how your resume will be
+                    displayed on your website.
+                  </span>
+                  <!-- <span>Use the arrows to adjust the positions of the sections.</span>  -->
                 </div>
                 <v-divider></v-divider>
-                <div class="layout-editor-container d-flex test">
+                <div class="layout-editor-container d-flex">
                   <div class="layout-editor d-flex flex-column elevation-2">
                     <transition-group
                       enter-active-class="animated fadeInLeft faster"
                       leave-active-class="animated fadeOutRight faster"
                       mode="out-in"
                     >
-                      <v-flex v-for="section in wizard_layout_list" :key="section.name" class="layout-section pa-2 d-flex flex-column">
+                      <v-flex
+                        v-for="section in wizard_layout_list"
+                        :key="section.name"
+                        class="layout-section pa-2 d-flex flex-column"
+                      >
                         <span class="title">{{ section.name }}</span>
                         <span>{{ section.text }}</span>
-                        <div class="layout-section-actions d-flex justify-center">
-                          <v-btn @click="moveUp(section.id)" :disabled="section.id === wizard_layout_list[0].id" icon color="info">
+                        <div
+                          class="layout-section-actions d-flex justify-center"
+                        >
+                          <v-btn
+                            :disabled="section.id === wizard_layout_list[0].id"
+                            icon
+                            color="info"
+                            @click="moveUp(section.id)"
+                          >
                             <v-icon>mdi-chevron-up</v-icon>
                           </v-btn>
-                          <v-btn @click="moveDown(section.id)" :disabled="section.id === wizard_layout_list[wizard_layout_list.length - 1].id" icon color="info">
+                          <v-btn
+                            :disabled="is_last_section(section.id)"
+                            icon
+                            color="info"
+                            @click="moveDown(section.id)"
+                          >
                             <v-icon>mdi-chevron-down</v-icon>
                           </v-btn>
-                          <v-btn @click="deleteLayout(section.id)" icon color="errorlayouts">
+                          <v-btn
+                            icon
+                            color="error"
+                            @click="deleteSection(section.id)"
+                          >
                             <v-icon>mdi-delete</v-icon>
                           </v-btn>
                         </div>
                       </v-flex>
                     </transition-group>
                   </div>
-                  <div class="available-sections-container ml-2 test">
-                    <v-flex v-for="section in available_sections" :key="section.name" class="available-section test">
+                  <div class="available-sections-container ml-2 elevation-1">
+                    <div class="d-flex align-center justify-center pt-2">
+                      <span>Available Sections</span>
+                    </div>
+                    <v-flex
+                      v-for="section in available_sections"
+                      :key="section.name"
+                      class="available-section d-flex flex-column justify-center align-center pa-4 my-2"
+                    >
                       <span>{{ section.name }}</span>
-                      <v-btn color="success">
+                      <v-btn
+                        icon
+                        color="success"
+                        class="available-section-btn"
+                        @click="addSection(section.id)"
+                      >
                         <v-icon>mdi-plus</v-icon>
                       </v-btn>
                     </v-flex>
                   </div>
                 </div>
               </v-layout>
+              <v-layout
+                v-if="resume_wizard_step === 2"
+                key="2"
+                class="wizard-step choose-section-step d-flex flex-column"
+              >
+                <div
+                  class="d-flex flex-column align-center choose-section-desc mb-3"
+                >
+                  <span class="headline">Section Selection</span>
+                  <span>
+                    Below you can select a layout for each section of your
+                    Resume.
+                  </span>
+                </div>
+                <v-divider class="mb-3"></v-divider>
+                <div
+                  v-for="section in wizard_layout_list"
+                  :key="section.name"
+                  class="elevation-2 my-3 d-flex flex-column align-center"
+                >
+                  <span class="title">{{ section.name }} Section</span>
+                  <v-item-group
+                    v-model="
+                      section_component[
+                        section.name.toLowerCase() + '_component'
+                      ]
+                    "
+                    mandatory
+                  >
+                    <v-container>
+                      <v-row>
+                        <v-col
+                          v-for="component in component_list(section.name)"
+                          :key="component.id"
+                        >
+                          <v-item
+                            v-slot:default="{ active, toggle }"
+                            :value="component"
+                          >
+                            <v-card
+                              :color="active ? 'primary' : ''"
+                              class="d-flex align-center section-component"
+                              dark
+                              height="150"
+                              @click="toggle"
+                            >
+                              <div>
+                                <v-img src="#"></v-img>
+                              </div>
+                            </v-card>
+                          </v-item>
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-item-group>
+                </div>
+              </v-layout>
+              <v-layout
+                v-for="section in wizard_layout_list_customise"
+                :key="section.id"
+                class="wizard-step customise-section-step d-flex flex-column"
+              >
+                <div
+                  class="customise-section-desc d-flex flex-column align-center"
+                >
+                  <span class="title">
+                    Customise your: {{ section.name }} section!
+                  </span>
+                  <span>
+                    Populate this section below with details from your CV or
+                    create it now.
+                  </span>
+                </div>
+                <v-divider></v-divider>
+                <div
+                  class="customise-section d-flex flex-column align-center justify-center"
+                >
+                  <LoadableComponent
+                    :component-name="
+                      section_component[
+                        section.name.toLowerCase() + '_component'
+                      ].component
+                    "
+                    :options="{
+                      input_dict_name: 'test',
+                      preview: false,
+                      height: '150',
+                      width: '150'
+                    }"
+                  ></LoadableComponent>
+                </div>
+              </v-layout>
             </transition>
           </v-container>
         </v-card-text>
-        <v-divider></v-divider> 
+        <v-divider></v-divider>
         <v-card-actions>
           <transition
-            enter-active-class="animated fadeInUp fast"
-            leave-active-class="animated fadeOutRight fast"
+            enter-active-class="animated fadeInUp faster"
+            leave-active-class="animated fadeOutDown faster"
             mode="out-in"
           >
-            <div class="px-7" v-if="resume_wizard_step !== 0">
-              <v-btn color="info">Next</v-btn>
+            <div v-if="resume_wizard_step !== 0" key="next" class="px-7">
+              <v-btn
+                :disabled="transitioning"
+                color="info"
+                @click="resume_wizard_step += 1"
+              >
+                Next
+              </v-btn>
+              <v-btn
+                :disabled="transitioning"
+                color="error"
+                @click="resume_wizard_step -= 1"
+              >
+                Back
+              </v-btn>
             </div>
           </transition>
         </v-card-actions>
@@ -223,6 +444,10 @@ export default {
   border: 1px solid red;
 }
 
+.wizard-dialog {
+  overflow-x: hidden;
+}
+
 .resume-wizard-wrapper {
   border: 1px solid;
   background-color: white;
@@ -230,6 +455,7 @@ export default {
 
 .wizard-container {
   height: 100%;
+  overflow-x: hidden;
 }
 
 .wizard-step {
@@ -268,7 +494,7 @@ export default {
 .layout-editor {
   overflow: auto;
   height: 100%;
-  border-radius: 5px;
+  // border-radius: 5px;
   width: 70%;
 }
 
@@ -276,11 +502,28 @@ export default {
   width: 30%;
 }
 
+.available-section {
+  border: 1px dashed #b6b6b6;
+  border-radius: 10px;
+}
+
 .layout-section {
   span {
     text-align: center;
   }
-  border-top: 1px solid #b6b6b6;
+  border: 1px dashed #b6b6b6;
   // margin: 2px;
+}
+
+.section-component {
+  width: 200px;
+}
+
+.customise-section-desc {
+  height: 15%;
+}
+
+.customise-section {
+  height: 85%;
 }
 </style>

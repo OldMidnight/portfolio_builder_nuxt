@@ -135,20 +135,9 @@ export default {
     saveProject() {
       this.validated_img_url = this.temp_project.img.url
 
-      const today = new Date()
-      const date =
-        today.getFullYear() +
-        '-' +
-        (today.getMonth() + 1) +
-        '-' +
-        today.getDate()
-      const time =
-        today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds()
-      const dateTime = date + '_' + time
-
       this.temp_project.id = this.editing_project
         ? this.temp_project.id
-        : dateTime
+        : Date.now()
 
       if (this.editing_project) {
         this.$emit('update', {
