@@ -19,6 +19,7 @@ export default {
       interests_components: [],
       resume_wizard_dialog: false,
       resume_wizard_step: 0,
+      progress: 0,
       wizard_layout_list: [
         {
           id: 0,
@@ -232,7 +233,13 @@ export default {
                   </span>
                 </div>
                 <div class="wizard-get-started-btn">
-                  <v-btn color="success" @click="resume_wizard_step += 1">
+                  <v-btn
+                    color="success"
+                    @click="
+                      resume_wizard_step += 1;
+                      progress += 100 / (wizard_layout_list.length + 3)
+                    "
+                  >
                     Get Started!
                   </v-btn>
                 </div>
@@ -429,14 +436,20 @@ export default {
               <v-btn
                 :disabled="transitioning || resume_wizard_step > wizard_layout_list.length + 2"
                 color="info"
-                @click="resume_wizard_step += 1"
+                @click="
+                  resume_wizard_step += 1;
+                  progress += 100 / (wizard_layout_list.length + 3)
+                "
               >
                 Next
               </v-btn>
               <v-btn
                 :disabled="transitioning"
                 color="error"
-                @click="resume_wizard_step -= 1"
+                @click="
+                  resume_wizard_step -= 1;
+                  progress -= 100 / (wizard_layout_list.length + 3)
+                "
               >
                 Back
               </v-btn>
@@ -454,6 +467,15 @@ export default {
                   Save
                 </v-btn>
               </transition>
+              <div class="wizard-progress d-flex flex-column align-center mx-9">
+                <span class="caption">Progress</span>
+                <v-progress-linear
+                  rounded
+                  striped
+                  :value="progress"
+                  class="align-self-center"
+                ></v-progress-linear>
+              </div>
             </div>
           </transition>
         </v-card-actions>
@@ -567,6 +589,10 @@ export default {
 }
 
 .wizard-btns {
+  width: 100%;
+}
+
+.wizard-progress {
   width: 100%;
 }
 </style>
