@@ -481,6 +481,7 @@ export default {
     this.tab_colors.projects = this.site_props.tab_colors.projects
     this.tab_colors.resume = this.site_props.tab_colors.resume
     this.showNextStep()
+    this.temp_site_props = JSON.stringify(this.site_props)
   },
   methods: {
     ...mapMutations({
@@ -693,8 +694,7 @@ export default {
       this.showNextStep()
     },
     clearChanges() {
-      this.clearAllChanges()
-      // this.restoreSiteProps({site_props: this.temp_site_props})
+      this.restoreSiteProps({ site_props: this.temp_site_props })
       this.page_option = null
       this.customise_page_option = null
       this.customise_page_option_number = null
@@ -1949,7 +1949,6 @@ export default {
 
 .preview-bottom-nav-arrows {
   height: 10%;
-  width: 23%;
   margin: 0 !important;
   // border: 1px solid;
 }

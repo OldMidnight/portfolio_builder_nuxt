@@ -15,7 +15,7 @@ export default {
       description_components: [],
       education_components: [],
       experience_components: [],
-      grades_components: [],
+      certifications_components: [],
       interests_components: [],
       resume_wizard_dialog: false,
       resume_wizard_step: 0,
@@ -45,7 +45,7 @@ export default {
         },
         {
           id: 4,
-          name: 'Grades',
+          name: 'Certifications',
           text:
             'This section will show your grades/score for any certificaton you have acheived.'
         },
@@ -62,7 +62,7 @@ export default {
         description_component: null,
         education_component: null,
         experience_component: null,
-        grades_component: null,
+        certifications_component: null,
         interests_component: null
       }
     }
@@ -99,7 +99,7 @@ export default {
     const descriptionComponentsNum = 3
     const educationComponentsNum = 3
     const experienceComponentsNum = 3
-    const gradesComponentsNum = 3
+    const certificationsComponentsNum = 3
     const interestsComponentsNum = 3
 
     for (let i = 1; i <= highest; i++) {
@@ -129,10 +129,11 @@ export default {
             'resume_sections/components/experience/experience_type_' + i
         })
       }
-      if (i <= gradesComponentsNum) {
-        this.grades_components.push({
+      if (i <= certificationsComponentsNum) {
+        this.certifications_components.push({
           id: i,
-          component: 'resume_sections/components/grades/grades_type_' + i
+          component:
+            'resume_sections/components/certifications/certifications_type_' + i
         })
       }
       if (i <= interestsComponentsNum) {
@@ -142,9 +143,6 @@ export default {
             'resume_sections/components/interests_hobbies/interests_type_' + i
         })
       }
-    }
-    if (!this.options.live) {
-      this.resume_wizard_dialog = true
     }
   },
   methods: {
@@ -187,7 +185,12 @@ export default {
 </script>
 
 <template>
-  <v-container>
+  <v-container fluid fill-height>
+    <v-layout class="d-flex flex-column align-center justify-center">
+      <v-btn color="info" @click="resume_wizard_dialog = true">
+        Create Your Resume!
+      </v-btn>
+    </v-layout>
     <v-dialog
       v-if="!options.preview && !options.live"
       v-model="resume_wizard_dialog"
@@ -205,11 +208,11 @@ export default {
         <v-card-text>
           <v-container class="wizard-container">
             <transition
-              enter-active-class="animated fadeInLeft fast"
-              leave-active-class="animated fadeOutRight fast"
+              enter-active-class="animated fadeInRight faster"
+              leave-active-class="animated fadeOutLeft faster"
+              mode="out-in"
               @before-leave="transitioning = true"
               @after-leave="transitioning = false"
-              mode="out-in"
             >
               <v-layout
                 v-if="resume_wizard_step === 0"
@@ -406,6 +409,12 @@ export default {
                   ></LoadableComponent>
                 </div>
               </v-layout>
+              <v-layout class="end-page">
+                <div class="end-page-section d-flex flex-column align-center justify-center">
+                  <span class="end-page-line end-page-line-1 display-2 mb-5">That's It!</span>
+                  <span class="end-page-line end-page-line-2 headline mt-6">You're all set now, hit the Save button below to view your masterpiece!</span>
+                </div>
+              </v-layout>
             </transition>
           </v-container>
         </v-card-text>
@@ -416,7 +425,7 @@ export default {
             leave-active-class="animated fadeOutDown faster"
             mode="out-in"
           >
-            <div v-if="resume_wizard_step !== 0" key="next" class="px-7">
+            <div v-if="resume_wizard_step !== 0" key="next" class="d-flex wizard-btns px-7">
               <v-btn
                 :disabled="transitioning"
                 color="info"
@@ -431,6 +440,20 @@ export default {
               >
                 Back
               </v-btn>
+              <transition
+                enter-active-class="animated fadeInUp faster"
+                leave-active-class="animated fadeOutDown faster"
+                mode="out-in"
+              >
+                <v-btn
+                  key="save"
+                  v-if="resume_wizard_step > wizard_layout_list.length + 2"
+                  color="success"
+                  @click="resume_wizard_dialog = false"
+                >
+                  Save
+                </v-btn>
+              </transition>
             </div>
           </transition>
         </v-card-actions>
@@ -525,5 +548,25 @@ export default {
 
 .customise-section {
   height: 85%;
+}
+
+.end-page-section {
+  width: 100%;
+  height: 100%;
+  padding-right: 15%;
+  padding-left: 15%;
+}
+
+.end-page {
+  height: 100%;
+}
+
+.end-page-line {
+  color: #0066ff;
+  text-align: center
+}
+
+.wizard-btns {
+  width: 100%;
 }
 </style>

@@ -57,7 +57,7 @@ export default {
       <v-layout class="main-container">
         <v-layout class="sidenav-container"></v-layout>
 
-        <v-layout class="content-container">
+        <v-layout class="content-container d-flex flex-column align-center">
           <v-switch
             v-model="enableSite"
             :label="`Enable Site - ` + user.domain + `.kreoh.com`"
@@ -68,18 +68,18 @@ export default {
 
           <v-spacer></v-spacer>
 
-          <v-btn v-if="enableSite" color="info" href="/editor">
+          <v-btn v-if="site_available" color="info" href="/editor">
             Edit {{ user.domain }}.kreoh.com
           </v-btn>
           <v-btn
-            v-if="enableSite"
+            :disabled="!enableSite"
             color="info"
-            :href="`http://${user.domain}.localhost:8080/`"
+            :href="`http://${user.domain}.localhost:3000/`"
             target="_blank"
           >
             Visit {{ user.domain }}.kreoh.com
           </v-btn>
-          <v-btn v-if="!enableSite" color="info" href="/creator">
+          <v-btn v-if="!site_available" color="info" href="/creator">
             Create {{ user.domain }}.kreoh.com
           </v-btn>
           <v-btn color="error" href="/auth/logout">Logout</v-btn>

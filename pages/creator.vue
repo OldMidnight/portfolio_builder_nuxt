@@ -2084,7 +2084,6 @@ export default {
 
 .preview-bottom-nav-arrows {
   height: 10%;
-  width: 23%;
   margin: 0 !important;
   // border: 1px solid;
 }

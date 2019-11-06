@@ -1,7 +1,6 @@
 <script>
 export default {
   auth: false,
-  // middleware: 'get_site_config',
   data() {
     return {}
   },
@@ -13,7 +12,7 @@ export default {
       return this.$store.state.creator.is_subdomain
     },
     getLayout() {
-      if (this.$store.state.creator.is_subdomain) {
+      if (this.is_subdomain) {
         return () =>
           import(
             `@/components/user/layouts/${this.$store.state.creator.site_props.layout}`
@@ -32,6 +31,14 @@ export default {
         .then((response) => {
           store.commit('creator/setSiteProps', JSON.parse(response.site_config))
         })
+    }
+  },
+  beforeCreate() {
+    if (
+      this.$store.state.creator.is_subdomain &&
+      !this.$store.state.creator.domain.available
+    ) {
+      this.$router.push({ path: '/site_disabled' })
     }
   }
 }

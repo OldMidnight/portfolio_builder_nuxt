@@ -54,41 +54,123 @@ export const state = () => ({
         value:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
       },
-      education_section: {
-        schools: [
-          {
-            id: 0,
-            name: 'Hogwarts School of Witchcraft and Wizadry',
-            address: {
-              line_1: 'Hogwarts Castle',
-              line_2: 'Highlands',
-              line_3: 'Scotland',
-              line_4: 'Great Britain'
-            },
-            years_attended: {
-              from: '2001-01',
-              till: null
-            }
+      education_section: [
+        {
+          id: 0,
+          name: 'Hogwarts School of Witchcraft and Wizadry',
+          address: {
+            line_1: 'Hogwarts Castle',
+            line_2: 'Highlands',
+            line_3: 'Scotland',
+            line_4: 'Great Britain'
           },
-          {
-            id: 1,
-            name: 'Hogwarts School of Witchcraft and Wizadry',
-            address: {
-              line_1: 'Hogwarts Castle',
-              line_2: 'Highlands',
-              line_3: 'Scotland',
-              line_4: 'Great Britain'
-            },
-            years_attended: {
-              from: '2001-01',
-              till: null
-            }
+          years_attended: {
+            from: '2001-01',
+            till: null
           }
-        ]
-      },
-      experience_component: {},
-      grades_component: {},
-      interests_component: {}
+        },
+        {
+          id: 1,
+          name: 'Hogwarts School of Witchcraft and Wizadry',
+          address: {
+            line_1: 'Hogwarts Castle',
+            line_2: 'Highlands',
+            line_3: 'Scotland',
+            line_4: 'Great Britain'
+          },
+          years_attended: {
+            from: '2001-01',
+            till: null
+          }
+        }
+      ],
+      experience_section: [
+        {
+          id: 0,
+          org_name: 'The Jedi',
+          duration: {
+            from: '2001-01',
+            till: null
+          },
+          role_name: 'Padawan',
+          role_description:
+            'A Jedi pupil or student, or broadly used as anyone that is learning'
+        },
+        {
+          id: 1,
+          org_name: 'The Jedi',
+          duration: {
+            from: '2001-01',
+            till: null
+          },
+          role_name: 'Padawan',
+          role_description:
+            'A Jedi pupil or student, or broadly used as anyone that is learning'
+        }
+      ],
+      certifications_section: [
+        {
+          id: 0,
+          name: 'AWS Certificate',
+          overall_grade: {
+            in_use: true,
+            value: '1.2'
+          },
+          certificate_sections: {
+            in_use: false,
+            values: []
+          },
+          date_recieved: '2001-01'
+        },
+        {
+          id: 1,
+          name: 'Leaving Certificate',
+          overall_grade: {
+            in_use: false,
+            value: false
+          },
+          certificate_sections: {
+            in_use: true,
+            values: [
+              {
+                id: 0,
+                name: 'English',
+                grade: 'A'
+              },
+              {
+                id: 1,
+                name: 'Maths',
+                grade: 'B'
+              },
+              {
+                id: 2,
+                name: 'Spanish',
+                grade: 'C'
+              }
+            ]
+          },
+          date_recieved: '2001-01'
+        }
+      ],
+      interests_section: [
+        {
+          id: 0,
+          title: 'Quidditch',
+          details: {
+            available: true,
+            value:
+              'Is this a real sport? No. Am I still claiming to have played it? Yes.'
+          }
+        },
+        {
+          id: 1,
+          title: 'Rugby',
+          details: {
+            available: false,
+            value: null
+          }
+        }
+      ]
     },
     homePages: [],
     projectsPages: [],
@@ -247,7 +329,7 @@ export const mutations = {
     state.site_props = siteProps
   },
   restoreSiteProps(state, payload) {
-    state.site_props = payload.site_props
+    state.site_props = JSON.parse(payload.site_props)
   },
   setIsSubdomain(state) {
     state.is_subdomain = true
@@ -256,16 +338,30 @@ export const mutations = {
     state.domain = payload.domain
   },
   setResumeSection(state, payload) {
-    if (payload.section_type === 'education') {
+    if (
+      payload.section_type !== 'info' &&
+      payload.section_type !== 'description'
+    ) {
       if (payload.prop === 'address') {
         // eslint-disable-next-line prettier/prettier
-        state.site_props.resume_page_inputs.education_section.schools[payload.id].address['line_' + payload.address_line] = payload.value
-      } else if (payload.prop === 'years_attended') {
+        state.site_props.resume_page_inputs.education_section[payload.id].address['line_' + payload.address_line] = payload.value
+      } else if (payload.append) {
+        // IF APPENDING TO LIST
         // eslint-disable-next-line prettier/prettier
-        state.site_props.resume_page_inputs.education_section.schools[payload.id].years_attended[payload.type] = payload.value
+        state.site_props.resume_page_inputs[payload.section_type + '_section'][payload.id][payload.prop][payload.type].push(payload.value)
+      } else if (payload.type) {
+        // IF MUTATING NESTED VALUE
+        if (payload.nested) {
+          // IF MUTATING NESTED VALUE IN A NESTED VALUE
+          // eslint-disable-next-line prettier/prettier
+          state.site_props.resume_page_inputs[payload.section_type + '_section'][payload.id][payload.prop][payload.type][payload.type_id][payload.type_value] = payload.value
+        } else {
+          // eslint-disable-next-line prettier/prettier
+          state.site_props.resume_page_inputs[payload.section_type + '_section'][payload.id][payload.prop][payload.type] = payload.value
+        }
       } else {
         // eslint-disable-next-line prettier/prettier
-        state.site_props.resume_page_inputs.education_section.schools[payload.id][payload.prop] = payload.value
+        state.site_props.resume_page_inputs[payload.section_type + '_section'][payload.id][payload.prop] = payload.value
       }
     } else if (payload.prop === 'address') {
       // eslint-disable-next-line prettier/prettier
@@ -274,6 +370,84 @@ export const mutations = {
       // eslint-disable-next-line prettier/prettier
       state.site_props.resume_page_inputs[payload.section_type + '_section'][payload.prop] = payload.value
     }
+  },
+  deleteCertificationsCertSection(state, payload) {
+    // eslint-disable-next-line prettier/prettier
+    state.site_props.resume_page_inputs.certifications_section[payload.grade_id].certificate_sections.values.splice(payload.section_id, 1)
+  },
+  addCertification(state) {
+    state.site_props.resume_page_inputs.certifications_section.push({
+      id: state.site_props.resume_page_inputs.certifications_section.length,
+      name: null,
+      overall_grade: {
+        in_use: false,
+        value: null
+      },
+      certificate_sections: {
+        in_use: false,
+        values: []
+      },
+      date_recieved: '2001-01'
+    })
+  },
+  deleteCertification(state, payload) {
+    state.site_props.resume_page_inputs.certifications_section.splice(
+      payload.id,
+      1
+    )
+    state.site_props.resume_page_inputs.certifications_section = state.site_props.resume_page_inputs.certifications_section.map(
+      function(val, index) {
+        val.id = index
+        return val
+      }
+    )
+  },
+  addInterest(state) {
+    state.site_props.resume_page_inputs.interests_section.push({
+      id: state.site_props.resume_page_inputs.interests_section.length,
+      title: null,
+      details: {
+        available: false,
+        value: null
+      }
+    })
+  },
+  deleteInterest(state, payload) {
+    state.site_props.resume_page_inputs.interests_section.splice(payload.id, 1)
+  },
+  addEducation(state) {
+    state.site_props.resume_page_inputs.education_section.push({
+      id: state.site_props.resume_page_inputs.education_section.length,
+      name: null,
+      address: {
+        line_1: null,
+        line_2: null,
+        line_3: null,
+        line_4: null
+      },
+      years_attended: {
+        from: '2001-01',
+        till: null
+      }
+    })
+  },
+  deleteEducation(state, payload) {
+    state.site_props.resume_page_inputs.education_section.splice(payload.id, 1)
+  },
+  addExperience(state) {
+    state.site_props.resume_page_inputs.experience_section.push({
+      id: state.site_props.resume_page_inputs.experience_section.length,
+      org_name: null,
+      duration: {
+        from: '2001-01',
+        till: null
+      },
+      role_name: null,
+      role_description: null
+    })
+  },
+  deleteExperience(state, payload) {
+    state.site_props.resume_page_inputs.experience_section.splice(payload.id, 1)
   }
 }
 

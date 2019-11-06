@@ -3,10 +3,10 @@ import { mapState, mapMutations } from 'vuex'
 export default {
   data() {
     return {
-      date_start: new Date().toISOString().substr(0, 10),
+      date_start: new Date().toISOString().substr(0, 7),
       date_start_open: false,
       date_end_open: false,
-      date_end: new Date().toISOString().substr(0, 10),
+      date_end: new Date().toISOString().substr(0, 7),
       editing: false,
       editing_school_id: null,
       temp_school: {
@@ -18,7 +18,7 @@ export default {
   computed: {
     ...mapState('creator', ['site_props']),
     schools() {
-      return this.site_props.resume_page_inputs.education_section.schools
+      return this.site_props.resume_page_inputs.education_section
     },
     school_name: {
       set(value) {
@@ -31,7 +31,7 @@ export default {
       },
       get() {
         // eslint-disable-next-line prettier/prettier
-        return this.editing ? this.site_props.resume_page_inputs.education_section.schools[this.editing_school_id].name : this.temp_school.val
+        return this.editing ? this.site_props.resume_page_inputs.education_section[this.editing_school_id].name : this.temp_school.val
       }
     },
     line_1: {
@@ -46,7 +46,7 @@ export default {
       },
       get() {
         // eslint-disable-next-line prettier/prettier
-        return this.editing ? this.site_props.resume_page_inputs.education_section.schools[this.editing_school_id].address.line_1 : this.temp_school.val
+        return this.editing ? this.site_props.resume_page_inputs.education_section[this.editing_school_id].address.line_1 : this.temp_school.val
       }
     },
     line_2: {
@@ -61,7 +61,7 @@ export default {
       },
       get() {
         // eslint-disable-next-line prettier/prettier
-        return this.editing ? this.site_props.resume_page_inputs.education_section.schools[this.editing_school_id].address.line_2 : this.temp_school.val
+        return this.editing ? this.site_props.resume_page_inputs.education_section[this.editing_school_id].address.line_2 : this.temp_school.val
       }
     },
     line_3: {
@@ -76,7 +76,7 @@ export default {
       },
       get() {
         // eslint-disable-next-line prettier/prettier
-        return this.editing ? this.site_props.resume_page_inputs.education_section.schools[this.editing_school_id].address.line_3 : this.temp_school.val
+        return this.editing ? this.site_props.resume_page_inputs.education_section[this.editing_school_id].address.line_3 : this.temp_school.val
       }
     },
     line_4: {
@@ -91,20 +91,27 @@ export default {
       },
       get() {
         // eslint-disable-next-line prettier/prettier
-        return this.editing ? this.site_props.resume_page_inputs.education_section.schools[this.editing_school_id].address.line_4 : this.temp_school.val
+        return this.editing ? this.site_props.resume_page_inputs.education_section[this.editing_school_id].address.line_4 : this.temp_school.val
       }
     }
   },
   watch: {
     currently_attending(value) {
-      if (!value) {
-        console.log('setting to now')
+      if (value) {
         this.setResumeSection({
           section_type: 'education',
           prop: 'years_attended',
           type: 'till',
           id: this.editing_school_id,
           value: null
+        })
+      } else {
+        this.setResumeSection({
+          section_type: 'education',
+          prop: 'years_attended',
+          type: 'till',
+          id: this.editing_school_id,
+          value: this.date_end
         })
       }
     },
@@ -129,16 +136,23 @@ export default {
   },
   methods: {
     ...mapMutations({
-      setResumeSection: 'creator/setResumeSection'
+      setResumeSection: 'creator/setResumeSection',
+      addEducation: 'creator/addEducation',
+      deleteEducation: 'creator/deleteExperience'
     }),
     selectSchool(id) {
       if (document.querySelector('.school-selected')) {
-        if (this.$refs['school_' + id][0] === document.querySelector('.school-selected')) {
+        if (
+          this.$refs['school_' + id][0] ===
+          document.querySelector('.school-selected')
+        ) {
           this.$refs['school_' + id][0].classList.remove('school-selected')
           this.editing = false
           this.editing_school_id = null
         } else {
-          document.querySelector('.school-selected').classList.remove('school-selected')
+          document
+            .querySelector('.school-selected')
+            .classList.remove('school-selected')
           this.$refs['school_' + id][0].classList.add('school-selected')
           this.editing = true
           this.editing_school_id = id
@@ -148,16 +162,17 @@ export default {
         this.editing = true
         this.editing_school_id = id
       }
-    },
-    update_school(id) {}
+    }
   }
 }
 </script>
 
 <template>
   <v-layout class="d-flex flex-column align-center edu-container">
-    <div class="edu-viewer d-flex flex-column align-center mb-3 pa-6 elevation-2">
-      <div class="schools-container d-flex">
+    <div
+      class="edu-viewer d-flex flex-column align-center mb-3 pa-6 elevation-2"
+    >
+      <div class="schools-container d-flex flex-wrap justify-center">
         <div
           v-for="school in schools"
           :key="school.id"
@@ -182,8 +197,8 @@ export default {
               {{ school.years_attended.from }} :
               {{
                 school.years_attended.till !== null
-                ?
-                school.years_attended.till : 'Now'
+                  ? school.years_attended.till
+                  : 'Now'
               }}
             </span>
           </div>
@@ -193,72 +208,98 @@ export default {
     <div
       class="section-editor d-flex flex-column align-center elevation-2 pa-2"
     >
-      <span class="title">Edit Your Eductaion Details</span>
-      <span class="caption my-3">Select a school above to begin editing it</span>
-      <div class="d-flex flex-column">
-        <v-text-field
-          v-model="school_name"
-          :disabled="!editing"
-          outlined
-          dense
-          label="Name of School"
-        ></v-text-field>
-        <div class="d-flex my-2 flex-column align-center">
-          <span class="body-2">Address</span>
-          <v-text-field
-            v-model="line_1"
-            :disabled="!editing"
-            outlined
-            dense
-            label="Line 1"
-          ></v-text-field>
-          <v-text-field
-            v-model="line_2"
-            :disabled="!editing"
-            outlined
-            dense
-            label="Line 2"
-          ></v-text-field>
-          <v-text-field
-            v-model="line_3"
-            :disabled="!editing"
-            outlined
-            dense
-            label="Line 3"
-          ></v-text-field>
-          <v-text-field
-            v-model="line_4"
-            :disabled="!editing"
-            outlined
-            dense
-            label="Line 4"
-          ></v-text-field>
+      <transition
+        enter-active-class="animated fadeIn faster"
+        leave-active-class="animated fadeOut faster"
+        mode="out-in"
+      >
+        <div
+          v-if="!editing"
+          key="placeholder"
+          class="editor-placeholder d-flex flex-column align-center justify-center"
+        >
+          <span class="headline">Select an item above to begin editing!</span>
+          <v-btn
+            color="info"
+            class="mt-4"
+            rounded
+            large
+            @click="addEducation()"
+          >
+            <span>Add a New Place of Education</span>
+          </v-btn>
         </div>
-        <div class="d-flex my-2 flex-column align-center">
-          <span class="body-2">Time Attending</span>
-          <v-text-field
-            v-model="date_start"
-            :disabled="!editing"
-            outlined
-            dense
-            label="From"
-            readonly
-            prepend-icon="mdi-calendar"
-            @focus="date_start_open = true"
-          ></v-text-field>
-          <v-text-field
-            v-model="date_end"
-            :disabled="!editing || currently_attending"
-            outlined
-            dense
-            label="Till"
-            readonly
-            prepend-icon="mdi-calendar"
-            @focus="date_end_open = true"
-          ></v-text-field>
-          <v-checkbox v-model="currently_attending" :disabled="!editing" label="Currently attending"></v-checkbox>
+        <div v-else key="editor" class="editor d-flex flex-column align-center">
+          <div class="d-flex flex-column">
+            <v-text-field
+              v-model="school_name"
+              :disabled="!editing"
+              outlined
+              dense
+              label="Name of School"
+            ></v-text-field>
+            <div class="d-flex my-2 flex-column align-center">
+              <span class="body-2">Address</span>
+              <v-text-field
+                v-model="line_1"
+                :disabled="!editing"
+                outlined
+                dense
+                label="Line 1"
+              ></v-text-field>
+              <v-text-field
+                v-model="line_2"
+                :disabled="!editing"
+                outlined
+                dense
+                label="Line 2"
+              ></v-text-field>
+              <v-text-field
+                v-model="line_3"
+                :disabled="!editing"
+                outlined
+                dense
+                label="Line 3"
+              ></v-text-field>
+              <v-text-field
+                v-model="line_4"
+                :disabled="!editing"
+                outlined
+                dense
+                label="Line 4"
+              ></v-text-field>
+            </div>
+            <div class="d-flex my-2 flex-column align-center">
+              <span class="body-2">Time Attending</span>
+              <v-text-field
+                v-model="date_start"
+                :disabled="!editing"
+                outlined
+                dense
+                label="From"
+                readonly
+                prepend-icon="mdi-calendar"
+                @focus="date_start_open = true"
+              ></v-text-field>
+              <v-text-field
+                v-model="date_end"
+                :disabled="!editing || currently_attending"
+                outlined
+                dense
+                label="Till"
+                readonly
+                prepend-icon="mdi-calendar"
+                @focus="date_end_open = true"
+              ></v-text-field>
+              <v-checkbox
+                v-model="currently_attending"
+                :disabled="!editing"
+                label="Currently attending"
+              ></v-checkbox>
+            </div>
+          </div>
         </div>
-      </div>
+      </transition>
     </div>
     <v-dialog
       ref="date_start_dialog"
@@ -269,8 +310,16 @@ export default {
     >
       <v-date-picker v-model="date_start" scrollable type="month">
         <v-spacer></v-spacer>
-        <v-btn text color="primary" @click="date_start_open = false">Cancel</v-btn>
-        <v-btn text color="primary" @click="$refs.date_start_dialog.save(date_start)">OK</v-btn>
+        <v-btn text color="primary" @click="date_start_open = false">
+          Cancel
+        </v-btn>
+        <v-btn
+          text
+          color="primary"
+          @click="$refs.date_start_dialog.save(date_start)"
+        >
+          OK
+        </v-btn>
       </v-date-picker>
     </v-dialog>
     <v-dialog
@@ -282,8 +331,16 @@ export default {
     >
       <v-date-picker v-model="date_end" scrollable type="month">
         <v-spacer></v-spacer>
-        <v-btn text color="primary" @click="date_end_open = false">Cancel</v-btn>
-        <v-btn text color="primary" @click="$refs.date_end_dialog.save(date_end)">OK</v-btn>
+        <v-btn text color="primary" @click="date_end_open = false">
+          Cancel
+        </v-btn>
+        <v-btn
+          text
+          color="primary"
+          @click="$refs.date_end_dialog.save(date_end)"
+        >
+          OK
+        </v-btn>
       </v-date-picker>
     </v-dialog>
   </v-layout>
@@ -304,7 +361,7 @@ export default {
 
 .school {
   // border: 1px solid #777;
-  width: 50%;
+  width: 45%;
   border-radius: 10px;
 }
 
@@ -327,5 +384,12 @@ export default {
   width: 100%;
   // border: 1px solid;
   overflow: auto;
+}
+
+.editor-placeholder {
+  height: 100%;
+  width: 100%;
+  border: 1px dashed #777;
+  border-radius: 10px;
 }
 </style>

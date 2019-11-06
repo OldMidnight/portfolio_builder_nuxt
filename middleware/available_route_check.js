@@ -1,5 +1,6 @@
 export default function({ store, redirect }) {
-  if (store.state.creator.is_subdomain) {
-    redirect('/')
+  // If the user is not authenticated
+  if (store.state.auth.loggedIn) {
+    return redirect('/')
   }
 }

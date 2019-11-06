@@ -1,7 +1,7 @@
 <script>
 import { mapActions } from 'vuex'
 export default {
-  name: 'registration',
+  name: 'Registration',
   transitions: {
     enterActiveClass: 'animated fadeInLeft fast',
     leaveActiveClass: 'animated fadeOutRight fast'
@@ -138,7 +138,7 @@ export default {
       </v-text-field>
       <v-btn color="success" @click="validateInfo()">Submit</v-btn>
     </div>
-    <div v-if="domainEntry">
+    <div v-if="domainEntry" class="d-flex flex-column align-center">
       <div>Enter Your Domain</div>
       <v-text-field
         ref="domain"

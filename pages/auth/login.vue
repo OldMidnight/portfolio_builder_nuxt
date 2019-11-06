@@ -1,7 +1,7 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 export default {
-  name: 'login',
+  name: 'Login',
   transitions: {
     enterActiveClass: 'animated fadeInLeft',
     leaveActiveClass: 'animated fadeOutRight'
