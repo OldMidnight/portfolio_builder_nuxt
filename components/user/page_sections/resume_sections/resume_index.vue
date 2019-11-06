@@ -427,7 +427,7 @@ export default {
           >
             <div v-if="resume_wizard_step !== 0" key="next" class="d-flex wizard-btns px-7">
               <v-btn
-                :disabled="transitioning"
+                :disabled="transitioning || resume_wizard_step > wizard_layout_list.length + 2"
                 color="info"
                 @click="resume_wizard_step += 1"
               >
