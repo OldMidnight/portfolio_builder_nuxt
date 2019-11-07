@@ -39,6 +39,7 @@ export const state = () => ({
     projects_page_2_inputs: {},
     projects_page_3_inputs: {},
     resume_page_inputs: {
+      resume_created: false,
       info_section: {
         name: null,
         phone: '0811111111',
@@ -448,6 +449,9 @@ export const mutations = {
   },
   deleteExperience(state, payload) {
     state.site_props.resume_page_inputs.experience_section.splice(payload.id, 1)
+  },
+  setResumeCreated(state) {
+    state.site_props.resume_page_inputs.resume_created = true
   }
 }
 

@@ -1,4 +1,5 @@
 <script>
+import { mapMutations } from 'vuex'
 import LoadableComponent from '@/components/helpers/loadable_component'
 export default {
   components: { LoadableComponent },
@@ -69,6 +70,9 @@ export default {
     }
   },
   computed: {
+    resume_created() {
+      return this.$store.state.creator.site_props.resume_page_inputs.resume_created
+    },
     component_list() {
       const vm = this
       return function(name) {
@@ -147,6 +151,9 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      setResumeCreated: 'creator/setResumeCreated'
+    }),
     moveUp(id) {
       const layout = this.wizard_layout_list.splice(id, 1)[0]
       const vm = this
@@ -169,6 +176,7 @@ export default {
     },
     deleteSection(id) {
       this.available_sections.push(this.wizard_layout_list[id])
+      this.section_component[this.wizard_layout_list[id].name.toLowerCase() + '_component'] = null
       for (let i = 0; i < this.available_sections.length; i++) {
         this.available_sections[i].id = i
       }
@@ -180,6 +188,9 @@ export default {
       for (let i = 0; i < this.wizard_layout_list.length; i++) {
         this.wizard_layout_list[i].id = i
       }
+    },
+    createResume() {
+      thos.setResumeCreated()
     }
   }
 }
@@ -188,9 +199,10 @@ export default {
 <template>
   <v-container fluid fill-height>
     <v-layout class="d-flex flex-column align-center justify-center">
-      <v-btn color="info" @click="resume_wizard_dialog = true">
+      <v-btn v-if="!resume_created" color="info" @click="resume_wizard_dialog = true">
         Create Your Resume!
       </v-btn>
+      <div v-else></div>
     </v-layout>
     <v-dialog
       v-if="!options.preview && !options.live"
@@ -462,7 +474,7 @@ export default {
                   key="save"
                   v-if="resume_wizard_step > wizard_layout_list.length + 2"
                   color="success"
-                  @click="resume_wizard_dialog = false"
+                  @click="resume_wizard_dialog = false; createResume()"
                 >
                   Save
                 </v-btn>
