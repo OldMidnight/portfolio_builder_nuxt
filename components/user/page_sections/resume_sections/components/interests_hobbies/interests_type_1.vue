@@ -1,6 +1,12 @@
 <script>
 import { mapState, mapMutations } from 'vuex'
 export default {
+  props: {
+    options: {
+      type: Object,
+      default: () => {}
+    }
+  },
   data() {
     return {
       editing: false,
@@ -61,26 +67,30 @@ export default {
       deleteInterest: 'creator/deleteInterest'
     }),
     selectInterest(id) {
-      if (document.querySelector('.interest-selected')) {
-        if (
-          this.$refs['interest_' + id][0] ===
-          document.querySelector('.interest-selected')
-        ) {
-          this.$refs['interest_' + id][0].classList.remove('interest-selected')
-          this.editing = false
-          this.editing_interest_id = null
+      if (this.options.editing) {
+        if (document.querySelector('.interest-selected')) {
+          if (
+            this.$refs['interest_' + id][0] ===
+            document.querySelector('.interest-selected')
+          ) {
+            this.$refs['interest_' + id][0].classList.remove(
+              'interest-selected'
+            )
+            this.editing = false
+            this.editing_interest_id = null
+          } else {
+            document
+              .querySelector('.interest-selected')
+              .classList.remove('interest-selected')
+            this.$refs['interest_' + id][0].classList.add('interest-selected')
+            this.editing = true
+            this.editing_interest_id = id
+          }
         } else {
-          document
-            .querySelector('.interest-selected')
-            .classList.remove('interest-selected')
           this.$refs['interest_' + id][0].classList.add('interest-selected')
           this.editing = true
           this.editing_interest_id = id
         }
-      } else {
-        this.$refs['interest_' + id][0].classList.add('interest-selected')
-        this.editing = true
-        this.editing_interest_id = id
       }
     }
   }
@@ -98,6 +108,7 @@ export default {
           :key="interest.id"
           :ref="'interest_' + interest.id"
           class="interest d-flex flex-column align-center elevation-1 ma-2 pa-6"
+          :class="{ selectable: options.editing }"
           @click="selectInterest(interest.id)"
         >
           <span class="title mb-2">{{ interest.title }}</span>
@@ -111,6 +122,7 @@ export default {
       </div>
     </div>
     <div
+      v-if="options.editing"
       class="section-editor d-flex flex-column align-center elevation-2 pa-2"
     >
       <transition
@@ -183,7 +195,7 @@ export default {
   border: 1px solid #0066ff;
 }
 
-.interest:hover {
+.selectable:hover {
   border: 1px solid #0066ff;
   cursor: pointer;
 }

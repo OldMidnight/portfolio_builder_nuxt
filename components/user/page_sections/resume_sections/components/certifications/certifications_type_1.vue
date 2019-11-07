@@ -1,6 +1,12 @@
 <script>
 import { mapState, mapMutations } from 'vuex'
 export default {
+  props: {
+    options: {
+      type: Object,
+      default: () => {}
+    }
+  },
   data() {
     return {
       date: new Date().toISOString().substr(0, 7),
@@ -87,18 +93,29 @@ export default {
       deleteCertification: 'creator/deleteCertification'
     }),
     selectGrade(id) {
-      if (document.querySelector('.grade-selected')) {
-        if (
-          this.$refs['grade_' + id][0] ===
-          document.querySelector('.grade-selected')
-        ) {
-          this.$refs['grade_' + id][0].classList.remove('grade-selected')
-          this.editing = false
-          this.editing_certification_id = null
+      if (this.options.editing) {
+        if (document.querySelector('.grade-selected')) {
+          if (
+            this.$refs['grade_' + id][0] ===
+            document.querySelector('.grade-selected')
+          ) {
+            this.$refs['grade_' + id][0].classList.remove('grade-selected')
+            this.editing = false
+            this.editing_certification_id = null
+          } else {
+            document
+              .querySelector('.grade-selected')
+              .classList.remove('grade-selected')
+            this.$refs['grade_' + id][0].classList.add('grade-selected')
+            this.editing = true
+            this.editing_certification_id = id
+            // eslint-disable-next-line prettier/prettier
+            // eslint-disable-next-line prettier/prettier
+            this.multiple_grades = this.certifications[this.editing_certification_id].certificate_sections.in_use
+            // eslint-disable-next-line prettier/prettier
+            this.overall_grade = this.certifications[this.editing_certification_id].overall_grade.in_use
+          }
         } else {
-          document
-            .querySelector('.grade-selected')
-            .classList.remove('grade-selected')
           this.$refs['grade_' + id][0].classList.add('grade-selected')
           this.editing = true
           this.editing_certification_id = id
@@ -108,15 +125,6 @@ export default {
           // eslint-disable-next-line prettier/prettier
           this.overall_grade = this.certifications[this.editing_certification_id].overall_grade.in_use
         }
-      } else {
-        this.$refs['grade_' + id][0].classList.add('grade-selected')
-        this.editing = true
-        this.editing_certification_id = id
-        // eslint-disable-next-line prettier/prettier
-        // eslint-disable-next-line prettier/prettier
-        this.multiple_grades = this.certifications[this.editing_certification_id].certificate_sections.in_use
-        // eslint-disable-next-line prettier/prettier
-        this.overall_grade = this.certifications[this.editing_certification_id].overall_grade.in_use
       }
     },
     addGradeSection() {
@@ -174,6 +182,7 @@ export default {
           :key="grade.id"
           :ref="'grade_' + grade.id"
           class="grade d-flex flex-column align-center my-3 pa-3 elevation-1"
+          :class="{ selectable: options.editing }"
           @click="selectGrade(grade.id)"
         >
           <div class="cert-name">
@@ -204,6 +213,7 @@ export default {
       </div>
     </div>
     <div
+      v-if="options.editing"
       class="section-editor d-flex flex-column align-center elevation-2 pa-2"
     >
       <transition
@@ -352,7 +362,7 @@ export default {
   border-radius: 10px;
 }
 
-.grade:hover {
+.selectable:hover {
   border: 1px solid #0066ff;
   cursor: pointer;
 }

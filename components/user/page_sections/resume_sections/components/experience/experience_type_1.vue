@@ -1,6 +1,12 @@
 <script>
 import { mapState, mapMutations } from 'vuex'
 export default {
+  props: {
+    options: {
+      type: Object,
+      default: () => {}
+    }
+  },
   data() {
     return {
       date_start: new Date().toISOString().substr(0, 7),
@@ -109,25 +115,28 @@ export default {
       deleteExperience: 'creator/deleteExperience'
     }),
     selectExp(id) {
-      if (document.querySelector('.exp-selected')) {
-        if (
-          this.$refs['exp_' + id][0] === document.querySelector('.exp-selected')
-        ) {
-          this.$refs['exp_' + id][0].classList.remove('exp-selected')
-          this.editing = false
-          this.editing_exp_id = null
+      if (this.options.editing) {
+        if (document.querySelector('.exp-selected')) {
+          if (
+            this.$refs['exp_' + id][0] ===
+            document.querySelector('.exp-selected')
+          ) {
+            this.$refs['exp_' + id][0].classList.remove('exp-selected')
+            this.editing = false
+            this.editing_exp_id = null
+          } else {
+            document
+              .querySelector('.exp-selected')
+              .classList.remove('exp-selected')
+            this.$refs['exp_' + id][0].classList.add('exp-selected')
+            this.editing = true
+            this.editing_exp_id = id
+          }
         } else {
-          document
-            .querySelector('.exp-selected')
-            .classList.remove('exp-selected')
           this.$refs['exp_' + id][0].classList.add('exp-selected')
           this.editing = true
           this.editing_exp_id = id
         }
-      } else {
-        this.$refs['exp_' + id][0].classList.add('exp-selected')
-        this.editing = true
-        this.editing_exp_id = id
       }
     }
   }
@@ -143,6 +152,7 @@ export default {
           :key="exp.id"
           :ref="'exp_' + exp.id"
           class="exp d-flex flex-column align-center pa-4 my-2"
+          :class="{ selectable: options.editing }"
           @click="selectExp(exp.id)"
         >
           <div class="org-name">
@@ -168,6 +178,7 @@ export default {
       </div>
     </div>
     <div
+      v-if="options.editing"
       class="section-editor d-flex flex-column align-center elevation-2 pa-2"
     >
       <transition
@@ -314,7 +325,7 @@ export default {
   word-wrap: break-word;
 }
 
-.exp:hover {
+.selectable:hover {
   cursor: pointer;
   border: 1px solid #0066ff;
   border-radius: 10px;

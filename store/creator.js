@@ -40,6 +40,8 @@ export const state = () => ({
     projects_page_3_inputs: {},
     resume_page_inputs: {
       resume_created: false,
+      resume_sections: {},
+      resume_layout: [],
       info_section: {
         name: null,
         phone: '0811111111',
@@ -450,15 +452,15 @@ export const mutations = {
   deleteExperience(state, payload) {
     state.site_props.resume_page_inputs.experience_section.splice(payload.id, 1)
   },
-  setResumeCreated(state) {
+  setResumeCreated(state, payload) {
+    state.site_props.resume_page_inputs.resume_sections = payload.sections
     state.site_props.resume_page_inputs.resume_created = true
+    state.site_props.resume_page_inputs.resume_layout = payload.layout
   }
 }
 
 export const actions = {
   registerWebsite(props) {
-    // console.log('no json props:', props.state.site_props)
-    // console.log('props:', JSON.stringify(props.state.site_props))
     this.$axios
       .$post('/create/register_site', {
         site_props: JSON.stringify(props.state.site_props)

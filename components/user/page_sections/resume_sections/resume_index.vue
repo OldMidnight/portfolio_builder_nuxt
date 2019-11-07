@@ -66,12 +66,18 @@ export default {
         experience_component: null,
         certifications_component: null,
         interests_component: null
-      }
+      },
+      resume_layout: []
     }
   },
   computed: {
     resume_created() {
-      return this.$store.state.creator.site_props.resume_page_inputs.resume_created
+      return this.$store.state.creator.site_props.resume_page_inputs
+        .resume_created
+    },
+    resume_sections() {
+      return this.$store.state.creator.site_props.resume_page_inputs
+        .resume_sections
     },
     component_list() {
       const vm = this
@@ -98,55 +104,62 @@ export default {
   },
   created() {
     // highest = The value of the list of components which has the highest number of components
-    const highest = 3
+    if (this.resume_created) {
+      this.section_component = this.resume_sections
+      this.resume_layout = this.$store.state.site_props.resume_page_inputs.resume_layout
+    } else {
+      const highest = 3
 
-    const infoComponentsNum = 3
-    const descriptionComponentsNum = 3
-    const educationComponentsNum = 3
-    const experienceComponentsNum = 3
-    const certificationsComponentsNum = 3
-    const interestsComponentsNum = 3
+      const infoComponentsNum = 3
+      const descriptionComponentsNum = 3
+      const educationComponentsNum = 3
+      const experienceComponentsNum = 3
+      const certificationsComponentsNum = 3
+      const interestsComponentsNum = 3
 
-    for (let i = 1; i <= highest; i++) {
-      if (i <= infoComponentsNum) {
-        this.info_components.push({
-          id: i,
-          component: 'resume_sections/components/info/info_type_' + i
-        })
-      }
-      if (i <= descriptionComponentsNum) {
-        this.description_components.push({
-          id: i,
-          component:
-            'resume_sections/components/description/description_type_' + i
-        })
-      }
-      if (i <= educationComponentsNum) {
-        this.education_components.push({
-          id: i,
-          component: 'resume_sections/components/education/education_type_' + i
-        })
-      }
-      if (i <= experienceComponentsNum) {
-        this.experience_components.push({
-          id: i,
-          component:
-            'resume_sections/components/experience/experience_type_' + i
-        })
-      }
-      if (i <= certificationsComponentsNum) {
-        this.certifications_components.push({
-          id: i,
-          component:
-            'resume_sections/components/certifications/certifications_type_' + i
-        })
-      }
-      if (i <= interestsComponentsNum) {
-        this.interests_components.push({
-          id: i,
-          component:
-            'resume_sections/components/interests_hobbies/interests_type_' + i
-        })
+      for (let i = 1; i <= highest; i++) {
+        if (i <= infoComponentsNum) {
+          this.info_components.push({
+            id: i,
+            component: 'resume_sections/components/info/info_type_' + i
+          })
+        }
+        if (i <= descriptionComponentsNum) {
+          this.description_components.push({
+            id: i,
+            component:
+              'resume_sections/components/description/description_type_' + i
+          })
+        }
+        if (i <= educationComponentsNum) {
+          this.education_components.push({
+            id: i,
+            component:
+              'resume_sections/components/education/education_type_' + i
+          })
+        }
+        if (i <= experienceComponentsNum) {
+          this.experience_components.push({
+            id: i,
+            component:
+              'resume_sections/components/experience/experience_type_' + i
+          })
+        }
+        if (i <= certificationsComponentsNum) {
+          this.certifications_components.push({
+            id: i,
+            component:
+              'resume_sections/components/certifications/certifications_type_' +
+              i
+          })
+        }
+        if (i <= interestsComponentsNum) {
+          this.interests_components.push({
+            id: i,
+            component:
+              'resume_sections/components/interests_hobbies/interests_type_' + i
+          })
+        }
       }
     }
   },
@@ -176,6 +189,7 @@ export default {
     },
     deleteSection(id) {
       this.available_sections.push(this.wizard_layout_list[id])
+      // eslint-disable-next-line prettier/prettier
       this.section_component[this.wizard_layout_list[id].name.toLowerCase() + '_component'] = null
       for (let i = 0; i < this.available_sections.length; i++) {
         this.available_sections[i].id = i
@@ -190,7 +204,13 @@ export default {
       }
     },
     createResume() {
-      thos.setResumeCreated()
+      this.resume_layout = this.wizard_layout_list.map((val) => {
+        return val.name.toLowerCase()
+      })
+      this.setResumeCreated({
+        sections: this.section_component,
+        layout: this.resume_layout
+      })
     }
   }
 }
@@ -199,10 +219,27 @@ export default {
 <template>
   <v-container fluid fill-height>
     <v-layout class="d-flex flex-column align-center justify-center">
-      <v-btn v-if="!resume_created" color="info" @click="resume_wizard_dialog = true">
+      <v-btn
+        v-if="!resume_created"
+        color="info"
+        @click="resume_wizard_dialog = true"
+      >
         Create Your Resume!
       </v-btn>
-      <div v-else></div>
+      <div class="sections-display" v-else>
+        <LoadableComponent
+          v-for="section in resume_layout"
+          :key="section"
+          :component-name="section_component[section + '_component'].component"
+          :options="{
+            input_dict_name: 'test',
+            preview: false,
+            editing: false,
+            height: '150',
+            width: '150'
+          }"
+        ></LoadableComponent>
+      </div>
     </v-layout>
     <v-dialog
       v-if="!options.preview && !options.live"
@@ -248,7 +285,7 @@ export default {
                   <v-btn
                     color="success"
                     @click="
-                      resume_wizard_step += 1;
+                      resume_wizard_step += 1
                       progress += 100 / (wizard_layout_list.length + 3)
                     "
                   >
@@ -429,9 +466,16 @@ export default {
                 </div>
               </v-layout>
               <v-layout class="end-page">
-                <div class="end-page-section d-flex flex-column align-center justify-center">
-                  <span class="end-page-line end-page-line-1 display-2 mb-5">That's It!</span>
-                  <span class="end-page-line end-page-line-2 headline mt-6">You're all set now, hit the Save button below to view your masterpiece!</span>
+                <div
+                  class="end-page-section d-flex flex-column align-center justify-center"
+                >
+                  <span class="end-page-line end-page-line-1 display-2 mb-5">
+                    That's It!
+                  </span>
+                  <span class="end-page-line end-page-line-2 headline mt-6">
+                    You're all set now, hit the Save button below to view your
+                    masterpiece!
+                  </span>
                 </div>
               </v-layout>
             </transition>
@@ -444,12 +488,19 @@ export default {
             leave-active-class="animated fadeOutDown faster"
             mode="out-in"
           >
-            <div v-if="resume_wizard_step !== 0" key="next" class="d-flex wizard-btns px-7">
+            <div
+              v-if="resume_wizard_step !== 0"
+              key="next"
+              class="d-flex wizard-btns px-7"
+            >
               <v-btn
-                :disabled="transitioning || resume_wizard_step > wizard_layout_list.length + 2"
+                :disabled="
+                  transitioning ||
+                    resume_wizard_step > wizard_layout_list.length + 2
+                "
                 color="info"
                 @click="
-                  resume_wizard_step += 1;
+                  resume_wizard_step += 1
                   progress += 100 / (wizard_layout_list.length + 3)
                 "
               >
@@ -459,7 +510,7 @@ export default {
                 :disabled="transitioning"
                 color="error"
                 @click="
-                  resume_wizard_step -= 1;
+                  resume_wizard_step -= 1
                   progress -= 100 / (wizard_layout_list.length + 3)
                 "
               >
@@ -471,10 +522,13 @@ export default {
                 mode="out-in"
               >
                 <v-btn
-                  key="save"
                   v-if="resume_wizard_step > wizard_layout_list.length + 2"
+                  key="save"
                   color="success"
-                  @click="resume_wizard_dialog = false; createResume()"
+                  @click="
+                    resume_wizard_dialog = false
+                    createResume()
+                  "
                 >
                   Save
                 </v-btn>
@@ -499,6 +553,12 @@ export default {
 <style lang="scss" scoped>
 .test {
   border: 1px solid red;
+}
+
+.sections-display {
+  border: 1px solid;
+  height: 100%;
+  overflow: auto;
 }
 
 .wizard-dialog {
@@ -597,7 +657,7 @@ export default {
 
 .end-page-line {
   color: #0066ff;
-  text-align: center
+  text-align: center;
 }
 
 .wizard-btns {

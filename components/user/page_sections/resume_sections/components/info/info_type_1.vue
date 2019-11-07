@@ -5,6 +5,12 @@ export default {
   directives: {
     mask
   },
+  props: {
+    options: {
+      type: Object,
+      default: () => {}
+    }
+  },
   data() {
     return {
       phone_mask: '###-###-####'
@@ -147,6 +153,7 @@ export default {
       </div>
     </div>
     <div
+      v-if="options.editing"
       class="section-editor d-flex flex-column align-center elevation-2 pa-2"
     >
       <span class="title my-3">Edit your details</span>

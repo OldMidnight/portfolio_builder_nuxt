@@ -1,6 +1,12 @@
 <script>
 import { mapState, mapMutations } from 'vuex'
 export default {
+  props: {
+    options: {
+      type: Object,
+      default: () => {}
+    }
+  },
   computed: {
     ...mapState('creator', ['site_props']),
     description: {
@@ -32,6 +38,7 @@ export default {
       </div>
     </div>
     <div
+      v-if="options.editing"
       class="section-editor pa-2 elevation-2 d-flex flex-column align-center"
     >
       <span class="title my-3">Describe Yourself!</span>

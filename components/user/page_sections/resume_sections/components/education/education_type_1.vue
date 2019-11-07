@@ -1,6 +1,12 @@
 <script>
 import { mapState, mapMutations } from 'vuex'
 export default {
+  props: {
+    options: {
+      type: Object,
+      default: () => {}
+    }
+  },
   data() {
     return {
       date_start: new Date().toISOString().substr(0, 7),
@@ -141,26 +147,28 @@ export default {
       deleteEducation: 'creator/deleteExperience'
     }),
     selectSchool(id) {
-      if (document.querySelector('.school-selected')) {
-        if (
-          this.$refs['school_' + id][0] ===
-          document.querySelector('.school-selected')
-        ) {
-          this.$refs['school_' + id][0].classList.remove('school-selected')
-          this.editing = false
-          this.editing_school_id = null
+      if (this.options.editing) {
+        if (document.querySelector('.school-selected')) {
+          if (
+            this.$refs['school_' + id][0] ===
+            document.querySelector('.school-selected')
+          ) {
+            this.$refs['school_' + id][0].classList.remove('school-selected')
+            this.editing = false
+            this.editing_school_id = null
+          } else {
+            document
+              .querySelector('.school-selected')
+              .classList.remove('school-selected')
+            this.$refs['school_' + id][0].classList.add('school-selected')
+            this.editing = true
+            this.editing_school_id = id
+          }
         } else {
-          document
-            .querySelector('.school-selected')
-            .classList.remove('school-selected')
           this.$refs['school_' + id][0].classList.add('school-selected')
           this.editing = true
           this.editing_school_id = id
         }
-      } else {
-        this.$refs['school_' + id][0].classList.add('school-selected')
-        this.editing = true
-        this.editing_school_id = id
       }
     }
   }
@@ -178,6 +186,7 @@ export default {
           :key="school.id"
           :ref="'school_' + school.id"
           class="school pa-2 ma-2 elevation-1 d-flex flex-column align-center"
+          :class="{ selectable: options.editing }"
           @click="selectSchool(school.id)"
         >
           <div class="school-name">
@@ -206,6 +215,7 @@ export default {
       </div>
     </div>
     <div
+      v-if="options.editing"
       class="section-editor d-flex flex-column align-center elevation-2 pa-2"
     >
       <transition
@@ -369,7 +379,7 @@ export default {
   border: 1px solid #0066ff;
 }
 
-.school:hover {
+.seclectable:hover {
   border: 1px solid #0066ff;
   cursor: pointer;
 }
