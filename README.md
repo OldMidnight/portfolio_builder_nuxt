@@ -1,22 +1,8 @@
-# kreoh_client
+# Kreoh.com Frontend
 
-> Nuxtjs client for kreoh.com
+ This is the client for Kreoh.com, an unreleased side-project of mine. It is built using VueJS, utilising nuxtJS for SSR optimisations.
 
-## Build Setup
-
-``` bash
-# install dependencies
-$ npm run install
-
-# serve with hot reload at localhost:3000
-$ npm run dev
-
-# build for production and launch server
-$ npm run build
-$ npm run start
-
-# generate static project
-$ npm run generate
-```
-
-For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
+## Utilises:
+* Vuetify
+* Axios
+* Vuex
