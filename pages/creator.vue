@@ -640,23 +640,26 @@ export default {
     ...mapActions({
       registerWebsite: 'creator/registerWebsite'
     }),
-    selectLayout(e) {
-      const layoutItemContainer = document.querySelector('.layout-selected')
+    selectLayout(e, layout) {
+      if (layout.id === 1) {
+        const layoutItemContainer = document.querySelector('.layout-selected')
 
-      if (layoutItemContainer !== e.target.parentElement) {
-        // If Clicking a different Layout
+        if (layoutItemContainer !== e.target.parentElement) {
+          // If Clicking a different Layout
 
-        this.setSiteLayout(
-          this.layouts[Number(e.target.parentElement.id.split('-')[1]) - 1].name
-        )
-      } else {
-        this.setSiteLayout(null)
-      }
+          this.setSiteLayout(
+            this.layouts[Number(e.target.parentElement.id.split('-')[1]) - 1]
+              .name
+          )
+        } else {
+          this.setSiteLayout(null)
+        }
 
-      if (this.site_props.layout !== null) {
-        this.showNextStep()
-      } else {
-        this.hideNextStep()
+        if (this.site_props.layout !== null) {
+          this.showNextStep()
+        } else {
+          this.hideNextStep()
+        }
       }
     },
     checkStepCount(step) {
@@ -920,19 +923,25 @@ export default {
 
         <v-layout row wrap class="creation-step-content">
           <v-flex
-            v-for="i in layouts"
-            :id="'layout-' + i.id"
-            :key="i.id"
+            v-for="layout in layouts"
+            :id="'layout-' + layout.id"
+            :key="layout.id"
             xs4
-            class="layout-item-container"
-            :class="{ 'layout-selected': site_props.layout === i.name }"
-            @click="selectLayout($event)"
+            :class="{
+              'layout-item-container': layout.id === 1,
+              'layout-selected': site_props.layout === layout.name,
+              'layout-disabled': layout.id !== 1
+            }"
+            @click="selectLayout($event, layout)"
           >
             <div
-              class="layout-item"
-              :class="{ 'layout-selected-2': site_props.layout === i.name }"
+              :class="{
+                'layout-item': layout.id === 1,
+                'layout-item-disabled': layout.id !== 1,
+                'layout-selected-2': site_props.layout === layout.name
+              }"
             ></div>
-            <p>this is layout {{ i.name }}</p>
+            <p>this is layout {{ layout.name }}</p>
           </v-flex>
         </v-layout>
       </v-flex>
@@ -2027,6 +2036,27 @@ export default {
   border-radius: 10px;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.layout-item-disabled {
+  height: 100%;
+  border: 1px solid #777;
+  background-color: #777;
+  border-radius: 10px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.layout-disabled {
+  height: 80%;
+  padding: 30px 20px 30px 20px !important;
+  cursor: not-allowed;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  p {
+    height: 10%;
+    margin: 0;
+    margin-top: 5px;
+  }
 }
 
 .layout-selected {
