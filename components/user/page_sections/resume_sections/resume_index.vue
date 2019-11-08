@@ -1,5 +1,5 @@
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapState } from 'vuex'
 import LoadableComponent from '@/components/helpers/loadable_component'
 export default {
   components: { LoadableComponent },
@@ -71,6 +71,7 @@ export default {
     }
   },
   computed: {
+    ...mapState('creator', ['site_props']),
     resume_created() {
       return this.$store.state.creator.site_props.resume_page_inputs
         .resume_created
@@ -575,7 +576,7 @@ export default {
                   ></LoadableComponent>
                 </div>
               </v-layout>
-              <v-layout class="end-page">
+              <v-layout key="end-page" class="end-page">
                 <div
                   class="end-page-section d-flex flex-column align-center justify-center"
                 >
@@ -688,7 +689,7 @@ export default {
 }
 
 .sections-display {
-  border: 1px solid #e6e6e6;
+  // border: 1px solid #e6e6e6;
   border-radius: 10px;
   height: 100%;
   overflow: auto;

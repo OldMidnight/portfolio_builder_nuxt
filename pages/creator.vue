@@ -193,6 +193,7 @@ export default {
           this.customise_foreground_color = '#FFFFFF'
           this.setForegroundValue({ type: 'img_src', value: null })
           this.setCustomForeground(value)
+          this.text_border_color = false
         } else {
           this.setCustomForeground(value)
         }
