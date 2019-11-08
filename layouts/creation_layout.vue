@@ -37,7 +37,7 @@ export default {
     <v-container grid-list-md text-xs-center fluid justify-center fill-height>
       <v-layout column align-center class="creation-page-layout">
         <v-flex class="top-nav">
-          <div class="mini-logo">Kreoh.com</div>
+          <div class="mini-logo font-weight-light">Kreoh.com</div>
         </v-flex>
         <nuxt />
         <v-flex class="next-creation-step">

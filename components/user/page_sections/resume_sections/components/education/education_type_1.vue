@@ -191,7 +191,9 @@ export default {
       }"
     >
       <div class="schools-container d-flex flex-wrap justify-center">
-        <span class="title font-weight-bold">Education:</span>
+        <span v-if="!options.editing" class="title font-weight-bold">
+          Education:
+        </span>
         <div
           v-for="school in schools"
           :key="school.id"

@@ -46,7 +46,9 @@ export default {
       }"
     >
       <div class="description pt-5 px-9 d-flex flex-column align-center">
-        <span class="title font-weight-bold">About Me:</span>
+        <span v-if="!options.editing" class="title font-weight-bold">
+          About Me:
+        </span>
         <span class="desc" :class="{ 'subtitle-1': !options.editing }">
           {{ description }}
         </span>

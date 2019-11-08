@@ -187,7 +187,9 @@ export default {
       }"
     >
       <div class="grades-wrapper d-flex flex-column align-center">
-        <span class="title font-weight-bold">Certifications:</span>
+        <span v-if="!options.editing" class="title font-weight-bold">
+          Certifications:
+        </span>
         <div
           v-for="grade in certifications"
           :key="grade.id"

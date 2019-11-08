@@ -159,7 +159,9 @@ export default {
       }"
     >
       <div class="exp-container d-flex flex-column align-center">
-        <span class="title my-2 font-weight-bold">Experience:</span>
+        <span v-if="!options.editing" class="title my-2 font-weight-bold">
+          Experience:
+        </span>
         <div
           v-for="exp in experiences"
           :key="exp.id"

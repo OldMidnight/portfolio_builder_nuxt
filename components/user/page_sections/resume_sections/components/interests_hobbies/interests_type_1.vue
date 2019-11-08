@@ -113,7 +113,9 @@ export default {
       }"
     >
       <div class="interests-wrapper d-flex flex-column align-center">
-        <span class="title font-weight-bold">Hobbies/Interests:</span>
+        <span v-if="!options.editing" class="title font-weight-bold">
+          Hobbies/Interests:
+        </span>
         <div
           v-for="interest in interests"
           :key="interest.id"

@@ -212,6 +212,7 @@ export default {
         layout: this.resume_layout
       })
       this.resume_wizard_step = 0
+      this.progress = 0
     }
   }
 }
@@ -262,7 +263,7 @@ export default {
     >
       <v-card height="600" class="wizard-dialog">
         <v-card-title class="d-flex flex-column">
-          <span class="display-1 align-self-center">
+          <span class="display-1 align-self-center font-weight-thin">
             Resume Creation Wizard
           </span>
         </v-card-title>
@@ -284,7 +285,7 @@ export default {
                 :class="{ 'intro-step': !resume_created }"
               >
                 <div class="logo">
-                  <p>Kreoh.com</p>
+                  <p class="font-weight-light">Kreoh.com</p>
                 </div>
                 <div class="wizard-desc d-flex flex-column align-center">
                   <span class="title">Easy and customisable resume editor</span>
@@ -312,7 +313,13 @@ export default {
                       left
                     >
                       <v-card>
-                        <v-card-title class="purple lighten-2 section-header">
+                        <v-card-title
+                          class="purple lighten-2 section-header"
+                          @click="
+                            resume_wizard_step = 1
+                            progress += 100 / (wizard_layout_list.length + 3)
+                          "
+                        >
                           <h3 class="display-1 white--text font-weight-light">Resume Layout</h3>
                         </v-card-title>
                         <v-container>
@@ -328,7 +335,13 @@ export default {
                       left
                     >
                       <v-card>
-                        <v-card-title class="green lighten-2 section-header">
+                        <v-card-title
+                          class="green lighten-2 section-header"
+                          @click="
+                            resume_wizard_step = 2
+                            progress += (100 / (wizard_layout_list.length + 3)) * 2
+                          "
+                        >
                           <h3 class="display-1 white--text font-weight-light">Resume Sections</h3>
                         </v-card-title>
                         <v-container>
@@ -339,14 +352,20 @@ export default {
                       </v-card>
                     </v-timeline-item>
                     <v-timeline-item
-                      v-for="section in resume_layout"
+                      v-for="(section, index) in resume_layout"
                       :key="section"
                       color="info"
                       fill-dot
                       left
                     >
                       <v-card>
-                        <v-card-title class="info section-header">
+                        <v-card-title
+                          class="info section-header"
+                          @click="
+                            resume_wizard_step = index + 3
+                            progress += (100 / (wizard_layout_list.length + 3)) * (index + 3)
+                          "
+                        >
                           <h3 class="display-1 white--text font-weight-light">
                             {{ section.charAt(0).toUpperCase() + section.slice(1) }}
                           </h3>
@@ -602,7 +621,8 @@ export default {
                 mode="out-in"
               >
                 <v-btn
-                  v-if="resume_wizard_step > wizard_layout_list.length + 2"
+                  :disabled="transitioning"
+                  v-if="resume_wizard_step > wizard_layout_list.length + 2 || resume_created"
                   key="save"
                   color="success"
                   @click="
@@ -621,6 +641,24 @@ export default {
                   :value="progress"
                   class="align-self-center"
                 ></v-progress-linear>
+              </div>
+              <div v-if="resume_created">
+                <transition
+                  enter-active-class="animated fadeInUp faster"
+                  leave-active-class="animated fadeOutDown faster"
+                  mode="out-in"
+                >
+                  <v-btn
+                    :disabled="transitioning"
+                    color="info"
+                    @click="
+                      resume_wizard_step = 0
+                      progress = 0
+                    "
+                  >
+                    Back to start
+                  </v-btn>
+                </transition>
               </div>
             </div>
           </transition>
