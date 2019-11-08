@@ -220,8 +220,8 @@ export default {
 </script>
 
 <template>
-  <v-container fluid fill-height>
-    <v-layout class="d-flex flex-column align-center justify-center">
+  <v-container class="resume-container" fill-height>
+    <v-layout class="resume-wrapper d-flex flex-column">
       <v-btn
         v-if="!resume_created"
         color="info"
@@ -229,9 +229,13 @@ export default {
       >
         Create Your Resume!
       </v-btn>
-      <div v-else class="sections-display">
+      <div v-else class="sections-display pa-2 d-flex flex-column">
         <div class="edit-btn d-flex flex-column align-center my-3">
-          <v-btn color="info" @click="resume_wizard_dialog = true">
+          <v-btn
+            v-if="!options.live"
+            color="info"
+            @click="resume_wizard_dialog = true"
+          >
             Edit Resume
           </v-btn>
         </div>
@@ -248,7 +252,11 @@ export default {
           }"
         ></LoadableComponent>
         <div class="edit-btn d-flex flex-column align-center my-3">
-          <v-btn color="info" @click="resume_wizard_dialog = true">
+          <v-btn
+            v-if="!options.live"
+            color="info"
+            @click="resume_wizard_dialog = true"
+          >
             Edit Resume
           </v-btn>
         </div>
@@ -684,16 +692,20 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.test {
-  border: 1px solid red;
+.resume-container {
+  // overflow: auto;
+  position: relative;
+}
+
+.resume-wrapper {
+  position: absolute;
 }
 
 .sections-display {
   // border: 1px solid #e6e6e6;
   border-radius: 10px;
-  height: 100%;
-  overflow: auto;
   font-size: initial;
+  overflow: auto;
 }
 
 .wizard-dialog {

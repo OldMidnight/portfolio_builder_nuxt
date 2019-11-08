@@ -61,7 +61,7 @@ export default {
       }"
       @click="changeActiveNav('home')"
     >
-      <p class="headline align-self-center ma-0">
+      <p class="headline align-self-center font-weight-light ma-0">
         {{ site_props.nav_titles.home }}
       </p>
     </v-flex>
@@ -82,7 +82,7 @@ export default {
       }"
       @click="changeActiveNav('projects')"
     >
-      <p class="headline align-self-center ma-0">
+      <p class="headline align-self-center font-weight-light ma-0">
         {{ site_props.nav_titles.projects }}
       </p>
     </v-flex>
@@ -103,7 +103,7 @@ export default {
       }"
       @click="changeActiveNav('resume')"
     >
-      <p class="headline align-self-center ma-0">
+      <p class="headline align-self-center font-weight-light ma-0">
         {{ site_props.nav_titles.resume }}
       </p>
     </v-flex>
@@ -115,9 +115,11 @@ export default {
   display: flex;
   padding: 0 !important;
   width: 100%;
-  max-height: 13%;
-  height: 13%;
+  max-height: 15%;
+  height: 15%;
   background-color: white;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
   // border-bottom: 1px solid #b6b6b6;
 }
 

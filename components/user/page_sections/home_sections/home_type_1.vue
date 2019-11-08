@@ -199,7 +199,11 @@ export default {
       >
         {{ name_model }}
       </span>
-      <span v-else :class="{ 'display-2': options.live, title: !options.live }">
+      <span
+        v-else
+        class="font-weight-light"
+        :class="{ 'display-2': options.live, title: !options.live }"
+      >
         {{ name_model }}
       </span>
       <span

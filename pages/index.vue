@@ -45,38 +45,23 @@ export default {
 </script>
 
 <template>
-  <!-- <v-container grid-list-md text-xs-center fluid justify-center fill-height>
-    <v-layout column>
-      <v-btn v-if="status.loggedIn" color="info" @click="logout()">
-        Logout
-      </v-btn>
-    </v-layout>
-  </v-container> -->
-  <client-only placeholder="loading...">
-    <component :is="getLayout"></component>
-  </client-only>
+  <v-layout class="app-container d-flex flex-column align-center">
+    <client-only placeholder="Built Using Kreoh.com">
+      <component :is="getLayout"></component>
+    </client-only>
+  </v-layout>
 </template>
 
 <style lang="scss" scoped>
-.arrow,
-.settings-cog {
-  color: #b6b6b6;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  cursor: pointer;
+.app-container {
+  height: 100%;
+  padding: 0 !important;
+  width: 100%;
 }
 
-.arrow:hover {
-  color: black;
-}
-
-.settings-cog:hover {
-  color: black;
-}
-
-.cog-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-end;
+.user-footer {
+  width: 100%;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 </style>

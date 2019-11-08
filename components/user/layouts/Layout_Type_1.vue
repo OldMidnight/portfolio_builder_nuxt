@@ -414,8 +414,8 @@ export default {
 
 .page-wrapper {
   width: 60%;
-  min-height: 85%;
-  max-height: 85%;
+  min-height: 80%;
+  max-height: 80%;
   // margin-top: 2% !important;
   // margin-bottom: 2% !important;
   // background-color: #fafafa;
@@ -452,8 +452,7 @@ export default {
   height: 90%;
   margin-bottom: 5% !important;
   // border: 1px solid;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
+  border-radius: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
