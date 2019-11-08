@@ -92,6 +92,14 @@ export default {
           this.editing_interest_id = id
         }
       }
+    },
+    deleteInt() {
+      const editingInterestId = this.editing_interest_id
+      this.editing_interest_id = null
+      this.deleteInterest({
+        id: editingInterestId
+      })
+      this.editing = false
     }
   }
 }
@@ -179,6 +187,14 @@ export default {
                 label="Describe Your Interest"
               ></v-textarea>
             </div>
+            <v-btn
+              color="error"
+              class="align-self-center mb-3"
+              width="10"
+              @click="deleteInt()"
+            >
+              <v-icon>mdi-delete-forever</v-icon>
+            </v-btn>
           </div>
         </div>
       </transition>

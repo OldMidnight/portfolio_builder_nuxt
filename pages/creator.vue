@@ -92,7 +92,8 @@ export default {
       show_page_delete_error: false,
       show_page_add_success: false,
       show_page_delete_success: false,
-      current_page_type: 1
+      current_page_type: 1,
+      resume_not_created: false
     }
   },
   computed: {
@@ -807,7 +808,11 @@ export default {
       this.activeNav_index = this.customise_page_option_number
     },
     saveChanges() {
-      this.showNextStep()
+      if (this.site_props.resume_page_inputs.resume_created) {
+        this.showNextStep()
+      } else {
+        this.resume_not_created = true
+      }
     },
     clearChanges() {
       this.clearAllChanges()
@@ -1945,6 +1950,12 @@ export default {
     <v-snackbar v-model="show_page_add_success" color="success" left>
       Added new page!
       <v-btn icon @click="show_page_add_success = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
+    <v-snackbar v-model="resume_not_created" color="warning">
+      Make sure to create your resume on the resume tab before saving!
+      <v-btn icon @click="resume_not_created = false">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-snackbar>

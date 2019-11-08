@@ -144,7 +144,7 @@ export default {
     ...mapMutations({
       setResumeSection: 'creator/setResumeSection',
       addEducation: 'creator/addEducation',
-      deleteEducation: 'creator/deleteExperience'
+      deleteEducation: 'creator/deleteEducation'
     }),
     selectSchool(id) {
       if (this.options.editing) {
@@ -170,6 +170,14 @@ export default {
           this.editing_school_id = id
         }
       }
+    },
+    deleteEdu() {
+      const editingSchoolId = this.editing_school_id
+      this.editing_school_id = null
+      this.deleteEducation({
+        id: editingSchoolId
+      })
+      this.editing = false
     }
   }
 }
@@ -330,6 +338,14 @@ export default {
                 label="Currently attending"
               ></v-checkbox>
             </div>
+            <v-btn
+              color="error"
+              class="align-self-center mb-3"
+              width="10"
+              @click="deleteEdu()"
+            >
+              <v-icon>mdi-delete-forever</v-icon>
+            </v-btn>
           </div>
         </div>
       </transition>
@@ -418,7 +434,7 @@ export default {
   border: 1px solid #0066ff;
 }
 
-.seclectable:hover {
+.selectable:hover {
   border: 1px solid #0066ff;
   cursor: pointer;
 }

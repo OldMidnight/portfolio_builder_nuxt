@@ -269,7 +269,7 @@ export default {
         </v-card-title>
         <v-card-text>
           <v-container class="wizard-container">
-            <transition
+            <transition-group
               enter-active-class="animated fadeInRight faster"
               leave-active-class="animated fadeOutLeft faster"
               mode="out-in"
@@ -588,7 +588,7 @@ export default {
                   </span>
                 </div>
               </v-layout>
-            </transition>
+            </transition-group>
           </v-container>
         </v-card-text>
         <v-divider></v-divider>

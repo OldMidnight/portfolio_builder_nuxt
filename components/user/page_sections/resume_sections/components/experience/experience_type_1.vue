@@ -138,6 +138,14 @@ export default {
           this.editing_exp_id = id
         }
       }
+    },
+    deleteEdu() {
+      const editingExpId = this.editing_exp_id
+      this.editing_exp_id = null
+      this.deleteExperience({
+        id: editingExpId
+      })
+      this.editing = false
     }
   }
 }
@@ -268,6 +276,14 @@ export default {
               label="Describe Your Position..."
               class="exp-desc-box"
             ></v-textarea>
+            <v-btn
+              color="error"
+              class="align-self-center mb-3"
+              width="10"
+              @click="deleteExp()"
+            >
+              <v-icon>mdi-delete-forever</v-icon>
+            </v-btn>
           </div>
         </div>
       </transition>
