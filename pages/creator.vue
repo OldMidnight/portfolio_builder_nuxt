@@ -528,7 +528,7 @@ export default {
       input_dict_values: {
         projects: [
           {
-            id: Date.now(),
+            id: Date.now().toString(),
             title: 'Project Title Here',
             description:
               'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
@@ -550,7 +550,7 @@ export default {
       input_dict_values: {
         projects: [
           {
-            id: Date.now(),
+            id: Date.now().toString(),
             title: 'Project Title Here',
             description:
               'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
@@ -562,7 +562,7 @@ export default {
             link: null
           },
           {
-            id: Date.now() + '_2',
+            id: Date.now().toString() + '_2',
             title: 'Project Title Here',
             description:
               'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',

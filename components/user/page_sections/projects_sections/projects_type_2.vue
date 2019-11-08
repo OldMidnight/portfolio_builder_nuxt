@@ -137,7 +137,7 @@ export default {
 
       this.temp_project.id = this.editing_project
         ? this.temp_project.id
-        : Date.now()
+        : Date.now().toString()
 
       if (this.editing_project) {
         this.$emit('update', {

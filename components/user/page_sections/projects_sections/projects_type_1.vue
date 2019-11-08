@@ -96,7 +96,6 @@ export default {
       // this.validateURL()
     }
   },
-  created() {},
   methods: {
     validateURL() {
       if (this.temp_project.img.url !== '') {
@@ -138,7 +137,7 @@ export default {
 
       this.temp_project.id = this.editing_project
         ? this.temp_project.id
-        : Date.now()
+        : Date.now().toString()
 
       if (this.editing_project) {
         this.$emit('update', {

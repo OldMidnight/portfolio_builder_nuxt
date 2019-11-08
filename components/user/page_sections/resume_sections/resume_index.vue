@@ -106,7 +106,7 @@ export default {
     // highest = The value of the list of components which has the highest number of components
     if (this.resume_created) {
       this.section_component = this.resume_sections
-      this.resume_layout = this.$store.state.site_props.resume_page_inputs.resume_layout
+      this.resume_layout = this.$store.state.creator.site_props.resume_page_inputs.resume_layout
     } else {
       const highest = 3
 
@@ -228,7 +228,7 @@ export default {
       >
         Create Your Resume!
       </v-btn>
-      <div class="sections-display" v-else>
+      <div v-else class="sections-display">
         <div class="edit-btn d-flex flex-column align-center my-3">
           <v-btn color="info" @click="resume_wizard_dialog = true">
             Edit Resume
@@ -284,7 +284,7 @@ export default {
                 class="wizard-step"
                 :class="{ 'intro-step': !resume_created }"
               >
-                <div class="logo">
+                <div class="logo my-9">
                   <p class="font-weight-light">Kreoh.com</p>
                 </div>
                 <div class="wizard-desc d-flex flex-column align-center">
@@ -305,13 +305,15 @@ export default {
                     Get Started!
                   </v-btn>
                 </div>
-                <div v-else class="wizard-timeline-container">
+                <div
+                  v-else
+                  class="wizard-timeline-container d-flex flex-column align-center"
+                >
+                  <span class="title font-weight-bold">
+                    Select a section to begin editing at that point.
+                  </span>
                   <v-timeline dense>
-                    <v-timeline-item
-                      color="purple lighten-2"
-                      fill-dot
-                      left
-                    >
+                    <v-timeline-item color="purple lighten-2" fill-dot left>
                       <v-card>
                         <v-card-title
                           class="purple lighten-2 section-header"
@@ -320,7 +322,9 @@ export default {
                             progress += 100 / (wizard_layout_list.length + 3)
                           "
                         >
-                          <h3 class="display-1 white--text font-weight-light">Resume Layout</h3>
+                          <h3 class="display-1 white--text font-weight-light">
+                            Resume Layout
+                          </h3>
                         </v-card-title>
                         <v-container>
                           <v-layout>
@@ -329,24 +333,26 @@ export default {
                         </v-container>
                       </v-card>
                     </v-timeline-item>
-                    <v-timeline-item
-                      color="green lighten-2"
-                      fill-dot
-                      left
-                    >
+                    <v-timeline-item color="green lighten-2" fill-dot left>
                       <v-card>
                         <v-card-title
                           class="green lighten-2 section-header"
                           @click="
                             resume_wizard_step = 2
-                            progress += (100 / (wizard_layout_list.length + 3)) * 2
+                            progress +=
+                              (100 / (wizard_layout_list.length + 3)) * 2
                           "
                         >
-                          <h3 class="display-1 white--text font-weight-light">Resume Sections</h3>
+                          <h3 class="display-1 white--text font-weight-light">
+                            Resume Sections
+                          </h3>
                         </v-card-title>
                         <v-container>
                           <v-layout>
-                            <div>Customise your choices for the different resume sections.</div>
+                            <div>
+                              Customise your choices for the different resume
+                              sections.
+                            </div>
                           </v-layout>
                         </v-container>
                       </v-card>
@@ -363,18 +369,23 @@ export default {
                           class="info section-header"
                           @click="
                             resume_wizard_step = index + 3
-                            progress += (100 / (wizard_layout_list.length + 3)) * (index + 3)
+                            progress +=
+                              (100 / (wizard_layout_list.length + 3)) *
+                              (index + 3)
                           "
                         >
                           <h3 class="display-1 white--text font-weight-light">
-                            {{ section.charAt(0).toUpperCase() + section.slice(1) }}
+                            {{
+                              section.charAt(0).toUpperCase() + section.slice(1)
+                            }}
                           </h3>
                         </v-card-title>
                         <v-container>
                           <v-layout>
                             <LoadableComponent
                               :component-name="
-                                section_component[section + '_component'].component
+                                section_component[section + '_component']
+                                  .component
                               "
                               :options="{
                                 input_dict_name: 'test',
@@ -621,9 +632,12 @@ export default {
                 mode="out-in"
               >
                 <v-btn
-                  :disabled="transitioning"
-                  v-if="resume_wizard_step > wizard_layout_list.length + 2 || resume_created"
+                  v-if="
+                    resume_wizard_step > wizard_layout_list.length + 2 ||
+                      resume_created
+                  "
                   key="save"
+                  :disabled="transitioning"
                   color="success"
                   @click="
                     resume_wizard_dialog = false
@@ -711,7 +725,6 @@ export default {
 }
 
 .logo {
-  margin-bottom: 15%;
   p {
     font-size: 60px;
     color: #0066ff;
@@ -789,11 +802,11 @@ export default {
 }
 
 .section-header {
-  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .section-header:hover {
   cursor: pointer;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 </style>
