@@ -116,8 +116,20 @@ export default {
 </script>
 
 <template>
-  <v-layout class="d-flex flex-column align-center info-container">
-    <div class="info-viewer mb-3 elevation-2">
+  <v-layout
+    class="d-flex flex-column align-center"
+    :class="{
+      'info-main-container': !options.editing,
+      'info-container': options.editing
+    }"
+  >
+    <div
+      class="mb-3 elevation-2"
+      :class="{
+        'info-viewer': options.editing,
+        'info-main-viewer': !options.editing
+      }"
+    >
       <div class="name d-flex flex-column align-center my-2">
         <span class="headline">{{ name }}</span>
       </div>
@@ -214,8 +226,17 @@ export default {
   height: 100%;
 }
 
+.info-main-container {
+  width: 100%;
+}
+
 .info-viewer {
   height: 50%;
+  width: 100%;
+}
+
+.info-main-viewer {
+  height: 100%;
   width: 100%;
 }
 

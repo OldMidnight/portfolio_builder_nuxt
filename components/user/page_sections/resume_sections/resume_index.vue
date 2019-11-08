@@ -211,6 +211,7 @@ export default {
         sections: this.section_component,
         layout: this.resume_layout
       })
+      this.resume_wizard_step = 0
     }
   }
 }
@@ -227,6 +228,11 @@ export default {
         Create Your Resume!
       </v-btn>
       <div class="sections-display" v-else>
+        <div class="edit-btn d-flex flex-column align-center my-3">
+          <v-btn color="info" @click="resume_wizard_dialog = true">
+            Edit Resume
+          </v-btn>
+        </div>
         <LoadableComponent
           v-for="section in resume_layout"
           :key="section"
@@ -239,6 +245,11 @@ export default {
             width: '150'
           }"
         ></LoadableComponent>
+        <div class="edit-btn d-flex flex-column align-center my-3">
+          <v-btn color="info" @click="resume_wizard_dialog = true">
+            Edit Resume
+          </v-btn>
+        </div>
       </div>
     </v-layout>
     <v-dialog
@@ -269,19 +280,20 @@ export default {
                 key="0"
                 column
                 align-center
-                class="wizard-step intro-step"
+                class="wizard-step"
+                :class="{ 'intro-step': !resume_created }"
               >
                 <div class="logo">
                   <p>Kreoh.com</p>
                 </div>
-                <div class="wizard-desc">
+                <div class="wizard-desc d-flex flex-column align-center">
                   <span class="title">Easy and customisable resume editor</span>
                   <span>
                     With Kreoh's in-built and customisable editor, put together
                     a resume purpose built for you.
                   </span>
                 </div>
-                <div class="wizard-get-started-btn">
+                <div v-if="!resume_created" class="wizard-get-started-btn">
                   <v-btn
                     color="success"
                     @click="
@@ -291,6 +303,73 @@ export default {
                   >
                     Get Started!
                   </v-btn>
+                </div>
+                <div v-else class="wizard-timeline-container">
+                  <v-timeline dense>
+                    <v-timeline-item
+                      color="purple lighten-2"
+                      fill-dot
+                      left
+                    >
+                      <v-card>
+                        <v-card-title class="purple lighten-2 section-header">
+                          <h3 class="display-1 white--text font-weight-light">Resume Layout</h3>
+                        </v-card-title>
+                        <v-container>
+                          <v-layout>
+                            <div>Re-design the layout of your resume here.</div>
+                          </v-layout>
+                        </v-container>
+                      </v-card>
+                    </v-timeline-item>
+                    <v-timeline-item
+                      color="green lighten-2"
+                      fill-dot
+                      left
+                    >
+                      <v-card>
+                        <v-card-title class="green lighten-2 section-header">
+                          <h3 class="display-1 white--text font-weight-light">Resume Sections</h3>
+                        </v-card-title>
+                        <v-container>
+                          <v-layout>
+                            <div>Customise your choices for the different resume sections.</div>
+                          </v-layout>
+                        </v-container>
+                      </v-card>
+                    </v-timeline-item>
+                    <v-timeline-item
+                      v-for="section in resume_layout"
+                      :key="section"
+                      color="info"
+                      fill-dot
+                      left
+                    >
+                      <v-card>
+                        <v-card-title class="info section-header">
+                          <h3 class="display-1 white--text font-weight-light">
+                            {{ section.charAt(0).toUpperCase() + section.slice(1) }}
+                          </h3>
+                        </v-card-title>
+                        <v-container>
+                          <v-layout>
+                            <LoadableComponent
+                              :component-name="
+                                section_component[section + '_component'].component
+                              "
+                              :options="{
+                                input_dict_name: 'test',
+                                preview: false,
+                                editing: false,
+                                height: '150',
+                                width: '150'
+                              }"
+                            ></LoadableComponent>
+                          </v-layout>
+                        </v-container>
+                      </v-card>
+                    </v-timeline-item>
+                  </v-timeline>
                 </div>
               </v-layout>
               <v-layout
@@ -459,6 +538,7 @@ export default {
                     :options="{
                       input_dict_name: 'test',
                       preview: false,
+                      editing: true,
                       height: '150',
                       width: '150'
                     }"
@@ -556,9 +636,11 @@ export default {
 }
 
 .sections-display {
-  border: 1px solid;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
   height: 100%;
   overflow: auto;
+  font-size: initial;
 }
 
 .wizard-dialog {
@@ -666,5 +748,14 @@ export default {
 
 .wizard-progress {
   width: 100%;
+}
+
+.section-header {
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+
+.section-header:hover {
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 </style>

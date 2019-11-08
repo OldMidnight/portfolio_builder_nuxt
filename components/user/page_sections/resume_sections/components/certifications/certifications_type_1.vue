@@ -172,17 +172,31 @@ export default {
 </script>
 
 <template>
-  <v-layout class="d-flex flex-column align-center grades-container">
+  <v-layout
+    class="d-flex flex-column align-center"
+    :class="{
+      'grades-main-container': !options.editing,
+      'grades-container': options.editing
+    }"
+  >
     <div
-      class="grades-viewer d-flex flex-column align-center mb-3 pa-6 elevation-2"
+      class="d-flex flex-column align-center mb-3 pa-6 elevation-2"
+      :class="{
+        'grades-viewer': options.editing,
+        'grades-main-viewer': !options.editing
+      }"
     >
       <div class="grades-wrapper d-flex flex-column align-center">
+        <span class="title font-weight-bold">Certifications:</span>
         <div
           v-for="grade in certifications"
           :key="grade.id"
           :ref="'grade_' + grade.id"
-          class="grade d-flex flex-column align-center my-3 pa-3 elevation-1"
-          :class="{ selectable: options.editing }"
+          class="d-flex flex-column align-center my-3 pa-3 elevation-1"
+          :class="{
+            'selectable, grade': options.editing,
+            'main-grade': !options.editing
+          }"
           @click="selectGrade(grade.id)"
         >
           <div class="cert-name">
@@ -346,8 +360,19 @@ export default {
   height: 100%;
 }
 
+.grades-main-container {
+  width: 100%;
+}
+
 .grades-viewer {
   height: 50%;
+  width: 100%;
+  overflow: auto;
+  position: relative;
+}
+
+.grades-main-viewer {
+  height: 100%;
   width: 100%;
   overflow: auto;
   position: relative;
@@ -359,6 +384,11 @@ export default {
 
 .grade {
   width: 60%;
+  border-radius: 10px;
+}
+
+.main-grade {
+  width: 90%;
   border-radius: 10px;
 }
 

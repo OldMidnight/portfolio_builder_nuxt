@@ -176,21 +176,42 @@ export default {
 </script>
 
 <template>
-  <v-layout class="d-flex flex-column align-center edu-container">
+  <v-layout
+    class="d-flex flex-column align-center"
+    :class="{
+      'edu-main-container': !options.editing,
+      'edu-container': options.editing
+    }"
+  >
     <div
-      class="edu-viewer d-flex flex-column align-center mb-3 pa-6 elevation-2"
+      class="d-flex flex-column align-center mb-3 pa-6 elevation-2"
+      :class="{
+        'edu-viewer': options.editing,
+        'edu-main-viewer': !options.editing
+      }"
     >
       <div class="schools-container d-flex flex-wrap justify-center">
+        <span class="title font-weight-bold">Education:</span>
         <div
           v-for="school in schools"
           :key="school.id"
           :ref="'school_' + school.id"
-          class="school pa-2 ma-2 elevation-1 d-flex flex-column align-center"
-          :class="{ selectable: options.editing }"
+          class="pa-2 ma-2 elevation-1 d-flex flex-column align-center"
+          :class="{
+            'selectable school': options.editing,
+            'main-school': !options.editing
+          }"
           @click="selectSchool(school.id)"
         >
           <div class="school-name">
-            <span class="body-1">{{ school.name }}</span>
+            <span
+              :class="{
+                'body-1': options.editing,
+                'body-2': !options.editing
+              }"
+            >
+              {{ school.name }}
+            </span>
           </div>
           <div class="school-address d-flex flex-column align-center">
             <span
@@ -362,8 +383,19 @@ export default {
   height: 100%;
 }
 
+.edu-main-container {
+  width: 100%;
+}
+
 .edu-viewer {
   height: 50%;
+  width: 100%;
+  overflow: auto;
+  position: relative;
+}
+
+.edu-main-viewer {
+  height: 100%;
   width: 100%;
   overflow: auto;
   position: relative;
@@ -372,6 +404,11 @@ export default {
 .school {
   // border: 1px solid #777;
   width: 45%;
+  border-radius: 10px;
+}
+
+.main-school {
+  width: 90%;
   border-radius: 10px;
 }
 

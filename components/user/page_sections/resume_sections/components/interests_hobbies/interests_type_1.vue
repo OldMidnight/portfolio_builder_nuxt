@@ -98,17 +98,31 @@ export default {
 </script>
 
 <template>
-  <v-layout class="d-flex flex-column align-center interests-container">
+  <v-layout
+    class="d-flex flex-column align-center"
+    :class="{
+      'interests-main-container': !options.editing,
+      'interests-container': options.editing
+    }"
+  >
     <div
-      class="interests-viewer d-flex flex-column align-center mb-3 pa-6 elevation-2"
+      class="d-flex flex-column align-center mb-3 pa-6 elevation-2"
+      :class="{
+        'interests-viewer': options.editing,
+        'interests-main-viewer': !options.editing
+      }"
     >
       <div class="interests-wrapper d-flex flex-column align-center">
+        <span class="title font-weight-bold">Hobbies/Interests:</span>
         <div
           v-for="interest in interests"
           :key="interest.id"
           :ref="'interest_' + interest.id"
-          class="interest d-flex flex-column align-center elevation-1 ma-2 pa-6"
-          :class="{ selectable: options.editing }"
+          class="d-flex flex-column align-center elevation-1 ma-2 pa-6"
+          :class="{
+            'selectable interest': options.editing,
+            'main-interest': !options.editing
+          }"
           @click="selectInterest(interest.id)"
         >
           <span class="title mb-2">{{ interest.title }}</span>
@@ -176,8 +190,19 @@ export default {
   height: 100%;
 }
 
+.interests-main-container {
+  width: 100%;
+}
+
 .interests-viewer {
   height: 50%;
+  width: 100%;
+  overflow: auto;
+  position: relative;
+}
+
+.interests-main-viewer {
+  height: 100%;
   width: 100%;
   overflow: auto;
   position: relative;
@@ -189,6 +214,12 @@ export default {
 
 .interest {
   width: 40%;
+  border-radius: 10px;
+}
+
+.main-interest {
+  width: 90%;
+  border-radius: 10px;
 }
 
 .interest-selected {

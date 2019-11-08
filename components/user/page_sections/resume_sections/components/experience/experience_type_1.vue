@@ -144,9 +144,22 @@ export default {
 </script>
 
 <template>
-  <v-layout class="d-flex flex-column align-center exp-container">
-    <div class="exp-viewer mb-3 elevation-2">
+  <v-layout
+    class="d-flex flex-column align-center"
+    :class="{
+      'exp-main-container': !options.editing,
+      'exp-container': options.editing
+    }"
+  >
+    <div
+      class="mb-3 elevation-2"
+      :class="{
+        'exp-viewer': options.editing,
+        'exp-main-viewer': !options.editing
+      }"
+    >
       <div class="exp-container d-flex flex-column align-center">
+        <span class="title my-2 font-weight-bold">Experience:</span>
         <div
           v-for="exp in experiences"
           :key="exp.id"
@@ -308,8 +321,18 @@ export default {
   height: 100%;
 }
 
+.exp-main-container {
+  width: 100%;
+}
+
 .exp-viewer {
   height: 50%;
+  width: 100%;
+  overflow: auto;
+}
+
+.exp-main-viewer {
+  height: 100%;
   width: 100%;
   overflow: auto;
 }
@@ -317,6 +340,7 @@ export default {
 .exp {
   border-top: 1px solid;
   width: 90%;
+  font-size: initial;
 }
 
 .desc {
