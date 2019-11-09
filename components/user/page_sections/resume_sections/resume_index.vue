@@ -224,6 +224,7 @@ export default {
     <v-layout class="resume-wrapper d-flex flex-column">
       <v-btn
         v-if="!resume_created"
+        class="align-self-center my-auto"
         color="info"
         @click="resume_wizard_dialog = true"
       >
@@ -584,7 +585,7 @@ export default {
                   ></LoadableComponent>
                 </div>
               </v-layout>
-              <v-layout key="end-page" class="end-page">
+              <v-layout v-if="resume_wizard_step === (wizard_layout_list.length + 3)" key="end-page" class="end-page">
                 <div
                   class="end-page-section d-flex flex-column align-center justify-center"
                 >
@@ -699,6 +700,7 @@ export default {
 
 .resume-wrapper {
   position: absolute;
+  width: 100%;
 }
 
 .sections-display {
