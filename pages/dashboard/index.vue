@@ -10,7 +10,10 @@ export default {
         { title: 'Dashboard', icon: 'mdi-view-dashboard' },
         { title: 'Photos', icon: 'mdi-image' },
         { title: 'About', icon: 'mdi-help-box' }
-      ]
+      ],
+      delete_error: false,
+      delete_success: false,
+      delete_msg: {}
     }
   },
   computed: {
@@ -31,7 +34,20 @@ export default {
     activateSite() {
       this.$axios.$post('/helper/site_config/site_activation')
     },
-    deleteSite() {}
+    deleteSite() {
+      this.$axios.$post('/helper/delete_site').then((response) => {
+        this.delete_msg = response
+        if (response.error) {
+          this.delete_error = true
+        } else if (response.success) {
+          this.delete_success = true
+        }
+      })
+      this.$axios.$get('/helper/get_site_active').then((response) => {
+        this.enableSite = response.site_active
+        this.site_available = response.site_available
+      })
+    }
   }
 }
 </script>
@@ -90,6 +106,18 @@ export default {
         </v-layout>
       </v-layout>
     </v-layout>
+    <v-snackbar v-model="delete_error" color="error">
+      {{ delete_msg.error }}
+      <v-btn icon @click="delete_error = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
+    <v-snackbar v-model="delete_success" color="success">
+      {{ delete_msg.success }}
+      <v-btn icon @click="delete_success = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
   </v-container>
 </template>
 

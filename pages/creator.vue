@@ -10,9 +10,9 @@ export default {
         required: (value) => !!value || 'Required.'
       },
       layouts: [
-        { id: 1, name: 'Layout_Type_1', img_path: 'Layout_1_img.png' },
-        { id: 2, name: 'Layout_Type_2', img_path: '#' },
-        { id: 3, name: 'Layout_Type_3', img_path: '#' }
+        { id: 1, name: 'ORIGINAL', img_path: 'Layout_1_img.png' },
+        { id: 2, name: 'STARK', img_path: '#' },
+        { id: 3, name: 'CLEAR', img_path: '#' }
       ],
       site_nav: 0,
       nav_types: [
@@ -640,17 +640,14 @@ export default {
     ...mapActions({
       registerWebsite: 'creator/registerWebsite'
     }),
-    selectLayout(e, layout) {
-      if (layout.id === 1) {
+    selectLayout(e, index) {
+      if (index === 0) {
         const layoutItemContainer = document.querySelector('.layout-selected')
 
         if (layoutItemContainer !== e.target.parentElement) {
           // If Clicking a different Layout
 
-          this.setSiteLayout(
-            this.layouts[Number(e.target.parentElement.id.split('-')[1]) - 1]
-              .name
-          )
+          this.setSiteLayout(this.layouts[index].name)
         } else {
           this.setSiteLayout(null)
         }
@@ -923,25 +920,31 @@ export default {
 
         <v-layout row wrap class="creation-step-content">
           <v-flex
-            v-for="layout in layouts"
-            :id="'layout-' + layout.id"
-            :key="layout.id"
+            v-for="(layout, index) in layouts"
+            :id="'layout-' + index"
+            :key="index"
             xs4
             :class="{
               'layout-item-container': layout.id === 1,
               'layout-selected': site_props.layout === layout.name,
               'layout-disabled': layout.id !== 1
             }"
-            @click="selectLayout($event, layout)"
+            @click="selectLayout($event, index)"
           >
             <div
+              class="d-flex flex-column justify-center pa-3"
               :class="{
                 'layout-item': layout.id === 1,
                 'layout-item-disabled': layout.id !== 1,
                 'layout-selected-2': site_props.layout === layout.name
               }"
-            ></div>
-            <p>this is layout {{ layout.name }}</p>
+            >
+              <img
+                :alt="'Layout Image: ' + layout.name"
+                :src="'/layout_images/' + layout.img_path"
+              />
+            </div>
+            <p class="text-center font-weight-light">{{ layout.name }}</p>
           </v-flex>
         </v-layout>
       </v-flex>
@@ -2031,11 +2034,14 @@ export default {
 
 .layout-item {
   height: 100%;
-  border: 1px solid white;
-  background-color: white;
+  border: 1px solid #e3f2fd;
+  background-color: #e3f2fd;
   border-radius: 10px;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  img {
+    width: 100%;
+  }
 }
 
 .layout-item-disabled {

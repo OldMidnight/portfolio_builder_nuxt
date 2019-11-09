@@ -524,15 +524,13 @@ export default {
       registerWebsite: 'creator/registerWebsite',
       updateWebsite: 'creator/updateWebsite'
     }),
-    selectLayout(e) {
+    selectLayout(e, index) {
       const layoutItemContainer = document.querySelector('.layout-selected')
 
-      if (layoutItemContainer !== e.target.parentElement) {
+      if (layoutItemContainer !== e.target.parentElement && index === 0) {
         // If Clicking a different Layout
 
-        this.setSiteLayout(
-          this.layouts[Number(e.target.parentElement.id.split('-')[1]) - 1].name
-        )
+        this.setSiteLayout(this.layouts[index].name)
       } else {
         this.setSiteLayout(null)
       }
@@ -799,16 +797,16 @@ export default {
 
         <v-layout row wrap class="creation-step-content">
           <v-flex
-            v-for="layout in layouts"
-            :id="'layout-' + layout.id"
-            :key="layout.id"
+            v-for="(layout, index) in layouts"
+            :id="'layout-' + index"
+            :key="index"
             xs4
             :class="{
               'layout-item-container': layout.id === 1,
               'layout-selected': site_props.layout === layout.name,
               'layout-disabled': layout.id !== 1
             }"
-            @click="selectLayout($event, layout)"
+            @click="selectLayout($event, index)"
           >
             <div
               class="d-flex flex-column justify-center pa-3"
