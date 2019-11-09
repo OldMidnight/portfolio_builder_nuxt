@@ -12,7 +12,9 @@ export default {}
         </v-flex>
       </v-layout>
     </v-container>
-    <span class="caption footer mb-5">&#169; 2020 Kreoh.com</span>
+    <span class="caption footer mb-5">
+      &#169; {{ new Date().getFullYear() }} — Kreoh.com
+    </span>
   </v-app>
 </template>
 

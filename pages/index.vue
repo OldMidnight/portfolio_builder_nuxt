@@ -48,6 +48,18 @@ export default {
   <v-layout class="app-container d-flex flex-column align-center">
     <client-only placeholder="Built Using Kreoh.com">
       <component :is="getLayout"></component>
+      <v-footer
+        padless
+        height="30"
+        class="user-footer caption font-weight-light d-flex flex-column align-center justify-center"
+      >
+        <span>
+          &#169; {{ new Date().getFullYear() }} —
+          <strong>
+            <a href="www.kreoh.com">Kreoh.com</a>
+          </strong>
+        </span>
+      </v-footer>
     </client-only>
   </v-layout>
 </template>
@@ -61,7 +73,5 @@ export default {
 
 .user-footer {
   width: 100%;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
 }
 </style>

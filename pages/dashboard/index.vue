@@ -30,7 +30,8 @@ export default {
     }),
     activateSite() {
       this.$axios.$post('/helper/site_config/site_activation')
-    }
+    },
+    deleteSite() {}
   }
 }
 </script>
@@ -81,6 +82,9 @@ export default {
           </v-btn>
           <v-btn v-if="!site_available" color="info" href="/creator">
             Create {{ user.domain }}.kreoh.com
+          </v-btn>
+          <v-btn v-if="site_available" color="error" @click="deleteSite()">
+            Delete {{ user.domain }}.kreoh.com
           </v-btn>
           <v-btn color="error" href="/auth/logout">Logout</v-btn>
         </v-layout>

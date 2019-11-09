@@ -424,7 +424,7 @@ export default {
 .bottom-nav-arrows {
   min-height: 5%;
   max-height: 5%;
-  width: 20%;
+  width: 15%;
   margin: 0 !important;
   // border: 1px solid;
 }

@@ -10,9 +10,9 @@ export default {
         required: (value) => !!value || 'Required.'
       },
       layouts: [
-        { id: 1, name: 'Layout_Type_1' },
-        { id: 2, name: 'Layout_Type_2' },
-        { id: 3, name: 'Layout_Type_3' }
+        { id: 1, name: 'Layout_Type_1', img_path: 'Layout_1_img.png' },
+        { id: 2, name: 'Layout_Type_2', img_path: '#' },
+        { id: 3, name: 'Layout_Type_3', img_path: '#' }
       ],
       site_nav: 0,
       nav_types: [

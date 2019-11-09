@@ -10,9 +10,9 @@ export default {
         required: (value) => !!value || 'Required.'
       },
       layouts: [
-        { id: 1, name: 'Layout_Type_1' },
-        { id: 2, name: 'Layout_Type_2' },
-        { id: 3, name: 'Layout_Type_3' }
+        { id: 1, name: 'ORIGINAL', img_path: 'Layout_1_img.png' },
+        { id: 2, name: 'STARK', img_path: '#' },
+        { id: 3, name: 'CLEAR', img_path: '#' }
       ],
       site_nav: 0,
       nav_types: [
@@ -811,13 +811,19 @@ export default {
             @click="selectLayout($event, layout)"
           >
             <div
+              class="d-flex flex-column justify-center pa-3"
               :class="{
                 'layout-item': layout.id === 1,
                 'layout-item-disabled': layout.id !== 1,
                 'layout-selected-2': site_props.layout === layout.name
               }"
-            ></div>
-            <p>this is layout {{ layout.name }}</p>
+            >
+              <img
+                :alt="'Layout Image: ' + layout.name"
+                :src="'/layout_images/' + layout.img_path"
+              />
+            </div>
+            <p class="text-center font-weight-light">{{ layout.name }}</p>
           </v-flex>
         </v-layout>
       </v-flex>
@@ -1882,11 +1888,14 @@ export default {
 
 .layout-item {
   height: 100%;
-  border: 1px solid white;
-  background-color: white;
+  border: 1px solid #e3f2fd;
+  background-color: #e3f2fd;
   border-radius: 10px;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  img {
+    width: 100%;
+  }
 }
 
 .layout-item-disabled {
