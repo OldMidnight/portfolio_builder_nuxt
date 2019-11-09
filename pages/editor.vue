@@ -10,9 +10,13 @@ export default {
         required: (value) => !!value || 'Required.'
       },
       layouts: [
-        { id: 1, name: 'ORIGINAL', img_path: 'Layout_1_img.png' },
-        { id: 2, name: 'STARK', img_path: '#' },
-        { id: 3, name: 'CLEAR', img_path: '#' }
+        { id: 1,
+          component_name: 'Layout_Type_1',
+          name: 'ORIGINAL',
+          img_path: 'Layout_1_img.png'
+        },
+        { id: 2, component_name: 'Layout_Type_2', name: 'STARK', img_path: '#' },
+        { id: 3, component_name: 'Layout_Type_3', name: 'CLEAR', img_path: '#' }
       ],
       site_nav: 0,
       nav_types: [
@@ -530,7 +534,7 @@ export default {
       if (layoutItemContainer !== e.target.parentElement && index === 0) {
         // If Clicking a different Layout
 
-        this.setSiteLayout(this.layouts[index].name)
+        this.setSiteLayout(this.layouts[index].component_name)
       } else {
         this.setSiteLayout(null)
       }
