@@ -10,13 +10,24 @@ export default {
         required: (value) => !!value || 'Required.'
       },
       layouts: [
-        { id: 1,
+        {
+          id: 1,
           component_name: 'Layout_Type_1',
           name: 'ORIGINAL',
           img_path: 'Layout_1_img.png'
         },
-        { id: 2, component_name: 'Layout_Type_2', name: 'STARK', img_path: '#' },
-        { id: 3, component_name: 'Layout_Type_3', name: 'CLEAR', img_path: '#' }
+        {
+          id: 2,
+          component_name: 'Layout_Type_2',
+          name: 'STARK',
+          img_path: '#'
+        },
+        {
+          id: 3,
+          component_name: 'Layout_Type_3',
+          name: 'CLEAR',
+          img_path: '#'
+        }
       ],
       site_nav: 0,
       nav_types: [
@@ -807,7 +818,7 @@ export default {
             xs4
             :class="{
               'layout-item-container': layout.id === 1,
-              'layout-selected': site_props.layout === layout.name,
+              'layout-selected': site_props.layout === layout.component_name,
               'layout-disabled': layout.id !== 1
             }"
             @click="selectLayout($event, index)"
@@ -817,7 +828,7 @@ export default {
               :class="{
                 'layout-item': layout.id === 1,
                 'layout-item-disabled': layout.id !== 1,
-                'layout-selected-2': site_props.layout === layout.name
+                'layout-selected-2': site_props.layout === layout.component_name
               }"
             >
               <img
@@ -1420,7 +1431,7 @@ export default {
             <!-- PREVIEW CONTAINER -->
 
             <v-layout
-              v-if="site_props.layout === layouts[0].name"
+              v-if="site_props.layout === layouts[0].component_name"
               column
               class="preview-1-page-container"
               :style="check_color_style"
@@ -1621,7 +1632,7 @@ export default {
               </v-flex>
             </v-layout>
             <v-layout
-              v-if="site_props.layout === layouts[1].name"
+              v-if="site_props.layout === layouts[1].component_name"
               class="preview-2-page-container"
             >
               <v-layout column class="preview-2-sidenav">
@@ -1637,7 +1648,7 @@ export default {
               <v-flex class="preview-2-content-body"></v-flex>
             </v-layout>
             <v-layout
-              v-if="site_props.layout === layouts[2].name"
+              v-if="site_props.layout === layouts[2].component_name"
               column
               align-center
               :class="{

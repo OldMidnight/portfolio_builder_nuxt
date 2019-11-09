@@ -22,14 +22,29 @@ export default {
       }
     }
   },
-  fetch({ store, $axios }) {
-    if (store.state.creator.is_subdomain) {
+  fetch({ store, $axios, redirect }) {
+    if (
+      store.state.creator.is_subdomain &&
+      !store.state.creator.domain.available
+    ) {
+      redirect('/site_disabled')
+    } else if (
+      store.state.creator.is_subdomain &&
+      store.state.creator.domain.available
+    ) {
       return $axios
         .$post('/helper/site_config', {
           domain: store.state.creator.domain.name
         })
         .then((response) => {
-          store.commit('creator/setSiteProps', JSON.parse(response.site_config))
+          if (response.error) {
+            redirect('/site_disabled')
+          } else {
+            store.commit(
+              'creator/setSiteProps',
+              JSON.parse(response.site_config)
+            )
+          }
         })
     }
   },

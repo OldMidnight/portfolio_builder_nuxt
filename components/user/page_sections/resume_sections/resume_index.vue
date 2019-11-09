@@ -585,7 +585,11 @@ export default {
                   ></LoadableComponent>
                 </div>
               </v-layout>
-              <v-layout v-if="resume_wizard_step === (wizard_layout_list.length + 3)" key="end-page" class="end-page">
+              <v-layout
+                v-if="resume_wizard_step === wizard_layout_list.length + 3"
+                key="end-page"
+                class="end-page"
+              >
                 <div
                   class="end-page-section d-flex flex-column align-center justify-center"
                 >
