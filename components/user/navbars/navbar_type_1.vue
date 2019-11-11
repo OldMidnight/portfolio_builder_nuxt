@@ -127,6 +127,8 @@ export default {
   border-bottom-color: green;
   height: 100%;
   margin: 0;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
   // border-left: 1px solid;
 }
 
