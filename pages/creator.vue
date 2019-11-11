@@ -320,8 +320,7 @@ export default {
     currentTabs() {
       return [
         { text: this.nav_title_home, value: 1 },
-        { text: this.nav_title_projects, value: 2 },
-        { text: this.nav_title_resume, value: 3 }
+        { text: this.nav_title_projects, value: 2 }
       ]
     },
     currentPages() {
@@ -333,10 +332,6 @@ export default {
         }
       } else if (this.customise_page_option === 2) {
         for (let i = 0; i < this.site_props.projectsPages.length; i++) {
-          pages.push({ text: 'Page ' + (i + 1), value: i + 1 })
-        }
-      } else if (this.customise_page_option === 3) {
-        for (let i = 0; i < this.site_props.resumePages.length; i++) {
           pages.push({ text: 'Page ' + (i + 1), value: i + 1 })
         }
       }
