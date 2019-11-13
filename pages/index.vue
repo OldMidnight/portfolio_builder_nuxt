@@ -55,6 +55,15 @@ export default {
     ) {
       this.$router.push({ path: '/site_disabled' })
     }
+  },
+  head() {
+    return {
+      title:
+        this.$store.state.creator.is_subdomain &&
+        this.$store.state.creator.domain.available
+          ? this.$store.state.creator.site_props.site_name
+          : 'Home - Kreoh.com'
+    }
   }
 }
 </script>

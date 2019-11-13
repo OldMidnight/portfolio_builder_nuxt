@@ -179,7 +179,12 @@ export default {
                 </v-btn>
               </div>
             </div>
-            <div class="site-setting-stats-container elevation-2"></div>
+            <div
+              class="site-setting-stats-container d-flex justify-center align-center"
+            >
+              <div class="site-stat ma-2 elevation-2"></div>
+              <div class="site-stat ma-2 elevation-2"></div>
+            </div>
           </div>
         </v-layout>
       </v-layout>
@@ -345,6 +350,11 @@ export default {
 .site-setting-stats-container {
   width: 100%;
   height: 20%;
+}
+
+.site-stat {
+  width: 100%;
+  height: 100%;
   background-color: #fafafa;
 }
 
