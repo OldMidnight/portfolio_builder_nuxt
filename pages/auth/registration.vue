@@ -51,6 +51,11 @@ export default {
       }
     }
   },
+  head() {
+    return {
+      title: 'Registration - Kreoh.com'
+    }
+  },
   methods: {
     ...mapActions({
       register: 'user_auth/register'

@@ -30,6 +30,11 @@ export default {
       this.site_available = response.site_available
     })
   },
+  head() {
+    return {
+      title: 'Dashboard - Kreoh.com'
+    }
+  },
   methods: {
     ...mapActions({
       logout: 'user_auth/logout'
@@ -270,7 +275,7 @@ export default {
 
 .dashboard-wrapper {
   padding: 0 !important;
-  background-color: #e0e0e0;
+  background-color: #eeeeee;
 }
 
 .dashboard-topnav {
@@ -307,8 +312,45 @@ export default {
   width: 80%;
   height: 80%;
   // margin: 60px 130px;
-  border-radius: 5px;
-  background-color: #f5f5f5;
+  background: rgba(177, 209, 246, 1);
+  background: -moz-linear-gradient(
+    -45deg,
+    rgba(177, 209, 246, 1) 0%,
+    rgba(246, 250, 254, 1) 47%,
+    rgba(246, 250, 254, 1) 63%
+  );
+  background: -webkit-gradient(
+    left top,
+    right bottom,
+    color-stop(0%, rgba(177, 209, 246, 1)),
+    color-stop(47%, rgba(246, 250, 254, 1)),
+    color-stop(63%, rgba(246, 250, 254, 1))
+  );
+  background: -webkit-linear-gradient(
+    -45deg,
+    rgba(177, 209, 246, 1) 0%,
+    rgba(246, 250, 254, 1) 47%,
+    rgba(246, 250, 254, 1) 63%
+  );
+  background: -o-linear-gradient(
+    -45deg,
+    rgba(177, 209, 246, 1) 0%,
+    rgba(246, 250, 254, 1) 47%,
+    rgba(246, 250, 254, 1) 63%
+  );
+  background: -ms-linear-gradient(
+    -45deg,
+    rgba(177, 209, 246, 1) 0%,
+    rgba(246, 250, 254, 1) 47%,
+    rgba(246, 250, 254, 1) 63%
+  );
+  background: linear-gradient(
+    135deg,
+    rgba(177, 209, 246, 1) 0%,
+    rgba(246, 250, 254, 1) 47%,
+    rgba(246, 250, 254, 1) 63%
+  );
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b1d1f6', endColorstr='#f6fafe', GradientType=1 );
   position: absolute;
 }
 

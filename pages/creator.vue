@@ -610,6 +610,11 @@ export default {
       value: this.$store.state.auth.user.email
     })
   },
+  head() {
+    return {
+      title: 'Creator - Kreoh.com'
+    }
+  },
   methods: {
     ...mapMutations({
       setHomePages: 'creator/setHomePages',

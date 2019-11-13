@@ -8,6 +8,11 @@ export default {
     ) {
       this.$router.push({ path: '/' })
     }
+  },
+  head() {
+    return {
+      title: 'Site Disabled'
+    }
   }
 }
 </script>

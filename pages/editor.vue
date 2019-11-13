@@ -494,6 +494,11 @@ export default {
     this.showNextStep()
     this.temp_site_props = JSON.stringify(this.site_props)
   },
+  head() {
+    return {
+      title: 'Editor - Kreoh.com'
+    }
+  },
   methods: {
     ...mapMutations({
       setHomePages: 'creator/setHomePages',

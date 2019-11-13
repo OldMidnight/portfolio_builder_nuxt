@@ -38,6 +38,11 @@ export default {
     },
     ...mapState('user_auth', ['status'])
   },
+  head() {
+    return {
+      title: 'Login - Kreoh.com'
+    }
+  },
   methods: {
     ...mapActions('user_auth', ['login']),
     validateInfo() {
