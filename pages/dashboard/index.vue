@@ -1,5 +1,5 @@
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 export default {
   data() {
     return {
@@ -13,10 +13,13 @@ export default {
       ],
       delete_error: false,
       delete_success: false,
-      delete_msg: {}
+      delete_msg: {},
+      temp_messages: [],
+      links: ['Home', 'About Us', 'Team', 'Services', 'Blog', 'Contact Us']
     }
   },
   computed: {
+    ...mapState('dashboard', ['price_plans']),
     user() {
       return this.$store.state.auth.user
     }
@@ -53,7 +56,141 @@ export default {
 </script>
 
 <template>
-  <v-container
+  <v-container class="dashboard-wrapper" fluid fill-height>
+    <v-layout class="dashboard-container d-flex flex-column">
+      <v-layout class="dashboard-topnav px-5 d-flex">
+        <div class="logo-container d-flex align-center">
+          <span class="logo font-weight-bold">Kreoh.com</span>
+        </div>
+        <div class="links-container d-flex align-center justify-center">
+          <v-btn text nuxt>FAQ</v-btn>
+          <v-btn text nuxt>Support</v-btn>
+        </div>
+      </v-layout>
+      <v-layout
+        class="dashboard-content-wrapper d-flex align-center justify-center ma-3"
+      >
+        <v-layout class="dashboard d-flex elevation-2">
+          <div class="general-settings-container">
+            <div
+              class="general-setting-wrapper d-flex flex-column align-center justify-center pa-2"
+            >
+              <div
+                class="gen-setting-item ma-2 pa-2 d-flex flex-column align-center justify-center elevation-1"
+              >
+                <v-icon size="50" color="success">mdi-settings</v-icon>
+                <div
+                  class="d-flex flex-column justify-center align-center my-2"
+                >
+                  <v-btn class="ma-1" color="info" x-small outlined>
+                    Site Setings
+                  </v-btn>
+                  <v-btn class="ma-1" color="info" x-small outlined>
+                    User Setings
+                  </v-btn>
+                </div>
+                <v-text-field
+                  class="mx-5"
+                  dense
+                  outlined
+                  label="Search..."
+                  prepend-inner-icon="mdi-magnify"
+                ></v-text-field>
+              </div>
+              <div
+                class="gen-setting-item messages ma-2 pa-2 d-flex flex-column align-center elevation-1"
+              >
+                <v-icon size="50" color="info">mdi-message</v-icon>
+                <div
+                  v-if="temp_messages.length > 0"
+                  class="messages-preview my-3"
+                >
+                  <div v-for="message in temp_messages" :key="message.id"></div>
+                </div>
+                <div v-else class="my-3">
+                  <span>No Unread Messages</span>
+                </div>
+                <v-btn class="align-self-center" color="info" outlined>
+                  Messages
+                </v-btn>
+              </div>
+              <div
+                class="gen-setting-item ma-2 pa-2 d-flex flex-column align-center justify-space-around elevation-1"
+              >
+                <v-icon size="50" color="#FDD835">mdi-star-outline</v-icon>
+                <span class="font-weight-light my-3">
+                  Account Type: {{ user.account_type }}
+                </span>
+                <span class="font-weight-light mb-3">
+                  Monthly Cost: &euro; {{ price_plans[user.account_type] }}
+                </span>
+                <v-btn color="info" small outlined>Manage Subscription</v-btn>
+              </div>
+              <div
+                class="gen-setting-item ma-2 pa-2 d-flex flex-column align-center justify-space-around elevation-1"
+              >
+                <v-icon size="50" color="#E53935">mdi-power</v-icon>
+                <v-btn color="info" nuxt replace to="/auth/logout" outlined>
+                  Logout
+                </v-btn>
+              </div>
+            </div>
+          </div>
+          <div
+            class="site-settings-container d-flex flex-column justify-center align-center pa-2"
+          >
+            <div
+              class="site-setting-website-container d-flex flex-column justify-center align-center"
+            >
+              <span class="site-name font-weight-light my-2">
+                {{ user.domain }}.kreoh.com
+              </span>
+              <div class="website-container elevation-2 ma-5"></div>
+              <div
+                class="website-actions-container d-flex justify-space-around align-center mb-5"
+              >
+                <v-btn
+                  v-if="site_available"
+                  outlined
+                  color="info"
+                  href="/editor"
+                >
+                  <v-icon>mdi-pencil</v-icon> Edit
+                </v-btn>
+                <v-btn
+                  :disabled="!enableSite"
+                  color="info"
+                  outlined
+                  :href="`http://${user.domain}.localhost:3000/`"
+                  target="_blank"
+                >
+                  <v-icon>mdi-open-in-new</v-icon> Visit
+                </v-btn>
+                <v-btn v-if="!site_available" color="info" href="/creator">
+                  <v-icon>mdi-plus</v-icon> Create
+                </v-btn>
+                <v-btn
+                  v-if="site_available"
+                  color="error"
+                  outlined
+                  @click="deleteSite()"
+                >
+                  <v-icon>mdi-delete-forever</v-icon>
+                </v-btn>
+              </div>
+            </div>
+            <div class="site-setting-stats-container elevation-2"></div>
+          </div>
+        </v-layout>
+      </v-layout>
+      <v-footer height="50" padless>
+        <v-col class="text-center" cols="12">
+          &#169; {{ new Date().getFullYear() }} — <strong>Kreoh</strong>
+        </v-col>
+      </v-footer>
+    </v-layout>
+  </v-container>
+  <!-- <v-container
     text-xs-center
     fluid
     justify-center
@@ -118,38 +255,116 @@ export default {
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-snackbar>
-  </v-container>
+  </v-container> -->
 </template>
 
 <style lang="scss" scoped>
+.test {
+  border: 1px solid red;
+}
+
+.dashboard-wrapper {
+  padding: 0 !important;
+  background-color: #e0e0e0;
+}
+
+.dashboard-topnav {
+  height: 5%;
+  background-color: #fafafa;
+}
+
+.logo-container {
+  width: 90%;
+  height: 100%;
+  span {
+    color: #0066ff;
+    text-align: center;
+    font-size: 20px;
+  }
+}
+
+.links-container {
+  width: 10%;
+}
+
+.dashboard-content-wrapper {
+  height: 95%;
+}
+
 .dashboard-container {
   padding: 0 !important;
-}
-
-.dash-toolbar {
-  color: white;
-  // width: 100%;
-}
-
-.dash-links {
-  color: white;
-  box-shadow: none !important;
-}
-
-.main-container {
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
-.sidenav-container {
-  border-right: 1px solid #d9d9d9;
-  width: 20%;
-  background-color: white;
-}
-
-.content-container {
+.dashboard {
   width: 80%;
-  padding: 2% 3% 0 3%;
+  height: 80%;
+  // margin: 60px 130px;
+  border-radius: 5px;
+  background-color: #f5f5f5;
+  position: absolute;
+}
+
+.general-settings-container {
+  width: 20%;
+  height: 100%;
+  border-right: 1px solid #e6e6e6;
+  overflow: auto;
+}
+
+.general-settings-wrapper {
+  position: absolute;
+}
+
+.gen-setting-item {
+  width: 100%;
   background-color: #fafafa;
+}
+
+.messages {
+  // min-height: 500px;
+  max-height: 500px;
+  overflow: auto;
+}
+
+.messages-preview {
+  overflow: auto;
+}
+
+.site-settings-container {
+  width: 80%;
+}
+
+.site-setting-website-container {
+  width: 100%;
+  height: 80%;
+}
+
+.site-setting-stats-container {
+  width: 100%;
+  height: 20%;
+  background-color: #fafafa;
+}
+
+.site-name {
+  font-size: 30px;
+  color: #0066ff;
+}
+
+.website-container {
+  width: 80%;
+  height: 90%;
+  background-color: #fafafa;
+}
+
+.website-actions-container {
+  height: 10%;
+  width: 40%;
+  button {
+    background-color: #fafafa;
+  }
+  // border: 1px solid #e6e6e6;
 }
 </style>
