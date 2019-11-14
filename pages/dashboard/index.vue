@@ -15,7 +15,8 @@ export default {
       delete_success: false,
       delete_msg: {},
       temp_messages: [],
-      links: ['Home', 'About Us', 'Team', 'Services', 'Blog', 'Contact Us']
+      links: ['Home', 'About Us', 'Team', 'Services', 'Blog', 'Contact Us'],
+      site_screenshot: null
     }
   },
   computed: {
@@ -29,6 +30,12 @@ export default {
       this.enableSite = response.site_active
       this.site_available = response.site_available
     })
+  },
+  created() {
+    this.site_screenshot =
+      'http://127.0.0.1:5000/uploads/screenshot/' +
+      this.user.domain +
+      '.kreoh.com.png'
   },
   head() {
     return {
@@ -63,25 +70,37 @@ export default {
 <template>
   <v-container class="dashboard-wrapper" fluid fill-height>
     <v-layout class="dashboard-container d-flex flex-column">
-      <v-layout class="dashboard-topnav px-5 d-flex">
+      <v-layout class="dashboard-topnav elevation-3 px-5 d-flex">
         <div class="logo-container d-flex align-center">
           <span class="logo font-weight-bold">Kreoh.com</span>
         </div>
-        <div class="links-container d-flex align-center justify-center">
+        <div class="links-container d-flex align-center justify-end">
           <v-btn text nuxt>FAQ</v-btn>
           <v-btn text nuxt>Support</v-btn>
+          <v-btn
+            color="error"
+            icon
+            small
+            nuxt
+            replace
+            to="/auth/logout"
+            outlined
+            class="mx-2"
+          >
+            <v-icon>mdi-power</v-icon>
+          </v-btn>
         </div>
       </v-layout>
       <v-layout
         class="dashboard-content-wrapper d-flex align-center justify-center ma-3"
       >
-        <v-layout class="dashboard d-flex elevation-2">
+        <v-layout class="dashboard px-4 py-2 d-flex elevation-4">
           <div class="general-settings-container">
             <div
               class="general-setting-wrapper d-flex flex-column align-center justify-center pa-2"
             >
               <div
-                class="gen-setting-item ma-2 pa-2 d-flex flex-column align-center justify-center elevation-1"
+                class="gen-setting-item ma-2 pa-4 d-flex flex-column align-center justify-center elevation-2"
               >
                 <v-icon size="50" color="success">mdi-settings</v-icon>
                 <div
@@ -103,7 +122,7 @@ export default {
                 ></v-text-field>
               </div>
               <div
-                class="gen-setting-item messages ma-2 pa-2 d-flex flex-column align-center elevation-1"
+                class="gen-setting-item messages ma-2 pa-4 d-flex flex-column align-center elevation-2"
               >
                 <v-icon size="50" color="info">mdi-message</v-icon>
                 <div
@@ -112,31 +131,30 @@ export default {
                 >
                   <div v-for="message in temp_messages" :key="message.id"></div>
                 </div>
-                <div v-else class="my-3">
-                  <span>No Unread Messages</span>
+                <div
+                  v-else
+                  class=" d-flex flex-column align-center justify-center my-3"
+                >
+                  <span class="text-center">No Unread Messages</span>
                 </div>
                 <v-btn class="align-self-center" color="info" outlined>
                   Messages
                 </v-btn>
               </div>
               <div
-                class="gen-setting-item ma-2 pa-2 d-flex flex-column align-center justify-space-around elevation-1"
+                class="gen-setting-item ma-2 pa-4 d-flex flex-column align-center justify-space-around elevation-2"
               >
-                <v-icon size="50" color="#FDD835">mdi-star-outline</v-icon>
+                <v-icon size="50" color="#FDD835">mdi-star</v-icon>
                 <span class="font-weight-light my-3">
                   Account Type: {{ user.account_type }}
                 </span>
                 <span class="font-weight-light mb-3">
                   Monthly Cost: &euro; {{ price_plans[user.account_type] }}
                 </span>
-                <v-btn color="info" small outlined>Manage Subscription</v-btn>
-              </div>
-              <div
-                class="gen-setting-item ma-2 pa-2 d-flex flex-column align-center justify-space-around elevation-1"
-              >
-                <v-icon size="50" color="#E53935">mdi-power</v-icon>
-                <v-btn color="info" nuxt replace to="/auth/logout" outlined>
-                  Logout
+                <v-btn color="info" small outlined>
+                  {{
+                    user.account_type === 'Free' ? 'Upgrade' : 'Subscription'
+                  }}
                 </v-btn>
               </div>
             </div>
@@ -147,41 +165,49 @@ export default {
             <div
               class="site-setting-website-container d-flex flex-column justify-center align-center"
             >
-              <span class="site-name font-weight-light my-2">
+              <span class="site-name font-weight-bold my-2">
                 {{ user.domain }}.kreoh.com
               </span>
-              <div class="website-container elevation-2 ma-5"></div>
               <div
-                class="website-actions-container d-flex justify-space-around align-center mb-5"
+                class="website-container d-flex flex-column justify-center align-center elevation-2 mb-2 pa-2"
               >
-                <v-btn
-                  v-if="site_available"
-                  outlined
-                  color="info"
-                  href="/editor"
+                <div
+                  class="website-preview-container d-flex flex-column align-center justify-center pa-3"
                 >
-                  <v-icon>mdi-pencil</v-icon> Edit
-                </v-btn>
-                <v-btn
-                  :disabled="!enableSite"
-                  color="info"
-                  outlined
-                  :href="`http://${user.domain}.localhost:3000/`"
-                  target="_blank"
+                  <v-img class="website-img" :src="site_screenshot"></v-img>
+                </div>
+                <div
+                  class="website-actions-container d-flex justify-space-around align-center"
                 >
-                  <v-icon>mdi-open-in-new</v-icon> Visit
-                </v-btn>
-                <v-btn v-if="!site_available" color="info" href="/creator">
-                  <v-icon>mdi-plus</v-icon> Create
-                </v-btn>
-                <v-btn
-                  v-if="site_available"
-                  color="error"
-                  outlined
-                  @click="deleteSite()"
-                >
-                  <v-icon>mdi-delete-forever</v-icon>
-                </v-btn>
+                  <v-btn
+                    v-if="site_available"
+                    outlined
+                    color="info"
+                    href="/editor"
+                  >
+                    <v-icon>mdi-pencil</v-icon> Edit
+                  </v-btn>
+                  <v-btn
+                    :disabled="!enableSite"
+                    color="info"
+                    outlined
+                    :href="`http://${user.domain}.localhost:3000/`"
+                    target="_blank"
+                  >
+                    <v-icon>mdi-open-in-new</v-icon> Visit
+                  </v-btn>
+                  <v-btn v-if="!site_available" color="info" href="/creator">
+                    <v-icon>mdi-plus</v-icon> Create
+                  </v-btn>
+                  <v-btn
+                    v-if="site_available"
+                    color="error"
+                    outlined
+                    @click="deleteSite()"
+                  >
+                    <v-icon>mdi-delete-forever</v-icon>
+                  </v-btn>
+                </div>
               </div>
             </div>
             <div
@@ -275,7 +301,21 @@ export default {
 
 .dashboard-wrapper {
   padding: 0 !important;
-  background-color: #eeeeee;
+  // background-color: #eeeeee;
+  // background: rgba(177, 209, 246, 1);
+  // background: -moz-linear-gradient(
+  //   -45deg,
+  //   rgba(177, 209, 246, 1) 0%,
+  //   rgba(246, 250, 254, 1) 47%,
+  //   rgba(246, 250, 254, 1) 63%
+  // );
+  background: rgba(204, 231, 255, 1);
+  background: -moz-linear-gradient(
+    -45deg,
+    rgba(204, 231, 255, 1) 0%,
+    rgba(255, 255, 255, 0.59) 41%,
+    rgba(255, 255, 255, 0) 100%
+  );
 }
 
 .dashboard-topnav {
@@ -284,7 +324,7 @@ export default {
 }
 
 .logo-container {
-  width: 90%;
+  width: 80%;
   height: 100%;
   span {
     color: #0066ff;
@@ -294,7 +334,7 @@ export default {
 }
 
 .links-container {
-  width: 10%;
+  width: 20%;
 }
 
 .dashboard-content-wrapper {
@@ -312,45 +352,15 @@ export default {
   width: 80%;
   height: 80%;
   // margin: 60px 130px;
-  background: rgba(177, 209, 246, 1);
-  background: -moz-linear-gradient(
-    -45deg,
-    rgba(177, 209, 246, 1) 0%,
-    rgba(246, 250, 254, 1) 47%,
-    rgba(246, 250, 254, 1) 63%
-  );
-  background: -webkit-gradient(
-    left top,
-    right bottom,
-    color-stop(0%, rgba(177, 209, 246, 1)),
-    color-stop(47%, rgba(246, 250, 254, 1)),
-    color-stop(63%, rgba(246, 250, 254, 1))
-  );
-  background: -webkit-linear-gradient(
-    -45deg,
-    rgba(177, 209, 246, 1) 0%,
-    rgba(246, 250, 254, 1) 47%,
-    rgba(246, 250, 254, 1) 63%
-  );
-  background: -o-linear-gradient(
-    -45deg,
-    rgba(177, 209, 246, 1) 0%,
-    rgba(246, 250, 254, 1) 47%,
-    rgba(246, 250, 254, 1) 63%
-  );
-  background: -ms-linear-gradient(
-    -45deg,
-    rgba(177, 209, 246, 1) 0%,
-    rgba(246, 250, 254, 1) 47%,
-    rgba(246, 250, 254, 1) 63%
-  );
-  background: linear-gradient(
-    135deg,
-    rgba(177, 209, 246, 1) 0%,
-    rgba(246, 250, 254, 1) 47%,
-    rgba(246, 250, 254, 1) 63%
-  );
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b1d1f6', endColorstr='#f6fafe', GradientType=1 );
+  background-color: #fafafa;
+  border-radius: 20px;
+  // background: rgba(177, 209, 246, 1);
+  // background: -moz-linear-gradient(
+  //   -45deg,
+  //   rgba(177, 209, 246, 1) 0%,
+  //   rgba(246, 250, 254, 1) 47%,
+  //   rgba(246, 250, 254, 1) 63%
+  // );
   position: absolute;
 }
 
@@ -368,6 +378,7 @@ export default {
 .gen-setting-item {
   width: 100%;
   background-color: #fafafa;
+  border-radius: 10px;
 }
 
 .messages {
@@ -386,29 +397,43 @@ export default {
 
 .site-setting-website-container {
   width: 100%;
-  height: 80%;
+  height: 70%;
 }
 
 .site-setting-stats-container {
   width: 100%;
-  height: 20%;
+  height: 30%;
 }
 
 .site-stat {
   width: 100%;
   height: 100%;
   background-color: #fafafa;
+  border-radius: 20px;
 }
 
 .site-name {
   font-size: 30px;
   color: #0066ff;
+  height: 20%;
 }
 
 .website-container {
-  width: 80%;
-  height: 90%;
+  width: 90%;
+  height: 80%;
   background-color: #fafafa;
+  border-radius: 20px;
+}
+
+.website-preview-container {
+  width: 100%;
+  height: 90%;
+}
+
+.website-img {
+  width: 80%;
+  height: 80%;
+  border-radius: 10px;
 }
 
 .website-actions-container {

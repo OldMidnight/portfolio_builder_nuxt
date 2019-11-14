@@ -4,6 +4,7 @@ import LoadableComponent from '@/components/helpers/loadable_component'
 export default {
   layout: 'creation_layout',
   components: { LoadableComponent },
+  middleware: 'check_site_created',
   data() {
     return {
       rules: {

@@ -461,22 +461,20 @@ export const mutations = {
 
 export const actions = {
   registerWebsite(props) {
-    this.$axios
-      .$post('/create/register_site', {
-        site_props: JSON.stringify(props.state.site_props)
-      })
-      .then(() => {
-        this.$router.push({ path: '/dashboard' })
-      })
+    this.$axios.$post('/create/register_site', {
+      site_props: JSON.stringify(props.state.site_props)
+    })
+    this.$axios.$get('/uploads/screenshot/grab').then(() => {
+      this.$router.push({ path: '/dashboard' })
+    })
   },
   updateWebsite(props) {
-    this.$axios
-      .$post('/create/update_site', {
-        site_props: JSON.stringify(props.state.site_props)
-      })
-      .then(() => {
-        this.$router.push({ path: '/dashboard' })
-      })
+    this.$axios.$post('/create/update_site', {
+      site_props: JSON.stringify(props.state.site_props)
+    })
+    this.$axios.$get('/uploads/screenshot/grab').then(() => {
+      this.$router.push({ path: '/dashboard' })
+    })
   }
 }
 

@@ -42,7 +42,10 @@ export default {
 <template>
   <v-flex
     class="top-nav nav-bar"
-    :class="{ 'matrix-card-opp': site_props.selected_theme === 3 }"
+    :class="{
+      'matrix-card-opp': site_props.selected_theme === 3,
+      'nav-slate': site_props.selected_theme === 1
+    }"
   >
     <!-- NAV ITEMS -->
     <v-flex
@@ -162,6 +165,11 @@ export default {
 
 .nav-item-slate.active {
   border-bottom: 3px solid #66a3ff !important;
+}
+
+.nav-slate {
+  color: white !important;
+  background-color: #8c8c8c !important;
 }
 
 .nav-item-slate:hover {
