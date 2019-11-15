@@ -109,7 +109,8 @@ export default {
       show_page_add_success: false,
       show_page_delete_success: false,
       current_page_type: 1,
-      resume_not_created: false
+      resume_not_created: false,
+      loader: null
     }
   },
   computed: {
@@ -478,6 +479,20 @@ export default {
           component: selectedTemplate
         })
       }
+    },
+    loader() {
+      const l = this.loader
+      this[l] = !this[l]
+
+      this.site_name_errors = false
+      if (!this.site_props.site_name) this.site_name_errors = true
+
+      this.$refs.site_name.validate(true)
+
+      if (!this.site_name_errors) {
+        this.updateWebsite(this.site_props)
+      }
+      this.loader = null
     }
   },
   mounted() {
@@ -687,22 +702,6 @@ export default {
         default:
           return this.creation_step === step
       }
-    },
-    validateName() {
-      this.validating = true
-      this.site_name_errors = false
-      if (!this.site_props.site_name) this.site_name_errors = true
-
-      this.$refs.site_name.validate(true)
-
-      if (!this.site_name_errors) {
-        this.registerWebsite(this.site_props)
-      }
-      this.validating = false
-    },
-    changeActiveNav(navName) {
-      this.activeNav = navName
-      this.activeNav_index = 1
     },
     changePreviewPage(direction) {
       switch (direction) {
@@ -1937,6 +1936,7 @@ export default {
               ref="site_name"
               v-model="site_name"
               label="Name"
+              outlined
               placeholder="John Doe: My Site"
               :rules="[
                 rules.required,
@@ -1948,9 +1948,14 @@ export default {
               outline
             >
             </v-text-field>
-            <v-btn v-if="!validating" color="info" @click="validateName()"
-              >Submit</v-btn
+            <v-btn
+              :loading="validating"
+              :disabled="validating"
+              color="info"
+              @click="loader = 'validating'"
             >
+              Submit
+            </v-btn>
           </v-flex>
         </div>
       </v-layout>

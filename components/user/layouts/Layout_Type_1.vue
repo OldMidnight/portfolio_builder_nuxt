@@ -79,6 +79,14 @@ export default {
       }
     }
   },
+  created() {
+    const dateTime = new Date()
+    const domain = this.$store.state.creator.domain.name
+    this.$axios.$post('/stats/add_record', {
+      domain,
+      date_time: dateTime
+    })
+  },
   mounted() {
     if (this.site_props.custom_background) {
       document.getElementById(

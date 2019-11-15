@@ -108,7 +108,8 @@ export default {
       show_page_add_success: false,
       show_page_delete_success: false,
       current_page_type: 1,
-      temp_site_props: null
+      temp_site_props: null,
+      loader: null
     }
   },
   computed: {
@@ -477,6 +478,20 @@ export default {
           component: selectedTemplate
         })
       }
+    },
+    loader() {
+      const l = this.loader
+      this[l] = !this[l]
+
+      this.site_name_errors = false
+      if (!this.site_props.site_name) this.site_name_errors = true
+
+      this.$refs.site_name.validate(true)
+
+      if (!this.site_name_errors) {
+        this.updateWebsite(this.site_props)
+      }
+      this.loader = null
     }
   },
   fetch({ store, $axios }) {
@@ -568,18 +583,6 @@ export default {
         default:
           return this.creation_step === step
       }
-    },
-    validateName() {
-      this.validating = true
-      this.site_name_errors = false
-      if (!this.site_props.site_name) this.site_name_errors = true
-
-      this.$refs.site_name.validate(true)
-
-      if (!this.site_name_errors) {
-        this.updateWebsite(this.site_props)
-      }
-      this.validating = false
     },
     changeActiveNav(navName) {
       this.activeNav = navName
@@ -842,7 +845,7 @@ export default {
       </v-flex>
 
       <v-layout
-        v-if="checkStepCount(1)"
+        v-else-if="checkStepCount(1)"
         key="1"
         class="creation-step preview-edit"
       >
@@ -1778,7 +1781,7 @@ export default {
       </v-layout>
 
       <v-layout
-        v-if="checkStepCount(2)"
+        v-else-if="checkStepCount(2)"
         key="2"
         class="creation-step justify-center creation-site-name-wrapper"
         align-center
@@ -1794,6 +1797,7 @@ export default {
               ref="site_name"
               v-model="site_name"
               label="Name"
+              outlined
               placeholder="John Doe: My Site"
               :rules="[
                 rules.required,
@@ -1805,9 +1809,14 @@ export default {
               outline
             >
             </v-text-field>
-            <v-btn v-if="!validating" color="info" @click="validateName()"
-              >Submit</v-btn
+            <v-btn
+              :loading="validating"
+              :disabled="validating"
+              color="info"
+              @click="loader = 'validating'"
             >
+              Submit
+            </v-btn>
           </v-flex>
         </div>
       </v-layout>
@@ -2144,10 +2153,6 @@ export default {
   width: 80%;
   margin-top: 5%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-}
-
-.creation-site-name-wrapper {
-  width: 40%;
 }
 
 .creation-site-name {

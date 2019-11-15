@@ -16,26 +16,65 @@ export default {
       delete_msg: {},
       temp_messages: [],
       links: ['Home', 'About Us', 'Team', 'Services', 'Blog', 'Contact Us'],
-      site_screenshot: null
+      site_screenshot: null,
+      stats_data: {
+        '0': [],
+        '1': [],
+        '2': [],
+        '3': [],
+        '4': [],
+        '5': [],
+        '6': []
+      },
+      stat_labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     }
   },
   computed: {
     ...mapState('dashboard', ['price_plans']),
+    ...mapState('creator', ['site_props']),
     user() {
       return this.$store.state.auth.user
+    },
+    stats_value() {
+      const value = []
+      for (const visit in this.stats_data) {
+        value.push(this.stats_data[visit].length)
+      }
+      return value
     }
   },
-  beforeCreate() {
-    this.$axios.$get('/helper/get_site_active').then((response) => {
-      this.enableSite = response.site_active
-      this.site_available = response.site_available
+  asyncData({ $axios }) {
+    return $axios.$get('/helper/get_site_active').then((response) => {
+      return {
+        enableSite: response.site_active,
+        site_available: response.site_available
+      }
     })
   },
+  // beforeCreate() {
+  //   if (this.site_available) {
+  //     this.$axios.$get('/stats/fetch_weekly').then((response) => {
+  //       this.stats_data = response
+  //     })
+  //   }
+  //   this.$auth.fetchUser()
+  // },
   created() {
-    this.site_screenshot =
-      'http://127.0.0.1:5000/uploads/screenshot/' +
-      this.user.domain +
-      '.kreoh.com.png'
+    if (this.site_available) {
+      this.$axios.$get('/stats/fetch_weekly').then((response) => {
+        this.stats_data = response
+      })
+    }
+    this.$auth.fetchUser()
+    this.site_screenshot = this.site_available
+      ? 'http://127.0.0.1:5000/uploads/screenshot/' +
+        this.user.domain +
+        '.kreoh.com.png'
+      : '/layout_images/Layout_1_img.png'
+
+    // this.$axios.$get('/stats/fetch_weekly').then((response) => {
+    //   this.stats_data = response
+    // })
   },
   head() {
     return {
@@ -62,6 +101,9 @@ export default {
         this.enableSite = response.site_active
         this.site_available = response.site_available
       })
+    },
+    logout() {
+      this.$auth.logout()
     }
   }
 }
@@ -77,16 +119,7 @@ export default {
         <div class="links-container d-flex align-center justify-end">
           <v-btn text nuxt>FAQ</v-btn>
           <v-btn text nuxt>Support</v-btn>
-          <v-btn
-            color="error"
-            icon
-            small
-            nuxt
-            replace
-            to="/auth/logout"
-            outlined
-            class="mx-2"
-          >
+          <v-btn color="error" small outlined class="mx-2" @click="logout()">
             <v-icon>mdi-power</v-icon>
           </v-btn>
         </div>
@@ -172,13 +205,24 @@ export default {
                 class="website-container d-flex flex-column justify-center align-center elevation-2 mb-2 pa-2"
               >
                 <div
-                  class="website-preview-container d-flex flex-column align-center justify-center pa-3"
+                  class="website-preview-container d-flex flex-column align-center justify-center pt-2"
                 >
-                  <v-img class="website-img" :src="site_screenshot"></v-img>
+                  <v-img
+                    class="website-img"
+                    contain
+                    :src="site_screenshot"
+                  ></v-img>
                 </div>
                 <div
-                  class="website-actions-container d-flex justify-space-around align-center"
+                  class="website-actions-container d-flex justify-space-around align-center mt-2"
                 >
+                  <v-switch
+                    v-model="enableSite"
+                    :label="enableSite ? 'Enabled' : 'Disabled'"
+                    inset
+                    :disabled="!site_available"
+                    @change="activateSite()"
+                  ></v-switch>
                   <v-btn
                     v-if="site_available"
                     outlined
@@ -213,7 +257,31 @@ export default {
             <div
               class="site-setting-stats-container d-flex justify-center align-center"
             >
-              <div class="site-stat ma-2 elevation-2"></div>
+              <div
+                v-if="user.site_created"
+                class="site-stat ma-2 d-flex flex-column align-center justify-space-between py-5 px-8 elevation-2"
+              >
+                <span class="font-weight-bold">Weekly Visitors</span>
+                <v-sparkline
+                  :value="stats_value"
+                  :labels="stat_labels"
+                  label-size="9"
+                  auto-draw
+                  padding="10"
+                  smooth="15"
+                  gradient-direction="top"
+                  :gradient="['#f72047', '#ffd200', '#1feaea']"
+                  stroke-linecap="round"
+                ></v-sparkline>
+              </div>
+              <div
+                v-else
+                class="site-stat ma-2 elevation-2 d-flex flex-column align-center justify-center px-12"
+              >
+                <span class="text-center">
+                  Create A Site First To See Some Colorful Stats!
+                </span>
+              </div>
               <div class="site-stat ma-2 elevation-2"></div>
             </div>
           </div>
@@ -354,13 +422,6 @@ export default {
   // margin: 60px 130px;
   background-color: #fafafa;
   border-radius: 20px;
-  // background: rgba(177, 209, 246, 1);
-  // background: -moz-linear-gradient(
-  //   -45deg,
-  //   rgba(177, 209, 246, 1) 0%,
-  //   rgba(246, 250, 254, 1) 47%,
-  //   rgba(246, 250, 254, 1) 63%
-  // );
   position: absolute;
 }
 
@@ -426,19 +487,20 @@ export default {
 }
 
 .website-preview-container {
-  width: 100%;
+  width: 75%;
   height: 90%;
 }
 
 .website-img {
-  width: 80%;
+  width: 100%;
   height: 80%;
   border-radius: 10px;
+  border: 1px solid #e6e6e6;
 }
 
 .website-actions-container {
   height: 10%;
-  width: 40%;
+  width: 70%;
   button {
     background-color: #fafafa;
   }
