@@ -41,6 +41,53 @@ export default {
         value.push(this.stats_data[visit].length)
       }
       return value
+    },
+    recent_visitor() {
+      const dateTime = new Date()
+      let day
+      switch (dateTime.getDay()) {
+        case 0:
+          day = 6
+          break
+
+        default:
+          day = dateTime.getDay() - 1
+          break
+      }
+      while (day !== 0) {
+        if (this.stats_data[day.toString()].length === 0) {
+          day--
+        } else {
+          break
+        }
+      }
+      const dayData = this.stats_data[day.toString()]
+      const lastVisitorStat = new Date(dayData[dayData.length - 1])
+
+      const dateDiffTime = Math.abs(dateTime - lastVisitorStat)
+      let dateDiff
+
+      if (dateDiffTime / 1000 < 60) {
+        dateDiff =
+          'about ' + Math.ceil(dateDiffTime / 1000).toString() + ' seconds'
+      } else if (dateDiffTime / 1000 / 60 < 60) {
+        dateDiff =
+          'about ' +
+          Math.floor(dateDiffTime / 1000 / 60).toString() +
+          ' minutes'
+      } else if (dateDiffTime / 1000 / 60 / 60 < 24) {
+        dateDiff =
+          'about ' +
+          Math.floor(dateDiffTime / 1000 / 60 / 60).toString() +
+          ' hours'
+      } else {
+        dateDiff =
+          'about ' +
+          Math.floor(dateDiffTime / (1000 * 60 * 60 * 24)).toString() +
+          ' days'
+      }
+
+      return dateDiff
     }
   },
   asyncData({ $axios }) {
@@ -193,16 +240,16 @@ export default {
             </div>
           </div>
           <div
-            class="site-settings-container d-flex flex-column justify-center align-center pa-2"
+            class="site-settings-container d-flex flex-column justify-center align-center px-2 pb-2"
           >
             <div
               class="site-setting-website-container d-flex flex-column justify-center align-center"
             >
-              <span class="site-name font-weight-bold my-2">
+              <span class="site-name font-weight-bold mb-2">
                 {{ user.domain }}.kreoh.com
               </span>
               <div
-                class="website-container d-flex flex-column justify-center align-center elevation-2 mb-2 pa-2"
+                class="website-container d-flex flex-column justify-space-between align-center elevation-2 mb-2 pa-2 pb-4"
               >
                 <div
                   class="website-preview-container d-flex flex-column align-center justify-center pt-2"
@@ -257,7 +304,7 @@ export default {
             <div
               class="site-setting-stats-container d-flex justify-center align-center"
             >
-              <div
+              <!-- <div
                 v-if="user.site_created"
                 class="site-stat ma-2 d-flex flex-column align-center justify-space-between py-5 px-8 elevation-2"
               >
@@ -281,8 +328,71 @@ export default {
                 <span class="text-center">
                   Create A Site First To See Some Colorful Stats!
                 </span>
-              </div>
-              <div class="site-stat ma-2 elevation-2"></div>
+              </div> -->
+              <v-card class="mt-3 mx-auto" max-width="45%">
+                <v-sheet
+                  class="v-sheet--offset mx-auto"
+                  elevation="12"
+                  max-width="calc(100% - 32px)"
+                >
+                  <v-sparkline
+                    :labels="stat_labels"
+                    :value="stats_value"
+                    auto-draw
+                    gradient-direction="top"
+                    :gradient="['#f72047', '#ffd200', '#1feaea']"
+                    line-width="2"
+                    padding="16"
+                  ></v-sparkline>
+                </v-sheet>
+                <v-card-text class="pt-0">
+                  <div class="title font-weight-light mb-2">
+                    Site Visitors
+                  </div>
+                  <div class="subheading font-weight-light grey--text">
+                    Weekly Traction
+                  </div>
+                  <v-divider class="my-2"></v-divider>
+                  <v-icon class="mr-2" small>
+                    mdi-clock
+                  </v-icon>
+                  <span class="caption grey--text font-weight-light">
+                    last visitor {{ recent_visitor }} ago
+                  </span>
+                </v-card-text>
+              </v-card>
+              <v-card class="mt-3 mx-auto" max-width="45%">
+                <v-sheet
+                  class="v-sheet--offset mx-auto"
+                  elevation="12"
+                  max-width="calc(100% - 32px)"
+                >
+                  <v-sparkline
+                    :labels="stat_labels"
+                    :value="stats_value"
+                    auto-draw
+                    gradient-direction="top"
+                    :gradient="['#f72047', '#ffd200', '#1feaea']"
+                    line-width="2"
+                    padding="16"
+                  ></v-sparkline>
+                </v-sheet>
+                <v-card-text class="pt-0">
+                  <div class="title font-weight-light mb-2">
+                    User Registrations
+                  </div>
+                  <div class="subheading font-weight-light grey--text">
+                    Last Campaign Performance
+                  </div>
+                  <v-divider class="my-2"></v-divider>
+                  <v-icon class="mr-2" small>
+                    mdi-clock
+                  </v-icon>
+                  <span class="caption grey--text font-weight-light">
+                    last registration 26 minutes ago
+                  </span>
+                </v-card-text>
+              </v-card>
             </div>
           </div>
         </v-layout>
@@ -294,72 +404,6 @@ export default {
       </v-footer>
     </v-layout>
   </v-container>
-  <!-- <v-container
-    text-xs-center
-    fluid
-    justify-center
-    fill-height
-    class="dashboard-container pa-0 ma-0"
-  >
-    <v-layout column>
-      <v-toolbar color="info" class="dash-toolbar">
-        <v-toolbar-title>Kreoh</v-toolbar-title>
-
-        <v-spacer></v-spacer>
-
-        <v-toolbar-items>
-          <v-btn class="dash-links" text>Support</v-btn>
-          <v-btn class="dash-links" text>FAQ</v-btn>
-        </v-toolbar-items>
-      </v-toolbar>
-      <v-layout class="main-container">
-        <v-layout class="sidenav-container"></v-layout>
-
-        <v-layout class="content-container d-flex flex-column align-center">
-          <v-switch
-            v-model="enableSite"
-            :label="`Enable Site - ` + user.domain + `.kreoh.com`"
-            inset
-            :disabled="!site_available"
-            @change="activateSite()"
-          ></v-switch>
-
-          <v-spacer></v-spacer>
-
-          <v-btn v-if="site_available" color="info" href="/editor">
-            Edit {{ user.domain }}.kreoh.com
-          </v-btn>
-          <v-btn
-            :disabled="!enableSite"
-            color="info"
-            :href="`http://${user.domain}.localhost:3000/`"
-            target="_blank"
-          >
-            Visit {{ user.domain }}.kreoh.com
-          </v-btn>
-          <v-btn v-if="!site_available" color="info" href="/creator">
-            Create {{ user.domain }}.kreoh.com
-          </v-btn>
-          <v-btn v-if="site_available" color="error" @click="deleteSite()">
-            Delete {{ user.domain }}.kreoh.com
-          </v-btn>
-          <v-btn color="error" href="/auth/logout">Logout</v-btn>
-        </v-layout>
-      </v-layout>
-    </v-layout>
-    <v-snackbar v-model="delete_error" color="error">
-      {{ delete_msg.error }}
-      <v-btn icon @click="delete_error = false">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-snackbar>
-    <v-snackbar v-model="delete_success" color="success">
-      {{ delete_msg.success }}
-      <v-btn icon @click="delete_success = false">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-snackbar>
-  </v-container> -->
 </template>
 
 <style lang="scss" scoped>
@@ -458,12 +502,12 @@ export default {
 
 .site-setting-website-container {
   width: 100%;
-  height: 70%;
+  height: 65%;
 }
 
 .site-setting-stats-container {
   width: 100%;
-  height: 30%;
+  height: 35%;
 }
 
 .site-stat {
@@ -476,14 +520,14 @@ export default {
 .site-name {
   font-size: 30px;
   color: #0066ff;
-  height: 20%;
+  height: 10%;
 }
 
 .website-container {
   width: 90%;
   height: 80%;
   background-color: #fafafa;
-  border-radius: 20px;
+  border-radius: 5px;
 }
 
 .website-preview-container {
@@ -505,5 +549,10 @@ export default {
     background-color: #fafafa;
   }
   // border: 1px solid #e6e6e6;
+}
+
+.v-sheet--offset {
+  top: -24px;
+  position: relative;
 }
 </style>
