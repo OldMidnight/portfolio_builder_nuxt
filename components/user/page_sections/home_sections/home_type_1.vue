@@ -147,45 +147,42 @@ export default {
     :class="{ slate: site_props.selected_theme === 1 && options.show_theme }"
     class="template-container"
   >
-    <div class="user-img-container">
-      <div :style="[imgStyle, check_color_style]">
-        <v-tooltip v-model="edit_img_tooltip" right>
-          <template v-slot:activator="{ on }">
-            <v-img
-              :style="imgStyle"
-              alt="User Profile Picture"
-              :src="
-                !options.preview
-                  ? site_props[options.input_dict_name].img_props.url
-                  : 'https://images.unsplash.com/photo-1542103749-8ef59b94f47e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80   '
-              "
-              :class="{
-                'user-hero-image-border':
-                  site_props.selected_theme === 3 && !options.preview,
-                'has-border':
-                  site_props.text_border_color &&
-                  site_props.selected_theme === null,
-                editable: !options.preview && !options.live
-              }"
-              class="user-hero-image elevation-2"
-              :contain="
-                site_props[options.input_dict_name]
-                  ? site_props[options.input_dict_name].img_props.contain
-                  : false
-              "
-              @click.stop="
-                !options.preview && !options.live
-                  ? (img_dialog = true)
-                  : (img_dialog = false)
-              "
-              @mouseover="edit_img_tooltip = !options.preview && !options.live"
-              @mouseout="edit_img_tooltip = false"
-            >
-            </v-img>
-          </template>
-          <span v-if="!options.preview && !options.live">Insert Image</span>
-        </v-tooltip>
-      </div>
+    <div class="user-img-container" :style="[check_color_style]">
+      <v-tooltip v-model="edit_img_tooltip" right>
+        <template v-slot:activator="{ on }">
+          <v-img
+            alt="User Profile Picture"
+            :src="
+              !options.preview
+                ? site_props[options.input_dict_name].img_props.url
+                : 'https://images.unsplash.com/photo-1542103749-8ef59b94f47e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80   '
+            "
+            :class="{
+              'user-hero-image-border':
+                site_props.selected_theme === 3 && !options.preview,
+              'has-border':
+                site_props.text_border_color &&
+                site_props.selected_theme === null,
+              editable: !options.preview && !options.live
+            }"
+            class="user-hero-image elevation-2"
+            :contain="
+              site_props[options.input_dict_name]
+                ? site_props[options.input_dict_name].img_props.contain
+                : false
+            "
+            @click.stop="
+              !options.preview && !options.live
+                ? (img_dialog = true)
+                : (img_dialog = false)
+            "
+            @mouseover="edit_img_tooltip = !options.preview && !options.live"
+            @mouseout="edit_img_tooltip = false"
+          >
+          </v-img>
+        </template>
+        <span v-if="!options.preview && !options.live">Insert Image</span>
+      </v-tooltip>
     </div>
     <v-flex
       :style="check_color_style"
@@ -201,7 +198,7 @@ export default {
       </span>
       <span
         v-else
-        class="font-weight-light"
+        class="header font-weight-light"
         :class="{ 'display-2': options.live, title: !options.live }"
       >
         {{ name_model }}
@@ -217,6 +214,7 @@ export default {
       <span
         v-else
         :class="{ caption: options.live, 'smaller-caption': !options.live }"
+        class="tag"
       >
         {{ tagline_model }}
       </span>
@@ -300,10 +298,70 @@ export default {
 .user-img-container {
   margin-left: auto;
   margin-right: auto;
-  height: 50%;
+  height: 250px;
   display: flex;
   align-items: flex-end;
   margin-top: 5%;
+  width: 250px;
+}
+
+@media (max-width: 600px) {
+  .user-img-container {
+    height: 130px;
+    width: 130px;
+  }
+
+  .header {
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 20px !important;
+    // overflow: auto;
+  }
+
+  .tag {
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 8px !important;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 850px) {
+  .user-img-container {
+    height: 170px;
+    width: 170px;
+  }
+
+  .header {
+    font-size: 24px !important;
+    // overflow: auto;
+  }
+
+  .tag {
+    font-size: 10px !important;
+  }
+}
+
+@media (min-width: 851px) and (max-width: 1100px) {
+  .user-img-container {
+    height: 200px;
+    width: 200px;
+  }
+
+  .header {
+    font-size: 32px !important;
+    // overflow: auto;
+  }
+
+  .tag {
+    font-size: 12px !important;
+  }
+}
+
+@media (min-width: 1101px) {
+  .user-img-container {
+    height: 250px;
+    width: 250px;
+  }
 }
 
 .img-preview-container {
@@ -322,6 +380,8 @@ export default {
 .user-hero-image {
   // border: 1px solid #b6b6b6;
   border-radius: 50%;
+  height: 100%;
+  width: 100%;
 }
 
 .user-hero-image-border {
@@ -330,7 +390,7 @@ export default {
 
 .user-landing-text {
   width: 100%;
-  height: 10%;
+  // height: 70%;
   span {
     width: 80%;
     max-width: 80%;

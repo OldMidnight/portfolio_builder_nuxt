@@ -1,9 +1,12 @@
 export default function(context) {
+  context.$axios.onRequest((config) => {
+    const token = context.$auth.getToken('jwtAuth')
+    context.$axios.setHeader('Authorization', token)
+  })
   context.$axios.onResponseError(async (error) => {
     const response = error.response
     if (context.$auth.loggedIn && response.status === 401) {
       const originalRequest = response.config
-      originalRequest._retry = true
       context.$axios.setHeader(
         'Authorization',
         context.$auth.getRefreshToken('jwtAuth')
@@ -17,7 +20,6 @@ export default function(context) {
         context.$auth.setUserToken(newToken)
         originalRequest.headers.Authorization = 'Bearer ' + newToken
         context.$axios.setHeader('Authorization', 'Bearer ' + newToken)
-        console.log(originalRequest)
         return context.$axios(originalRequest)
       } else {
         context.redirect(301, '/auth/login')

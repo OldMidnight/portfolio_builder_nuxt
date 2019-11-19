@@ -64,7 +64,7 @@ export default {
       }"
       @click="changeActiveNav('home')"
     >
-      <p class="headline align-self-center font-weight-light ma-0">
+      <p class="nav-text headline align-self-center font-weight-light ma-0">
         {{ site_props.nav_titles.home }}
       </p>
     </v-flex>
@@ -85,7 +85,7 @@ export default {
       }"
       @click="changeActiveNav('projects')"
     >
-      <p class="headline align-self-center font-weight-light ma-0">
+      <p class="nav-text headline align-self-center font-weight-light ma-0">
         {{ site_props.nav_titles.projects }}
       </p>
     </v-flex>
@@ -106,7 +106,7 @@ export default {
       }"
       @click="changeActiveNav('resume')"
     >
-      <p class="headline align-self-center font-weight-light ma-0">
+      <p class="nav-text headline align-self-center font-weight-light ma-0">
         {{ site_props.nav_titles.resume }}
       </p>
     </v-flex>
@@ -198,5 +198,40 @@ export default {
   border-top: 1px solid;
   border-left: 1px solid;
   border-right: 1px solid;
+}
+
+@media (max-width: 600px) {
+  .nav-text {
+    font-size: 14px !important;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 850px) {
+  .nav-text {
+    font-size: 20px !important;
+  }
+}
+
+@media (min-width: 851px) and (max-width: 1100px) {
+  .user-img-container {
+    height: 200px;
+    width: 200px;
+  }
+
+  .header {
+    font-size: 32px !important;
+    // overflow: auto;
+  }
+
+  .tag {
+    font-size: 12px !important;
+  }
+}
+
+@media (min-width: 1101px) {
+  .user-img-container {
+    height: 250px;
+    width: 250px;
+  }
 }
 </style>

@@ -470,8 +470,8 @@ export default {
 
 .content-body {
   width: 100%;
-  max-height: 87%;
-  height: 87%;
+  max-height: 85%;
+  height: 85%;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
   background-color: white;

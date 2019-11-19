@@ -472,14 +472,9 @@ export const actions = {
     this.$axios.$post('/create/update_site', {
       site_props: JSON.stringify(props.state.site_props)
     })
-    this.$axios
-      .$get('/uploads/screenshot/grab')
-      .then(() => {
-        this.$router.push({ path: '/dashboard' })
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+    this.$axios.$get('/uploads/screenshot/grab').then(() => {
+      this.$router.push({ path: '/dashboard' })
+    })
   }
 }
 

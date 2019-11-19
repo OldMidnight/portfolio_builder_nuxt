@@ -1957,7 +1957,7 @@ export default {
 }
 
 .preview-edit-window {
-  width: 50%;
+  width: 40%;
   height: 100%;
   position: absolute;
   // padding-left: 10px !important;

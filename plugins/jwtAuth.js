@@ -30,7 +30,26 @@ export default class JWTScheme {
   mounted() {
     if (this.options.tokenRequired) {
       const token = this.$auth.syncToken(this.name)
+      this.$auth.syncRefreshToken(this.name)
       this._setToken(token)
+    }
+
+    if (process.client) {
+      const token = this.$auth.getRefreshToken(this.name)
+      if (token) {
+        this.$auth.ctx.app.$axios.setHeader('Authorization', token)
+        let newToken = null
+        this.$auth.ctx.app.$axios
+          .$post('/helper/refresh_token')
+          .then((response) => {
+            newToken = response.access_token
+            this.$auth.setToken(this.name, 'Bearer ' + newToken)
+            this._setToken(newToken)
+            this.$auth.ctx.app.$axios.$get('/auth/user').then((response) => {
+              this.$auth.setUser(response)
+            })
+          })
+      }
     }
 
     return this.$auth.fetchUserOnce()

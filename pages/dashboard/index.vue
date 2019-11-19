@@ -26,7 +26,8 @@ export default {
         '5': [],
         '6': []
       },
-      stat_labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+      stat_labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      autodraw: false
     }
   },
   computed: {
@@ -92,7 +93,6 @@ export default {
   },
   asyncData({ $axios }) {
     return $axios.$get('/helper/get_site_active').then((response) => {
-      console.log(response)
       return {
         enableSite: response.site_active,
         site_available: response.site_available
@@ -108,21 +108,20 @@ export default {
   //   this.$auth.fetchUser()
   // },
   created() {
-    if (this.site_available) {
-      this.$axios.$get('/stats/fetch_weekly').then((response) => {
-        this.stats_data = response
-      })
-    }
     this.$auth.fetchUser()
     this.site_screenshot = this.site_available
       ? 'http://127.0.0.1:5000/uploads/screenshot/' +
         this.user.domain +
         '.kreoh.com.png'
       : '/layout_images/Layout_1_img.png'
-
-    // this.$axios.$get('/stats/fetch_weekly').then((response) => {
-    //   this.stats_data = response
-    // })
+  },
+  mounted() {
+    if (this.site_available) {
+      this.$axios.$get('/stats/fetch_weekly').then((response) => {
+        this.stats_data = response
+      })
+    }
+    this.autodraw = true
   },
   head() {
     return {
@@ -330,16 +329,16 @@ export default {
                   Create A Site First To See Some Colorful Stats!
                 </span>
               </div> -->
-              <v-card class="mt-3 mx-auto" max-width="45%">
+              <v-card class="mt-3 mx-auto" width="45%">
                 <v-sheet
                   class="v-sheet--offset mx-auto"
                   elevation="12"
                   max-width="calc(100% - 32px)"
                 >
                   <v-sparkline
-                    :labels="stat_labels"
-                    :value="stats_value"
-                    auto-draw
+                    :labels="autodraw ? stat_labels : ['a']"
+                    :value="autodraw ? stats_value : ['a']"
+                    :auto-draw="autodraw"
                     gradient-direction="top"
                     :gradient="['#f72047', '#ffd200', '#1feaea']"
                     line-width="2"
@@ -362,16 +361,16 @@ export default {
                   </span>
                 </v-card-text>
               </v-card>
-              <v-card class="mt-3 mx-auto" max-width="45%">
+              <v-card class="mt-3 mx-auto" width="45%">
                 <v-sheet
                   class="v-sheet--offset mx-auto"
                   elevation="12"
                   max-width="calc(100% - 32px)"
                 >
                   <v-sparkline
-                    :labels="stat_labels"
-                    :value="stats_value"
-                    auto-draw
+                    :labels="autodraw ? stat_labels : []"
+                    :value="autodraw ? stats_value : []"
+                    :auto-draw="autodraw"
                     gradient-direction="top"
                     :gradient="['#f72047', '#ffd200', '#1feaea']"
                     line-width="2"
