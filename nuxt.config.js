@@ -41,7 +41,7 @@ module.exports = {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: [],
+  plugins: ['~/plugins/axios'],
   /*
    ** Nuxt.js dev-modules
    */
@@ -65,32 +65,24 @@ module.exports = {
   // auth Config
   auth: {
     strategies: {
-      local: {
+      jwtAuth: {
+        _scheme: '~/plugins/jwtAuth.js',
         endpoints: {
           login: {
             url: '/auth/login',
             method: 'post',
-            propertyName: 'access_token'
-          },
-          logout: { url: '/auth/logout', method: 'post' },
-          refresh: {
-            url: '/helpers/refresh_token',
-            method: 'post',
-            propertyName: 'refresh_token'
-          },
-          register: {
-            url: '/auth/register',
-            method: 'post',
-            propertyName: 'access_token'
+            propertyName: false
           },
           user: {
             url: '/auth/user',
             method: 'get',
             propertyName: false
           }
-        }
-        // tokenRequired: true,
-        // tokenType: 'bearer'
+          // user: false
+        },
+        tokenRequired: true,
+        tokenType: 'Bearer',
+        tokenName: 'Authorization'
       }
     },
     redirect: {

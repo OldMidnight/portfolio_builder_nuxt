@@ -92,6 +92,7 @@ export default {
   },
   asyncData({ $axios }) {
     return $axios.$get('/helper/get_site_active').then((response) => {
+      console.log(response)
       return {
         enableSite: response.site_active,
         site_available: response.site_available

@@ -490,7 +490,7 @@ export default {
       this.$refs.site_name.validate(true)
 
       if (!this.site_name_errors) {
-        this.updateWebsite(this.site_props)
+        this.registerWebsite(this.site_props)
       }
       this.loader = null
     }
@@ -689,6 +689,10 @@ export default {
           this.hideNextStep()
         }
       }
+    },
+    changeActiveNav(navName) {
+      this.activeNav = navName
+      this.activeNav_index = 1
     },
     checkStepCount(step) {
       switch (step) {
