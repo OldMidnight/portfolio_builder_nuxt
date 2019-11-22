@@ -169,6 +169,7 @@ export default {
       }
     },
     editProject(e) {
+      e = JSON.parse(e)
       this.temp_project = e
       this.add_project_dialog = true
       if (e.img.url !== '') {

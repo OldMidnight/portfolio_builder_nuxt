@@ -1,6 +1,10 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 export default {
+  transitions: {
+    enterActiveClass: 'animated fadeInLeft',
+    leaveActiveClass: 'animated fadeOutRight'
+  },
   data() {
     return {
       enableSite: false,
@@ -16,17 +20,25 @@ export default {
       delete_msg: {},
       temp_messages: [],
       links: ['Home', 'About Us', 'Team', 'Services', 'Blog', 'Contact Us'],
-      site_screenshot: null,
+      site_screenshot: '/layout_images/Layout_1_img.png',
       stats_data: {
-        '0': [],
-        '1': [],
-        '2': [],
-        '3': [],
-        '4': [],
-        '5': [],
-        '6': []
+        0: [],
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: []
       },
-      stat_labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      stat_labels_dict: {
+        0: 'Mon',
+        1: 'Tue',
+        2: 'Wed',
+        3: 'Thu',
+        4: 'Fri',
+        5: 'Sat',
+        6: 'Sun'
+      },
       autodraw: false
     }
   },
@@ -38,10 +50,41 @@ export default {
     },
     stats_value() {
       const value = []
-      for (const visit in this.stats_data) {
-        value.push(this.stats_data[visit].length)
+      let labels = []
+      let day = new Date().getDay()
+      if (day === 0) {
+        day = 6
+      } else {
+        day = day - 1
+      }
+      for (let i = day; i >= 0; i--) {
+        labels.push(i)
+      }
+      for (let i = 6; i > day; i--) {
+        labels.push(i)
+      }
+      labels = labels.reverse()
+      // console.log(labels)
+      for (const day of labels) {
+        value.push(this.stats_data[day].length)
       }
       return value
+    },
+    stat_labels() {
+      const labels = []
+      let day = new Date().getDay()
+      if (day === 0) {
+        day = 6
+      } else {
+        day = day - 1
+      }
+      for (let i = day; i >= 0; i--) {
+        labels.push(this.stat_labels_dict[i])
+      }
+      for (let i = 6; i > day; i--) {
+        labels.push(this.stat_labels_dict[i])
+      }
+      return labels.reverse()
     },
     recent_visitor() {
       const dateTime = new Date()
@@ -109,6 +152,8 @@ export default {
   // },
   created() {
     this.$auth.fetchUser()
+  },
+  updated() {
     this.site_screenshot = this.site_available
       ? 'http://127.0.0.1:5000/uploads/screenshot/' +
         this.user.domain +
@@ -120,6 +165,10 @@ export default {
       this.$axios.$get('/stats/fetch_weekly').then((response) => {
         this.stats_data = response
       })
+      this.site_screenshot =
+        'http://127.0.0.1:5000/uploads/screenshot/' +
+        this.user.domain +
+        '.kreoh.com.png'
     }
     this.autodraw = true
   },
@@ -304,31 +353,6 @@ export default {
             <div
               class="site-setting-stats-container d-flex justify-center align-center"
             >
-              <!-- <div
-                v-if="user.site_created"
-                class="site-stat ma-2 d-flex flex-column align-center justify-space-between py-5 px-8 elevation-2"
-              >
-                <span class="font-weight-bold">Weekly Visitors</span>
-                <v-sparkline
-                  :value="stats_value"
-                  :labels="stat_labels"
-                  label-size="9"
-                  auto-draw
-                  padding="10"
-                  smooth="15"
-                  gradient-direction="top"
-                  :gradient="['#f72047', '#ffd200', '#1feaea']"
-                  stroke-linecap="round"
-                ></v-sparkline>
-              </div>
-              <div
-                v-else
-                class="site-stat ma-2 elevation-2 d-flex flex-column align-center justify-center px-12"
-              >
-                <span class="text-center">
-                  Create A Site First To See Some Colorful Stats!
-                </span>
-              </div> -->
               <v-card class="mt-3 mx-auto" width="45%">
                 <v-sheet
                   class="v-sheet--offset mx-auto"
@@ -350,7 +374,7 @@ export default {
                     Site Visitors
                   </div>
                   <div class="subheading font-weight-light grey--text">
-                    Weekly Traction
+                    Weekly Average - 
                   </div>
                   <v-divider class="my-2"></v-divider>
                   <v-icon class="mr-2" small>

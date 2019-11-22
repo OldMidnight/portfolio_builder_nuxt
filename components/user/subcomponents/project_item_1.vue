@@ -51,13 +51,16 @@ export default {
   },
   methods: {
     editProject() {
-      this.$emit('edit_project', {
-        id: this.id,
-        title: this.title,
-        description: this.description,
-        img: this.img,
-        link: this.link
-      })
+      this.$emit(
+        'edit_project',
+        JSON.stringify({
+          id: this.id,
+          title: this.title,
+          description: this.description,
+          img: this.img,
+          link: this.link
+        })
+      )
     },
     truncate(text, length, clamp) {
       clamp = clamp || '...'
@@ -200,12 +203,18 @@ export default {
 
 .preview-desc {
   font-size: 8px;
+  white-space: pre-wrap;
+  text-align: center;
+  word-wrap: break-word;
 }
 
 .project-desc {
   // height: 80%;
   overflow: auto;
   margin: 0 !important;
+  white-space: pre-wrap;
+  text-align: center;
+  word-wrap: break-word;
 }
 
 .project-link {

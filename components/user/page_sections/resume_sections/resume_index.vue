@@ -705,13 +705,15 @@ export default {
 .resume-wrapper {
   position: absolute;
   width: 100%;
+  left: 0;
+  padding: 0 10%;
+  overflow: auto;
 }
 
 .sections-display {
   // border: 1px solid #e6e6e6;
   border-radius: 10px;
   font-size: initial;
-  overflow: auto;
 }
 
 .wizard-dialog {

@@ -5,6 +5,10 @@ export default {
   layout: 'creation_layout',
   components: { LoadableComponent },
   middleware: 'check_site_created',
+  transitions: {
+    enterActiveClass: 'animated fadeInLeft',
+    leaveActiveClass: 'animated fadeOutRight'
+  },
   data() {
     return {
       rules: {
@@ -2101,7 +2105,7 @@ export default {
 
 .preview-edit {
   flex-direction: row;
-  width: 90%;
+  width: 100%;
   position: relative;
 }
 

@@ -4,6 +4,10 @@ import LoadableComponent from '@/components/helpers/loadable_component'
 export default {
   layout: 'creation_layout',
   components: { LoadableComponent },
+  transitions: {
+    enterActiveClass: 'animated fadeInLeft',
+    leaveActiveClass: 'animated fadeOutRight'
+  },
   data() {
     return {
       rules: {
@@ -1447,7 +1451,10 @@ export default {
             >
               <v-flex
                 class="preview-1-top-nav preview-nav-bar"
-                :class="{ 'matrix-card-opp': site_props.selected_theme === 3 }"
+                :class="{
+                  'matrix-card-opp': site_props.selected_theme === 3,
+                  slate: site_props.selected_theme === 1
+                }"
               >
                 <!-- NAV ITEMS -->
                 <v-flex
@@ -1952,7 +1959,7 @@ export default {
 
 .preview-edit {
   flex-direction: row;
-  width: 90%;
+  width: 100%;
   position: relative;
 }
 
@@ -2016,6 +2023,8 @@ export default {
   padding: 0 !important;
   width: 100%;
   height: 15%;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
   // background-color: white;
   // border-bottom: 1px solid #b6b6b6;
 }
@@ -2032,6 +2041,8 @@ export default {
   border-bottom-color: green;
   height: 100%;
   margin: 0;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
   // border-left: 1px solid;
 }
 

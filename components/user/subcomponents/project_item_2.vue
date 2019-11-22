@@ -115,65 +115,22 @@ export default {
         </span>
         <span
           :class="{ 'body-2': options.live, caption: !options.live }"
-          class="text-center"
+          class="desc text-center"
         >
           {{ options.preview ? truncate(description, 30, '...') : description }}
         </span>
       </v-flex>
       <v-flex v-if="link" class="project-actions-container"></v-flex>
     </div>
-    <!-- <v-card
-      width="300"
-      :style="[check_custom_style]"
-      class="project-item mx-auto"
-      :class="{
-        slate: site_props.selected_theme === 1,
-        matrix: site_props.selected_theme === 3,
-        'matrix-border': site_props.selected_theme === 3
-      }"
+    <v-btn
+      v-if="!options.live && !options.preview"
+      :color="site_props.selected_theme === 3 ? '#00E676' : 'info'"
+      class="edit-icon mt-4 ml-3 pa-1 px-2"
+      @click.stop="editProject()"
     >
-      <v-card-text>
-        <v-container>
-          <v-tooltip v-model="edit_project_tooltip" bottom>
-            <template v-slot:activator="{ on }">
-              <v-icon
-                v-if="!options.live && !options.preview"
-                class="edit-icon mt-1 ml-3 pa-1"
-                :color="site_props.selected_theme === 3 ? '#00E676' : 'warning'"
-                @click.stop="editProject()"
-                @mouseover="edit_project_tooltip = true"
-                @mouseout="edit_project_tooltip = false"
-                >mdi-pencil</v-icon
-              >
-            </template>
-            <span>Edit</span>
-          </v-tooltip>
-          <div
-            class="project-item-wrapper"
-            :style="[check_custom_style]"
-            :class="{
-              slate: site_props.selected_theme === 1,
-              matrix: site_props.selected_theme === 3
-            }"
-          >
-            <v-flex v-if="img.url !== ''" class="project-img-container">
-              <v-img
-                class="project-img"
-                :src="img.url"
-                :contain="img.contain"
-              ></v-img>
-            </v-flex>
-            <v-flex
-              class="d-flex justify-center align-center flex-column project-desc-container"
-            >
-              <span class="headline">{{ title }}</span>
-              <span class="subtitle text-center">{{ description }}</span>
-            </v-flex>
-            <v-flex v-if="link" class="project-actions-container"></v-flex>
-          </div>
-        </v-container>
-      </v-card-text>
-    </v-card> -->
+      <v-icon>mdi-pencil</v-icon>
+      Edit
+    </v-btn>
   </div>
 </template>
 
@@ -184,7 +141,7 @@ export default {
   right: 1%;
   top: 0;
   border: 1px solid;
-  border-radius: 50%;
+  border-radius: 5px;
   cursor: pointer;
 }
 
@@ -248,5 +205,11 @@ export default {
   height: 100%;
   width: 100%;
   border-radius: 20px;
+}
+
+.desc {
+  white-space: pre-wrap;
+  text-align: center;
+  word-wrap: break-word;
 }
 </style>

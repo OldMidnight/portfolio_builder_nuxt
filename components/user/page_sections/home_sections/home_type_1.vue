@@ -147,7 +147,13 @@ export default {
     :class="{ slate: site_props.selected_theme === 1 && options.show_theme }"
     class="template-container"
   >
-    <div class="user-img-container" :style="[check_color_style]">
+    <div
+      :class="{
+        'smaller-user-img-container': !options.live && !options.preview,
+        'user-img-container': options.live || options.preview
+      }"
+      :style="[check_color_style]"
+    >
       <v-tooltip v-model="edit_img_tooltip" right>
         <template v-slot:activator="{ on }">
           <v-img
@@ -305,10 +311,25 @@ export default {
   width: 250px;
 }
 
+.smaller-user-img-container {
+  margin-left: auto;
+  margin-right: auto;
+  height: 200px;
+  display: flex;
+  align-items: flex-end;
+  margin-top: 5%;
+  width: 200px;
+}
+
 @media (max-width: 600px) {
   .user-img-container {
     height: 130px;
     width: 130px;
+  }
+
+  .smaller-user-img-container {
+    height: 70px;
+    width: 70px;
   }
 
   .header {
@@ -325,10 +346,15 @@ export default {
   }
 }
 
-@media (min-width: 601px) and (max-width: 850px) {
+@media (min-width: 601px) and (max-width: 990px) {
   .user-img-container {
     height: 170px;
     width: 170px;
+  }
+
+  .smaller-user-img-container {
+    height: 100px;
+    width: 100px;
   }
 
   .header {
@@ -341,10 +367,15 @@ export default {
   }
 }
 
-@media (min-width: 851px) and (max-width: 1100px) {
+@media (min-width: 991px) and (max-width: 1300px) {
   .user-img-container {
     height: 200px;
     width: 200px;
+  }
+
+  .smaller-user-img-container {
+    height: 150px;
+    width: 150px;
   }
 
   .header {
@@ -357,10 +388,15 @@ export default {
   }
 }
 
-@media (min-width: 1101px) {
+@media (min-width: 1301px) {
   .user-img-container {
     height: 250px;
     width: 250px;
+  }
+
+  .smaller-user-img-container {
+    height: 190px;
+    width: 190px;
   }
 }
 

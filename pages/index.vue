@@ -1,6 +1,10 @@
 <script>
 export default {
   auth: false,
+  transitions: {
+    enterActiveClass: 'animated fadeInLeft',
+    leaveActiveClass: 'animated fadeOutRight'
+  },
   data() {
     return {}
   },
