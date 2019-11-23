@@ -21,25 +21,24 @@ export default {
       temp_messages: [],
       links: ['Home', 'About Us', 'Team', 'Services', 'Blog', 'Contact Us'],
       site_screenshot: '/layout_images/Layout_1_img.png',
-      stats_data: {
-        0: [],
-        1: [],
-        2: [],
-        3: [],
-        4: [],
-        5: [],
-        6: []
-      },
-      stat_labels_dict: {
-        0: 'Mon',
-        1: 'Tue',
-        2: 'Wed',
-        3: 'Thu',
-        4: 'Fri',
-        5: 'Sat',
-        6: 'Sun'
-      },
-      autodraw: false
+      weekly_stats_data: [1],
+      weekly_stats_labels: ['a'],
+      weekly_stats_avg: 0,
+      weekly_stats_highest: 'calculating...',
+      last_visitor_time: 'calculating...',
+      hourly_stats_data: [1],
+      hourly_stats_labels: ['a'],
+      hourly_stats_avg: 0,
+      hourly_stats_highest: 'calculating...',
+      monthly_stats_data: [1],
+      monthly_stats_labels: ['a'],
+      monthly_stats_avg: 0,
+      monthly_stats_highest: 'calculating...',
+      weekly_autodraw: false,
+      hourly_autodraw: false,
+      monthly_autodraw: false,
+      dashboard_flipped: false,
+      current_displayed_section: 'main'
     }
   },
   computed: {
@@ -47,91 +46,15 @@ export default {
     ...mapState('creator', ['site_props']),
     user() {
       return this.$store.state.auth.user
-    },
-    stats_value() {
-      const value = []
-      let labels = []
-      let day = new Date().getDay()
-      if (day === 0) {
-        day = 6
+    }
+  },
+  watch: {
+    dashboard_flipped(value) {
+      if (value) {
+        document.querySelector('#dashboard').style.transform = 'rotateY(180deg)'
       } else {
-        day = day - 1
+        document.querySelector('#dashboard').style.transform = 'none'
       }
-      for (let i = day; i >= 0; i--) {
-        labels.push(i)
-      }
-      for (let i = 6; i > day; i--) {
-        labels.push(i)
-      }
-      labels = labels.reverse()
-      // console.log(labels)
-      for (const day of labels) {
-        value.push(this.stats_data[day].length)
-      }
-      return value
-    },
-    stat_labels() {
-      const labels = []
-      let day = new Date().getDay()
-      if (day === 0) {
-        day = 6
-      } else {
-        day = day - 1
-      }
-      for (let i = day; i >= 0; i--) {
-        labels.push(this.stat_labels_dict[i])
-      }
-      for (let i = 6; i > day; i--) {
-        labels.push(this.stat_labels_dict[i])
-      }
-      return labels.reverse()
-    },
-    recent_visitor() {
-      const dateTime = new Date()
-      let day
-      switch (dateTime.getDay()) {
-        case 0:
-          day = 6
-          break
-
-        default:
-          day = dateTime.getDay() - 1
-          break
-      }
-      while (day !== 0) {
-        if (this.stats_data[day.toString()].length === 0) {
-          day--
-        } else {
-          break
-        }
-      }
-      const dayData = this.stats_data[day.toString()]
-      const lastVisitorStat = new Date(dayData[dayData.length - 1])
-
-      const dateDiffTime = Math.abs(dateTime - lastVisitorStat)
-      let dateDiff
-
-      if (dateDiffTime / 1000 < 60) {
-        dateDiff =
-          'about ' + Math.ceil(dateDiffTime / 1000).toString() + ' seconds'
-      } else if (dateDiffTime / 1000 / 60 < 60) {
-        dateDiff =
-          'about ' +
-          Math.floor(dateDiffTime / 1000 / 60).toString() +
-          ' minutes'
-      } else if (dateDiffTime / 1000 / 60 / 60 < 24) {
-        dateDiff =
-          'about ' +
-          Math.floor(dateDiffTime / 1000 / 60 / 60).toString() +
-          ' hours'
-      } else {
-        dateDiff =
-          'about ' +
-          Math.floor(dateDiffTime / (1000 * 60 * 60 * 24)).toString() +
-          ' days'
-      }
-
-      return dateDiff
     }
   },
   asyncData({ $axios }) {
@@ -142,35 +65,24 @@ export default {
       }
     })
   },
-  // beforeCreate() {
-  //   if (this.site_available) {
-  //     this.$axios.$get('/stats/fetch_weekly').then((response) => {
-  //       this.stats_data = response
-  //     })
-  //   }
-  //   this.$auth.fetchUser()
-  // },
   created() {
     this.$auth.fetchUser()
-  },
-  updated() {
-    this.site_screenshot = this.site_available
-      ? 'http://127.0.0.1:5000/uploads/screenshot/' +
-        this.user.domain +
-        '.kreoh.com.png'
-      : '/layout_images/Layout_1_img.png'
   },
   mounted() {
     if (this.site_available) {
       this.$axios.$get('/stats/fetch_weekly').then((response) => {
-        this.stats_data = response
+        this.weekly_stats_data = response.values
+        this.weekly_stats_labels = response.labels
+        this.last_visitor_time = response.last_visitor_time
+        this.weekly_stats_avg = response.avg
+        this.weekly_stats_highest = response.highest
+        this.weekly_autodraw = true
       })
       this.site_screenshot =
         'http://127.0.0.1:5000/uploads/screenshot/' +
         this.user.domain +
         '.kreoh.com.png'
     }
-    this.autodraw = true
   },
   head() {
     return {
@@ -200,6 +112,33 @@ export default {
     },
     logout() {
       this.$auth.logout()
+    },
+    flipTo(section) {
+      if (section !== 'main') {
+        this.dashboard_flipped = true
+      } else {
+        this.dashboard_flipped = false
+      }
+      this.current_displayed_section = section
+      if (section === 'site_settings') {
+        this.$axios.$get('/stats/fetch_hourly').then((response) => {
+          this.hourly_stats_data = response.values
+          this.hourly_stats_labels = response.labels
+          this.hourly_stats_avg = response.avg
+          this.hourly_stats_highest = response.highest
+          this.hourly_autodraw = true
+        })
+        this.$axios.$get('/stats/fetch_monthly').then((response) => {
+          this.monthly_stats_data = response.values
+          this.monthly_stats_labels = response.labels
+          this.monthly_stats_avg = response.avg
+          this.monthly_stats_highest = response.highest
+          this.monthly_autodraw = true
+        })
+      }
+    },
+    userFavicon() {
+      return '/favicon.ico'
     }
   }
 }
@@ -223,201 +162,442 @@ export default {
       <v-layout
         class="dashboard-content-wrapper d-flex align-center justify-center ma-3"
       >
-        <v-layout class="dashboard px-4 py-2 d-flex elevation-4">
-          <div class="general-settings-container">
+        <v-layout id="dashboard" class="elevation-4">
+          <div class="dashboard-front px-4 py-2 d-flex">
+            <div class="general-settings-container">
+              <div
+                class="general-setting-wrapper d-flex flex-column align-center justify-center pa-2"
+              >
+                <div
+                  class="gen-setting-item ma-2 pa-4 d-flex flex-column align-center justify-center elevation-2"
+                >
+                  <v-icon size="50" color="success">mdi-settings</v-icon>
+                  <div
+                    class="d-flex flex-column justify-center align-center my-2"
+                  >
+                    <v-btn
+                      class="ma-1"
+                      color="info"
+                      x-small
+                      outlined
+                      @click="flipTo('site_settings')"
+                    >
+                      Site Setings
+                    </v-btn>
+                    <v-btn
+                      class="ma-1"
+                      color="info"
+                      x-small
+                      outlined
+                      @click="flipTo('user_settings')"
+                    >
+                      User Setings
+                    </v-btn>
+                  </div>
+                  <v-text-field
+                    class="mx-5"
+                    dense
+                    outlined
+                    label="Search..."
+                    prepend-inner-icon="mdi-magnify"
+                  ></v-text-field>
+                </div>
+                <div
+                  class="gen-setting-item messages ma-2 pa-4 d-flex flex-column align-center elevation-2"
+                >
+                  <v-icon size="50" color="info">mdi-message</v-icon>
+                  <div
+                    v-if="temp_messages.length > 0"
+                    class="messages-preview my-3"
+                  >
+                    <div
+                      v-for="message in temp_messages"
+                      :key="message.id"
+                    ></div>
+                  </div>
+                  <div
+                    v-else
+                    class=" d-flex flex-column align-center justify-center my-3"
+                  >
+                    <span class="text-center">No Unread Messages</span>
+                  </div>
+                  <v-btn
+                    class="align-self-center"
+                    color="info"
+                    outlined
+                    @click="flipTo('messages')"
+                  >
+                    Messages
+                  </v-btn>
+                </div>
+                <div
+                  class="gen-setting-item ma-2 pa-4 d-flex flex-column align-center justify-space-around elevation-2"
+                >
+                  <v-icon size="50" color="#FDD835">mdi-star</v-icon>
+                  <span class="font-weight-light my-3">
+                    Account Type: {{ user.account_type }}
+                  </span>
+                  <span class="font-weight-light mb-3">
+                    Monthly Cost: &euro; {{ price_plans[user.account_type] }}
+                  </span>
+                  <v-btn
+                    color="info"
+                    small
+                    outlined
+                    @click="flipTo('subscriptions')"
+                  >
+                    {{
+                      user.account_type === 'Free' ? 'Upgrade' : 'Subscription'
+                    }}
+                  </v-btn>
+                </div>
+              </div>
+            </div>
             <div
-              class="general-setting-wrapper d-flex flex-column align-center justify-center pa-2"
+              class="site-settings-container d-flex flex-column justify-center align-center px-2 pb-2"
             >
               <div
-                class="gen-setting-item ma-2 pa-4 d-flex flex-column align-center justify-center elevation-2"
+                class="site-setting-website-container d-flex flex-column justify-center align-center"
               >
-                <v-icon size="50" color="success">mdi-settings</v-icon>
+                <span class="site-name font-weight-bold mb-2">
+                  {{ user.domain }}.kreoh.com
+                </span>
                 <div
-                  class="d-flex flex-column justify-center align-center my-2"
+                  class="website-container d-flex flex-column justify-space-between align-center elevation-2 mb-2 pa-2 pb-4"
                 >
-                  <v-btn class="ma-1" color="info" x-small outlined>
-                    Site Setings
-                  </v-btn>
-                  <v-btn class="ma-1" color="info" x-small outlined>
-                    User Setings
-                  </v-btn>
+                  <div
+                    class="website-preview-container d-flex flex-column align-center justify-center pt-2"
+                  >
+                    <v-img
+                      class="website-img"
+                      contain
+                      :src="site_screenshot"
+                    ></v-img>
+                  </div>
+                  <div
+                    class="website-actions-container d-flex justify-space-around align-center mt-2"
+                  >
+                    <v-switch
+                      v-model="enableSite"
+                      :label="enableSite ? 'Enabled' : 'Disabled'"
+                      inset
+                      :disabled="!site_available"
+                      @change="activateSite()"
+                    ></v-switch>
+                    <v-btn
+                      v-if="site_available"
+                      outlined
+                      color="info"
+                      href="/editor"
+                    >
+                      <v-icon>mdi-pencil</v-icon> Edit
+                    </v-btn>
+                    <v-btn
+                      :disabled="!enableSite"
+                      color="info"
+                      outlined
+                      :href="`http://${user.domain}.localhost:3000/`"
+                      target="_blank"
+                    >
+                      <v-icon>mdi-open-in-new</v-icon> Visit
+                    </v-btn>
+                    <v-btn v-if="!site_available" color="info" href="/creator">
+                      <v-icon>mdi-plus</v-icon> Create
+                    </v-btn>
+                    <v-btn
+                      v-if="site_available"
+                      color="error"
+                      outlined
+                      @click="deleteSite()"
+                    >
+                      <v-icon>mdi-delete-forever</v-icon>
+                    </v-btn>
+                  </div>
                 </div>
-                <v-text-field
-                  class="mx-5"
-                  dense
-                  outlined
-                  label="Search..."
-                  prepend-inner-icon="mdi-magnify"
-                ></v-text-field>
               </div>
               <div
-                class="gen-setting-item messages ma-2 pa-4 d-flex flex-column align-center elevation-2"
+                class="site-setting-stats-container d-flex justify-center align-center"
               >
-                <v-icon size="50" color="info">mdi-message</v-icon>
-                <div
-                  v-if="temp_messages.length > 0"
-                  class="messages-preview my-3"
-                >
-                  <div v-for="message in temp_messages" :key="message.id"></div>
-                </div>
-                <div
-                  v-else
-                  class=" d-flex flex-column align-center justify-center my-3"
-                >
-                  <span class="text-center">No Unread Messages</span>
-                </div>
-                <v-btn class="align-self-center" color="info" outlined>
-                  Messages
-                </v-btn>
-              </div>
-              <div
-                class="gen-setting-item ma-2 pa-4 d-flex flex-column align-center justify-space-around elevation-2"
-              >
-                <v-icon size="50" color="#FDD835">mdi-star</v-icon>
-                <span class="font-weight-light my-3">
-                  Account Type: {{ user.account_type }}
-                </span>
-                <span class="font-weight-light mb-3">
-                  Monthly Cost: &euro; {{ price_plans[user.account_type] }}
-                </span>
-                <v-btn color="info" small outlined>
-                  {{
-                    user.account_type === 'Free' ? 'Upgrade' : 'Subscription'
-                  }}
-                </v-btn>
+                <v-card class="mt-3 mx-auto" width="45%">
+                  <v-sheet
+                    class="v-sheet--offset mx-auto"
+                    elevation="12"
+                    max-width="calc(100% - 32px)"
+                  >
+                    <v-sparkline
+                      v-if="weekly_autodraw"
+                      :labels="weekly_stats_labels"
+                      :value="weekly_stats_data"
+                      :auto-draw="weekly_autodraw"
+                      gradient-direction="top"
+                      :gradient="['#f72047', '#ffd200', '#1feaea']"
+                      line-width="2"
+                      padding="16"
+                      stroke-linecap="round"
+                      smooth="4"
+                    ></v-sparkline>
+                  </v-sheet>
+                  <v-card-text class="pt-0">
+                    <div class="title font-weight-light mb-2">
+                      Site Visitors
+                    </div>
+                    <div class="subheading font-weight-light grey--text">
+                      Weekly Average - {{ weekly_stats_avg }}
+                      / visitors per week
+                    </div>
+                    <v-divider class="my-2"></v-divider>
+                    <v-icon class="mr-2" small>
+                      mdi-clock
+                    </v-icon>
+                    <span class="caption grey--text font-weight-light">
+                      last visitor {{ last_visitor_time }}
+                    </span>
+                  </v-card-text>
+                </v-card>
+                <v-card class="mt-3 mx-auto" width="45%">
+                  <v-sheet
+                    class="v-sheet--offset mx-auto"
+                    elevation="12"
+                    max-width="calc(100% - 32px)"
+                  >
+                    <v-sparkline
+                      v-if="weekly_autodraw"
+                      :labels="weekly_stats_labels"
+                      :value="weekly_stats_data"
+                      :auto-draw="weekly_autodraw"
+                      gradient-direction="top"
+                      :gradient="['#f72047', '#ffd200', '#1feaea']"
+                      line-width="2"
+                      padding="16"
+                      stroke-linecap="round"
+                      smooth="4"
+                    ></v-sparkline>
+                  </v-sheet>
+                  <v-card-text class="pt-0">
+                    <div class="title font-weight-light mb-2">
+                      User Registrations
+                    </div>
+                    <div class="subheading font-weight-light grey--text">
+                      Last Campaign Performance
+                    </div>
+                    <v-divider class="my-2"></v-divider>
+                    <v-icon class="mr-2" small>
+                      mdi-clock
+                    </v-icon>
+                    <span class="caption grey--text font-weight-light">
+                      last registration 26 minutes ago
+                    </span>
+                  </v-card-text>
+                </v-card>
               </div>
             </div>
           </div>
-          <div
-            class="site-settings-container d-flex flex-column justify-center align-center px-2 pb-2"
-          >
-            <div
-              class="site-setting-website-container d-flex flex-column justify-center align-center"
+          <div class="dashboard-back d-flex">
+            <v-layout
+              v-if="current_displayed_section === 'site_settings'"
+              class="flipped-section d-flex flex-column px-4 py-9"
             >
-              <span class="site-name font-weight-bold mb-2">
-                {{ user.domain }}.kreoh.com
-              </span>
               <div
-                class="website-container d-flex flex-column justify-space-between align-center elevation-2 mb-2 pa-2 pb-4"
+                class="flipped-section-header d-flex justify-start align-center elevation-1 pl-6 py-3"
               >
-                <div
-                  class="website-preview-container d-flex flex-column align-center justify-center pt-2"
-                >
-                  <v-img
-                    class="website-img"
-                    contain
-                    :src="site_screenshot"
-                  ></v-img>
+                <div class="flipped-header-back-btn">
+                  <v-btn
+                    elevation="2"
+                    rounded
+                    color="info"
+                    @click="flipTo('main')"
+                  >
+                    Back
+                  </v-btn>
                 </div>
                 <div
-                  class="website-actions-container d-flex justify-space-around align-center mt-2"
+                  class="flipped-header-title d-flex justify-space-between pr-10"
                 >
-                  <v-switch
-                    v-model="enableSite"
-                    :label="enableSite ? 'Enabled' : 'Disabled'"
-                    inset
-                    :disabled="!site_available"
-                    @change="activateSite()"
-                  ></v-switch>
-                  <v-btn
-                    v-if="site_available"
-                    outlined
-                    color="info"
-                    href="/editor"
-                  >
-                    <v-icon>mdi-pencil</v-icon> Edit
-                  </v-btn>
-                  <v-btn
-                    :disabled="!enableSite"
-                    color="info"
-                    outlined
-                    :href="`http://${user.domain}.localhost:3000/`"
-                    target="_blank"
-                  >
-                    <v-icon>mdi-open-in-new</v-icon> Visit
-                  </v-btn>
-                  <v-btn v-if="!site_available" color="info" href="/creator">
-                    <v-icon>mdi-plus</v-icon> Create
-                  </v-btn>
-                  <v-btn
-                    v-if="site_available"
-                    color="error"
-                    outlined
-                    @click="deleteSite()"
-                  >
-                    <v-icon>mdi-delete-forever</v-icon>
-                  </v-btn>
+                  <span class="headline font-weight-light">
+                    Website Settings
+                  </span>
+                  <span class="font-weight-bold site-name-header">
+                    Kreoh
+                  </span>
                 </div>
               </div>
-            </div>
-            <div
-              class="site-setting-stats-container d-flex justify-center align-center"
-            >
-              <v-card class="mt-3 mx-auto" width="45%">
-                <v-sheet
-                  class="v-sheet--offset mx-auto"
-                  elevation="12"
-                  max-width="calc(100% - 32px)"
-                >
-                  <v-sparkline
-                    :labels="autodraw ? stat_labels : ['a']"
-                    :value="autodraw ? stats_value : ['a']"
-                    :auto-draw="autodraw"
-                    gradient-direction="top"
-                    :gradient="['#f72047', '#ffd200', '#1feaea']"
-                    line-width="2"
-                    padding="16"
-                  ></v-sparkline>
-                </v-sheet>
-                <v-card-text class="pt-0">
-                  <div class="title font-weight-light mb-2">
-                    Site Visitors
-                  </div>
-                  <div class="subheading font-weight-light grey--text">
-                    Weekly Average - 
-                  </div>
-                  <v-divider class="my-2"></v-divider>
-                  <v-icon class="mr-2" small>
-                    mdi-clock
-                  </v-icon>
-                  <span class="caption grey--text font-weight-light">
-                    last visitor {{ recent_visitor }} ago
+              <div
+                class="flipped-section-wrapper my-2 section-stats d-flex elevation-1"
+              >
+                <div class="flipped-section-nav elevation-1 d-flex flex-column">
+                  <span class="font-weight-bold text-center my-5">
+                    Navigation
                   </span>
-                </v-card-text>
-              </v-card>
-              <v-card class="mt-3 mx-auto" width="45%">
-                <v-sheet
-                  class="v-sheet--offset mx-auto"
-                  elevation="12"
-                  max-width="calc(100% - 32px)"
-                >
-                  <v-sparkline
-                    :labels="autodraw ? stat_labels : []"
-                    :value="autodraw ? stats_value : []"
-                    :auto-draw="autodraw"
-                    gradient-direction="top"
-                    :gradient="['#f72047', '#ffd200', '#1feaea']"
-                    line-width="2"
-                    padding="16"
-                  ></v-sparkline>
-                </v-sheet>
-                <v-card-text class="pt-0">
-                  <div class="title font-weight-light mb-2">
-                    User Registrations
+                  <v-btn
+                    color="#ECEFF1"
+                    depressed
+                    width="100%"
+                    class="site-setting-nav-btn pa-9"
+                  >
+                    Metrics
+                  </v-btn>
+                  <v-btn
+                    depressed
+                    color="#ECEFF1"
+                    width="100%"
+                    class="site-setting-nav-btn pa-9"
+                  >
+                    Functionality
+                  </v-btn>
+                </div>
+                <div class="flipped-section-content-wrapper px-6">
+                  <div class="flipped-section-content mt-4">
+                    <span class="display-1 ml-4 mt-3 font-weight-light">
+                      Metrics
+                    </span>
+                    <v-card class="mx-2 my-2" max-width="80%">
+                      <v-card-subtitle>Hourly Vistor Count</v-card-subtitle>
+                      <v-card-text>
+                        <v-sheet>
+                          <v-sparkline
+                            v-if="hourly_autodraw"
+                            :labels="hourly_stats_labels"
+                            :value="hourly_stats_data"
+                            :auto-draw="hourly_autodraw"
+                            gradient-direction="top"
+                            :gradient="['#f72047', '#ffd200', '#1feaea']"
+                            line-width="2"
+                            padding="16"
+                            stroke-linecap="round"
+                            smooth="4"
+                            width="500"
+                          ></v-sparkline>
+                        </v-sheet>
+                      </v-card-text>
+                      <v-card-text>
+                        <div class="stat-labels d-flex flex-column">
+                          <span class="title">Details:</span>
+                          <span class="font-weight-light">
+                            Highest for period: {{ hourly_stats_highest }}
+                          </span>
+                          <span class="font-weight-light">
+                            Average for period: {{ hourly_stats_avg }}
+                          </span>
+                        </div>
+                      </v-card-text>
+                    </v-card>
+
+                    <v-card class="mx-2 my-2" max-width="80%">
+                      <v-card-subtitle>Daily Vistor Count</v-card-subtitle>
+                      <v-card-text>
+                        <v-sheet>
+                          <v-sparkline
+                            v-if="weekly_autodraw"
+                            :labels="weekly_stats_labels"
+                            :value="weekly_stats_data"
+                            :auto-draw="weekly_autodraw"
+                            gradient-direction="top"
+                            :gradient="['#f72047', '#ffd200', '#1feaea']"
+                            line-width="2"
+                            padding="16"
+                            smooth="4"
+                            width="500"
+                          ></v-sparkline>
+                        </v-sheet>
+                      </v-card-text>
+                      <v-card-text>
+                        <div class="stat-labels d-flex flex-column">
+                          <span class="title">Details:</span>
+                          <span class="font-weight-light">
+                            Highest for period: {{ weekly_stats_highest }}
+                          </span>
+                          <span class="font-weight-light">
+                            Average for period: {{ weekly_stats_avg }}
+                          </span>
+                        </div>
+                      </v-card-text>
+                    </v-card>
+
+                    <v-card class="mx-2 my-2" max-width="80%">
+                      <v-card-subtitle>Monthly Vistor Count</v-card-subtitle>
+                      <v-card-text>
+                        <v-sheet>
+                          <v-sparkline
+                            v-if="monthly_autodraw"
+                            :labels="monthly_stats_labels"
+                            :value="monthly_stats_data"
+                            :auto-draw="monthly_autodraw"
+                            gradient-direction="top"
+                            :gradient="['#f72047', '#ffd200', '#1feaea']"
+                            line-width="2"
+                            padding="16"
+                            stroke-linecap="round"
+                            smooth="4"
+                            width="500"
+                          ></v-sparkline>
+                        </v-sheet>
+                      </v-card-text>
+                      <v-card-text>
+                        <div class="stat-labels d-flex flex-column">
+                          <span class="title">Details:</span>
+                          <span class="font-weight-light">
+                            Highest for period: {{ monthly_stats_highest }}
+                          </span>
+                          <span class="font-weight-light">
+                            Average for period: {{ monthly_stats_avg }}
+                          </span>
+                        </div>
+                      </v-card-text>
+                    </v-card>
                   </div>
-                  <div class="subheading font-weight-light grey--text">
-                    Last Campaign Performance
+                  <div class="flipped-section-content mb-3 mt-10">
+                    <span class="display-1 ml-4 my-3 font-weight-light">
+                      Functionality
+                    </span>
+                    <div
+                      class="function-icon-container elevation-1 pa-3 d-flex flex-column justify-center align-center"
+                    >
+                      <span class="title">Website Icon</span>
+                      <div
+                        class="function-icon-actions d-flex justify-center align-center px-9"
+                      >
+                        <div class="icon-btns mr-5">
+                          <v-btn
+                            :disabled="user.account_type === 'Free'"
+                            color="info"
+                            rounded
+                          >
+                            <v-icon>mdi-cloud-upload</v-icon> Upload
+                          </v-btn>
+                          <v-btn color="info" rounded>
+                            <v-icon>mdi-link</v-icon> Link
+                          </v-btn>
+                        </div>
+                        <div
+                          class="ml-5 icon-preview d-flex align-center justify-center"
+                        >
+                          <div
+                            class="icon-preview-container d-flex align-center justify-center"
+                          >
+                            <v-img
+                              class="icon-img"
+                              :src="userFavicon()"
+                              max-height="80"
+                              max-width="80"
+                            ></v-img>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <v-divider class="my-2"></v-divider>
-                  <v-icon class="mr-2" small>
-                    mdi-clock
-                  </v-icon>
-                  <span class="caption grey--text font-weight-light">
-                    last registration 26 minutes ago
-                  </span>
-                </v-card-text>
-              </v-card>
-            </div>
+                </div>
+              </div>
+              <div class="flipped-section-footer elevation-1"></div>
+            </v-layout>
+            <v-layout v-if="current_displayed_section === 'user_settings'">
+              <p>User Settings</p>
+            </v-layout>
+            <v-layout v-if="current_displayed_section === 'messages'">
+              <p>Messages</p>
+            </v-layout>
+            <v-layout v-if="current_displayed_section === 'subscriptions'">
+              <p>Subscriptions</p>
+            </v-layout>
           </div>
         </v-layout>
       </v-layout>
@@ -482,15 +662,32 @@ export default {
   width: 100%;
   height: 100%;
   position: relative;
+  perspective: 80%;
 }
 
-.dashboard {
+#dashboard {
   width: 80%;
   height: 80%;
   // margin: 60px 130px;
   background-color: #fafafa;
   border-radius: 20px;
   position: absolute;
+  transition: transform 1.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform-style: preserve-3d;
+}
+
+.dashboard-back,
+.dashboard-front {
+  position: absolute;
+  backface-visibility: hidden;
+  background-color: #fafafa;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+}
+
+.dashboard-back {
+  transform: rotateY(180deg);
 }
 
 .general-settings-container {
@@ -547,6 +744,11 @@ export default {
   height: 10%;
 }
 
+.site-name-header {
+  color: #0066ff;
+  font-size: 22px;
+}
+
 .website-container {
   width: 90%;
   height: 80%;
@@ -578,5 +780,55 @@ export default {
 .v-sheet--offset {
   top: -24px;
   position: relative;
+}
+
+.flipped-section {
+  height: 100%;
+  width: 100%;
+}
+
+.flipped-header-back-btn {
+  width: 10%;
+}
+
+.flipped-header-title {
+  width: 90%;
+}
+
+.flipped-section-wrapper {
+  width: 100%;
+  overflow: hidden;
+}
+
+.flipped-section-nav {
+  width: 20%;
+  height: 100%;
+}
+
+.flipped-section-content-wrapper {
+  width: 80%;
+  overflow: auto;
+}
+
+.flipped-section-content {
+  width: 100%;
+}
+
+.function-icon-actions {
+  width: 100%;
+}
+
+// .icon-btns {
+//   width: 50%;
+// }
+
+// .icon-preview {
+//   width: 50%;
+// }
+
+.icon-preview-container {
+  border: 1px solid #e6e6e6;
+  width: 100px;
+  height: 100px;
 }
 </style>

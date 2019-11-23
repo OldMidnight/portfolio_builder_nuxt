@@ -17,7 +17,7 @@ export const actions = {
     commit('loginRequest', { email })
 
     this.$auth
-      .loginWith('jwtAuth', {
+      .loginWith('local', {
         data: {
           email,
           password

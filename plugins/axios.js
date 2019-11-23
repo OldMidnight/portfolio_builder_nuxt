@@ -1,6 +1,6 @@
 export default function(context) {
   context.$axios.onRequest((config) => {
-    const token = context.$auth.getToken('jwtAuth')
+    const token = context.$auth.getToken('local')
     context.$axios.setHeader('Authorization', token)
   })
   context.$axios.onResponseError(async (error) => {
@@ -9,7 +9,7 @@ export default function(context) {
       const originalRequest = response.config
       context.$axios.setHeader(
         'Authorization',
-        context.$auth.getRefreshToken('jwtAuth')
+        context.$auth.getRefreshToken('local')
       )
       const newToken = await context.$axios
         .$post('/helper/refresh_token')

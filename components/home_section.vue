@@ -12,7 +12,6 @@ export default {
       switch (this.current_view_item) {
         case 'item-intro':
           el = document.querySelector('#item-layouts')
-          console.log(el)
           el.scrollIntoView({ behavior: 'smooth', block: 'center' })
           // console.log(goTo)
           // goTo(el, { duration: 300, offset: 0 })

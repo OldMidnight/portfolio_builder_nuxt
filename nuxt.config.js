@@ -65,7 +65,7 @@ module.exports = {
   // auth Config
   auth: {
     strategies: {
-      jwtAuth: {
+      local: {
         _scheme: '~/plugins/jwtAuth.js',
         endpoints: {
           login: {

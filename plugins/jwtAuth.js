@@ -1,4 +1,4 @@
-export default class JWTScheme {
+export default class LocalScheme {
   constructor(auth, options) {
     this.$auth = auth
     this.name = options._name
