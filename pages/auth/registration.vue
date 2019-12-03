@@ -67,11 +67,11 @@ export default {
         this.$refs[f].validate(true)
       })
       if (!this.formHasErrors) {
-        this.domainEntry = true
         this.formHasErrors = false
       }
     },
     validateDomain() {
+      this.validateInfo()
       this.formHasErrors = false
       if (!this.domain) this.formHasErrors = true
 
@@ -141,9 +141,24 @@ export default {
         @click:append="show_password = !show_password"
       >
       </v-text-field>
-      <v-btn color="success" @click="validateInfo()">Submit</v-btn>
+      <v-text-field
+        ref="domain"
+        v-model="domain"
+        label="Domain"
+        :rules="[
+          rules.required,
+          () => (!!domain && domain.length >= 3) || 'Min 3 characters',
+          () => (!!domain && domain.length <= 20) || 'Max 20 characters'
+        ]"
+        class="auth-input"
+        outlined
+        @click="domainValid = null"
+      >
+      </v-text-field>
+      <!-- <v-btn color="success" @click.stop="validateInfo()">Submit</v-btn> -->
+      <v-btn color="success" @click="validateDomain()">Submit</v-btn>
     </div>
-    <div v-if="domainEntry" class="d-flex flex-column align-center">
+    <!-- <div v-if="domainEntry" class="d-flex flex-column align-center">
       <div>Enter Your Domain</div>
       <v-text-field
         ref="domain"
@@ -159,8 +174,8 @@ export default {
         @click="domainValid = null"
       >
       </v-text-field>
-      <v-btn color="success" @click="validateDomain()">Submit</v-btn>
-    </div>
+      <v-btn color="success" @click.stop="validateDomain()">Submit</v-btn>
+    </div> -->
     <v-flex class="d-flex flex-column align-center auth-link">
       <span class="caption">Already have an account?</span>
       <nuxt-link to="/auth/login" class="caption auth-link">Login</nuxt-link>

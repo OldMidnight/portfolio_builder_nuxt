@@ -1,10 +1,3 @@
-// import { userService } from '@/_services'
-
-// const user = JSON.parse(window.$nuxt.$storage.getUniversal('user'))
-// export const state = user
-//   ? { status: { loggedIn: true }, user }
-//   : { status: {}, user: null }
-
 export const state = () => ({
   status: {
     loggedIn: false
@@ -26,32 +19,8 @@ export const actions = {
       .then(() => {
         this.$router.push({ path: '/dashboard' })
       })
-    // .$post('/auth/login', { email, password })
-    // .then((response) => {
-    //   commit('loginSuccess', response.user)
-    //   this.$axios.setToken(response.access_token, 'Bearer', ['post'])
-    //   this.$auth.$storage.setUniversal('user', JSON.stringify(response))
-    //   this.$router.push({ path: '/dashboard' })
-    // })
-    // .catch((error) => {
-    //   commit('loginFailure', error)
-    // })
-    // userService.login(email, password).then(
-    //   (user) => {
-    //     commit('loginSuccess', user)
-    //     if (nextPath === 'home') {
-    //       this.$router.push({ name: 'home' })
-    //     } else {
-    //       this.$router.push({ name: nextPath })
-    //     }
-    //   },
-    //   (error) => {
-    //     commit('loginFailure', error)
-    //   }
-    // )
   },
   logout({ commit }) {
-    // userService.logout()
     commit('logout')
     this.$router.push({ name: 'home' })
   },
@@ -61,9 +30,16 @@ export const actions = {
       .$post('/auth/register', user)
       .then((response) => {
         commit('registerSuccess', response.user)
-        // this.$axios.setToken(response.access_token, 'Bearer', ['post'])
-        // this.$auth.$storage.setUniversal('user', JSON.stringify(response))
-        this.$router.push({ path: '/auth/login' })
+        this.$auth
+          .loginWith('local', {
+            data: {
+              email: user.email,
+              password: user.password
+            }
+          })
+          .then(() => {
+            this.$router.push({ path: '/dashboard' })
+          })
       })
       .catch((error) => {
         commit('registerFailure', error)

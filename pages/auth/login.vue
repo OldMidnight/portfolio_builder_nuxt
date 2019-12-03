@@ -89,7 +89,7 @@ export default {
       @click:append="show_password = !show_password"
     >
     </v-text-field>
-    <v-btn color="success" @click="validateInfo()">Submit</v-btn>
+    <v-btn color="success" @click.stop="validateInfo()">Submit</v-btn>
     <v-flex class="mt-2 auth-link d-flex flex-column align-center">
       <span class="caption">New to Kreoh?</span>
       <nuxt-link to="/auth/registration" class="auth-link caption">

@@ -1,6 +1,10 @@
 export const state = () => ({
   creation_step: 0,
   site_props: {
+    favicon: {
+      use: false,
+      link: null
+    },
     layout: null,
     navigation: 0,
     navigation_style: '1',
@@ -456,25 +460,34 @@ export const mutations = {
     state.site_props.resume_page_inputs.resume_sections = payload.sections
     state.site_props.resume_page_inputs.resume_created = true
     state.site_props.resume_page_inputs.resume_layout = payload.layout
+  },
+  setFavicon(state, payload) {
+    state.site_props.favicon = payload
   }
 }
 
 export const actions = {
   registerWebsite(props) {
-    this.$axios.$post('/create/register_site', {
-      site_props: JSON.stringify(props.state.site_props)
-    })
-    this.$axios.$get('/uploads/screenshot/grab').then(() => {
-      this.$router.push({ path: '/dashboard' })
-    })
+    this.$axios
+      .$post('/create/register_site', {
+        site_props: JSON.stringify(props.state.site_props)
+      })
+      .then(() => {
+        this.$axios.$get('/uploads/screenshot/grab').then(() => {
+          this.$router.push({ path: '/dashboard' })
+        })
+      })
   },
   updateWebsite(props) {
-    this.$axios.$post('/create/update_site', {
-      site_props: JSON.stringify(props.state.site_props)
-    })
-    this.$axios.$get('/uploads/screenshot/grab').then(() => {
-      this.$router.push({ path: '/dashboard' })
-    })
+    this.$axios
+      .$post('/create/update_site', {
+        site_props: JSON.stringify(props.state.site_props)
+      })
+      .then(() => {
+        this.$axios.$get('/uploads/screenshot/grab').then(() => {
+          this.$router.push({ path: '/dashboard' })
+        })
+      })
   }
 }
 

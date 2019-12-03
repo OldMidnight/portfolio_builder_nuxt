@@ -95,7 +95,7 @@ export default {
     },
     async getValidatedURL() {
       const validation = await this.$axios
-        .$get(this.img_url)
+        .get(this.img_url)
         .then((response) => {
           if (response.headers['content-type'].split('/')[0] === 'image') {
             return this.img_url

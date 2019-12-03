@@ -176,7 +176,7 @@ export default {
           :ref="'exp_' + exp.id"
           class="exp d-flex flex-column align-center pa-4 my-2"
           :class="{ selectable: options.editing }"
-          @click="selectExp(exp.id)"
+          @click.stop="selectExp(exp.id)"
         >
           <div class="org-name">
             <span class="body-1">{{ exp.org_name }}</span>
@@ -220,7 +220,7 @@ export default {
             class="mt-4"
             rounded
             large
-            @click="addExperience()"
+            @click.stop="addExperience()"
           >
             <span>Add a New Experience</span>
           </v-btn>
@@ -280,7 +280,7 @@ export default {
               color="error"
               class="align-self-center mb-3"
               width="10"
-              @click="deleteExp()"
+              @click.stop="deleteExp()"
             >
               <v-icon>mdi-delete-forever</v-icon>
             </v-btn>
@@ -324,7 +324,7 @@ export default {
         <v-btn
           text
           color="primary"
-          @click="$refs.date_end_dialog.save(date_end)"
+          @click.stop="$refs.date_end_dialog.save(date_end)"
         >
           OK
         </v-btn>

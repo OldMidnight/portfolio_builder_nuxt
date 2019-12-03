@@ -111,7 +111,7 @@ export default {
     },
     async getValidatedURL() {
       const validation = await this.$axios
-        .$get(this.temp_project.img.url)
+        .get(this.temp_project.img.url)
         .then((response) => {
           if (response.headers['content-type'].split('/')[0] === 'image') {
             return this.temp_project.img.url
@@ -351,7 +351,7 @@ export default {
               :disabled="!project_valid"
               color="blue darken-1"
               text
-              @click="validateProject()"
+              @click.stop="validateProject()"
               >Save</v-btn
             >
             <v-btn
@@ -359,7 +359,7 @@ export default {
               class="align-self-right"
               color="red"
               text
-              @click="delete_project_dialog = true"
+              @click.stop="delete_project_dialog = true"
               >Delete</v-btn
             >
           </v-flex>
@@ -381,7 +381,7 @@ export default {
 
         <v-card-actions>
           <v-flex class="">
-            <v-btn color="red" text @click="deleteProject()"
+            <v-btn color="red" text @click.stop="deleteProject()"
               >Yes, Delete Now!</v-btn
             >
             <v-btn

@@ -279,9 +279,9 @@ export default {
         </v-card-title>
         <v-card-text>
           <v-container class="wizard-container">
-            <transition-group
-              enter-active-class="animated fadeInRight faster"
-              leave-active-class="animated fadeOutLeft faster"
+            <transition
+              enter-active-class="animated fadeInUp faster"
+              leave-active-class="animated fadeOutUp faster"
               mode="out-in"
               @before-leave="transitioning = true"
               @after-leave="transitioning = false"
@@ -602,7 +602,7 @@ export default {
                   </span>
                 </div>
               </v-layout>
-            </transition-group>
+            </transition>
           </v-container>
         </v-card-text>
         <v-divider></v-divider>
@@ -727,7 +727,7 @@ export default {
 
 .wizard-container {
   height: 100%;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .wizard-step {

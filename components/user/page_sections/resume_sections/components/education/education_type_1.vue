@@ -211,7 +211,7 @@ export default {
             'selectable school': options.editing,
             'main-school': !options.editing
           }"
-          @click="selectSchool(school.id)"
+          @click.stop="selectSchool(school.id)"
         >
           <div class="school-name">
             <span
@@ -265,7 +265,7 @@ export default {
             class="mt-4"
             rounded
             large
-            @click="addEducation()"
+            @click.stop="addEducation()"
           >
             <span>Add a New Place of Education</span>
           </v-btn>
@@ -342,7 +342,7 @@ export default {
               color="error"
               class="align-self-center mb-3"
               width="10"
-              @click="deleteEdu()"
+              @click.stop="deleteEdu()"
             >
               <v-icon>mdi-delete-forever</v-icon>
             </v-btn>
@@ -365,7 +365,7 @@ export default {
         <v-btn
           text
           color="primary"
-          @click="$refs.date_start_dialog.save(date_start)"
+          @click.stop="$refs.date_start_dialog.save(date_start)"
         >
           OK
         </v-btn>
@@ -386,7 +386,7 @@ export default {
         <v-btn
           text
           color="primary"
-          @click="$refs.date_end_dialog.save(date_end)"
+          @click.stop="$refs.date_end_dialog.save(date_end)"
         >
           OK
         </v-btn>

@@ -133,7 +133,7 @@ export default {
             'selectable interest': options.editing,
             'main-interest': !options.editing
           }"
-          @click="selectInterest(interest.id)"
+          @click.stop="selectInterest(interest.id)"
         >
           <span class="title mb-2">{{ interest.title }}</span>
           <span
@@ -160,7 +160,13 @@ export default {
           class="editor-placeholder d-flex flex-column align-center justify-center"
         >
           <span class="headline">Select an item above to begin editing!</span>
-          <v-btn color="info" class="mt-4" rounded large @click="addInterest()">
+          <v-btn
+            color="info"
+            class="mt-4"
+            rounded
+            large
+            @click.stop="addInterest()"
+          >
             <span>Add a New Interest</span>
           </v-btn>
         </div>
@@ -191,7 +197,7 @@ export default {
               color="error"
               class="align-self-center mb-3"
               width="10"
-              @click="deleteInt()"
+              @click.stop="deleteInt()"
             >
               <v-icon>mdi-delete-forever</v-icon>
             </v-btn>

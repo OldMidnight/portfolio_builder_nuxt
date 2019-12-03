@@ -199,7 +199,7 @@ export default {
             'selectable, grade': options.editing,
             'main-grade': !options.editing
           }"
-          @click="selectGrade(grade.id)"
+          @click.stop="selectGrade(grade.id)"
         >
           <div class="cert-name">
             <span class="title">{{ grade.name }}</span>
@@ -248,7 +248,7 @@ export default {
             class="mt-4"
             rounded
             large
-            @click="addCertification()"
+            @click.stop="addCertification()"
           >
             <span>Add a New Certification</span>
           </v-btn>
@@ -304,13 +304,13 @@ export default {
                   color="error"
                   class="mb-6 ml-2"
                   icon
-                  @click.once="deleteCertSection(section.id)"
+                  @click.stop="deleteCertSection(section.id)"
                 >
                   <v-icon>mdi-close</v-icon>
                 </v-btn>
               </div>
               <div v-if="multiple_grades" class="mb-3">
-                <v-btn color="info" @click="addGradeSection()">
+                <v-btn color="info" @click.stop="addGradeSection()">
                   Add Grade Section
                 </v-btn>
               </div>
@@ -328,7 +328,7 @@ export default {
               color="error"
               class="align-self-center mb-3"
               width="10"
-              @click="deleteCert()"
+              @click.stop="deleteCert()"
             >
               <v-icon>mdi-delete-forever</v-icon>
             </v-btn>
@@ -348,7 +348,7 @@ export default {
         <v-btn text color="primary" @click="date_open = false">
           Cancel
         </v-btn>
-        <v-btn text color="primary" @click="$refs.date_dialog.save(date)">
+        <v-btn text color="primary" @click.stop="$refs.date_dialog.save(date)">
           OK
         </v-btn>
       </v-date-picker>

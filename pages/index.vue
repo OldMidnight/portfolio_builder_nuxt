@@ -44,10 +44,7 @@ export default {
           if (response.error) {
             redirect('/site_disabled')
           } else {
-            store.commit(
-              'creator/setSiteProps',
-              JSON.parse(response.site_config)
-            )
+            store.commit('creator/setSiteProps', response.site_config)
           }
         })
     }
@@ -66,7 +63,24 @@ export default {
         this.$store.state.creator.is_subdomain &&
         this.$store.state.creator.domain.available
           ? this.$store.state.creator.site_props.site_name
-          : 'Home - Kreoh.com'
+          : 'Home - Kreoh.com',
+      link:
+        this.$store.state.creator.is_subdomain &&
+        this.$store.state.creator.domain.available &&
+        this.$store.state.creator.site_props.favicon.use
+          ? [
+              {
+                rel: 'icon',
+                href: this.$store.state.creator.site_props.favicon.link
+              }
+            ]
+          : [
+              {
+                rel: 'stylesheet',
+                href:
+                  'https://fonts.googleapis.com/css?family=Roboto&display=swap'
+              }
+            ]
     }
   }
 }

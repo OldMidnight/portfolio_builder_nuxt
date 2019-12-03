@@ -62,7 +62,7 @@ export default {
         'dark-nav-text': site_props.tab_text_color === 'black',
         'white-nav-text': site_props.tab_text_color === 'white'
       }"
-      @click="changeActiveNav('home')"
+      @click.stop="changeActiveNav('home')"
     >
       <p class="nav-text headline align-self-center font-weight-light ma-0">
         {{ site_props.nav_titles.home }}
@@ -83,7 +83,7 @@ export default {
         'dark-nav-text': site_props.tab_text_color === 'black',
         'white-nav-text': site_props.tab_text_color === 'white'
       }"
-      @click="changeActiveNav('projects')"
+      @click.stop="changeActiveNav('projects')"
     >
       <p class="nav-text headline align-self-center font-weight-light ma-0">
         {{ site_props.nav_titles.projects }}
@@ -104,7 +104,7 @@ export default {
         'dark-nav-text': site_props.tab_text_color === 'black',
         'white-nav-text': site_props.tab_text_color === 'white'
       }"
-      @click="changeActiveNav('resume')"
+      @click.stop="changeActiveNav('resume')"
     >
       <p class="nav-text headline align-self-center font-weight-light ma-0">
         {{ site_props.nav_titles.resume }}

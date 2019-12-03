@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapMutations } from 'vuex'
 export default {
   transitions: {
     enterActiveClass: 'animated fadeInLeft',
@@ -7,7 +7,7 @@ export default {
   },
   data() {
     return {
-      enableSite: false,
+      site_parked: false,
       site_available: false,
       sidenav: true,
       items: [
@@ -38,7 +38,13 @@ export default {
       hourly_autodraw: false,
       monthly_autodraw: false,
       dashboard_flipped: false,
-      current_displayed_section: 'main'
+      current_displayed_section: 'main',
+      favicon_dialog_link: false,
+      favicon_url: null,
+      validated_favicon_url: null,
+      favicon_url_error: false,
+      favicon_dialog_upload: false,
+      favicon_file: null
     }
   },
   computed: {
@@ -46,6 +52,15 @@ export default {
     ...mapState('creator', ['site_props']),
     user() {
       return this.$store.state.auth.user
+    },
+    userFavicon() {
+      if (this.site_props.favicon.use) {
+        return this.site_props.favicon.link
+      } else {
+        return this.validated_favicon_url !== null
+          ? this.validated_favicon_url
+          : '/favicon.ico'
+      }
     }
   },
   watch: {
@@ -60,8 +75,15 @@ export default {
   asyncData({ $axios }) {
     return $axios.$get('/helper/get_site_active').then((response) => {
       return {
-        enableSite: response.site_active,
+        site_parked: response.site_parked,
         site_available: response.site_available
+      }
+    })
+  },
+  fetch({ store, $axios }) {
+    return $axios.$get('/helper/auth_site_config').then((response) => {
+      if (!response.site_not_created) {
+        store.commit('creator/setSiteProps', response.site_config)
       }
     })
   },
@@ -91,24 +113,65 @@ export default {
   },
   methods: {
     ...mapActions({
-      logout: 'user_auth/logout'
+      logout: 'user_auth/logout',
+      updateWebsite: 'creator/updateWebsite'
     }),
+    ...mapMutations({
+      setFavicon: 'creator/setFavicon'
+    }),
+    validateFavicon() {
+      this.getValidatedFavicon().then((result) => {
+        this.validated_favicon_url = result.value
+        if (!result.error) {
+          this.setFavicon({
+            use: true,
+            link: this.validated_favicon_url
+          })
+          this.updateWebsite(this.site_props)
+        }
+      })
+    },
+    async getValidatedFavicon() {
+      const validation = await this.$axios
+        .get(this.favicon_url)
+        .then((response) => {
+          console.log(response.config)
+          if (
+            response.headers['content-type'] === 'image/vnd.microsoft.icon' ||
+            response.headers['content-type'] === 'image/x-icon'
+          ) {
+            this.favicon_dialog_link = false
+            return { error: false, value: this.favicon_url }
+          } else {
+            this.favicon_url_error = true
+            return { error: true, value: 'Invalid Image URL.' }
+          }
+        })
+        .catch((error) => {
+          this.favicon_url_error = true
+          return { error: true, value: error }
+        })
+      return validation
+    },
     activateSite() {
       this.$axios.$post('/helper/site_config/site_activation')
     },
     deleteSite() {
-      this.$axios.$post('/helper/delete_site').then((response) => {
-        this.delete_msg = response
-        if (response.error) {
-          this.delete_error = true
-        } else if (response.success) {
-          this.delete_success = true
-        }
-      })
+      this.$axios
+        .$post('/helper/delete_site', { domain: this.user.domain })
+        .then((response) => {
+          this.delete_msg = response
+          if (response.error) {
+            this.delete_error = true
+          } else if (response.success) {
+            this.delete_success = true
+          }
+        })
       this.$axios.$get('/helper/get_site_active').then((response) => {
-        this.enableSite = response.site_active
+        this.site_parked = response.site_parked
         this.site_available = response.site_available
       })
+      this.site_screenshot = '/layout_images/Layout_1_img.png'
     },
     logout() {
       this.$auth.logout()
@@ -137,8 +200,49 @@ export default {
         })
       }
     },
-    userFavicon() {
-      return '/favicon.ico'
+    scrollTo(id) {
+      const el = document.getElementById(id)
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    },
+    async uploadFavicon() {
+      const formData = new FormData()
+      formData.append('favicon', this.favicon_file)
+      const url = 'http://127.0.0.1:5000/uploads/favicon/set'
+      const config = {
+        headers: {
+          'content-type': 'multipart/form-data'
+        }
+      }
+      await this.$axios({
+        method: 'post',
+        url,
+        data: formData,
+        config
+      }).then(() => {
+        this.favicon_dialog_upload = false
+        this.setFavicon({
+          use: true,
+          link:
+            'http://127.0.0.1:5000/uploads/favicon/' +
+            this.user.id +
+            '_' +
+            this.user.domain +
+            '_' +
+            this.favicon_file.name
+        })
+        this.updateWebsite(this.site_props)
+        this.favicon_file = null
+      })
+    },
+    resetFavicon() {
+      this.$axios.$post('/uploads/favicon/delete', {
+        filename: this.site_props.favicon.link.split('/')[5]
+      })
+      this.setFavicon({
+        use: false,
+        link: null
+      })
+      this.updateWebsite(this.site_props)
     }
   }
 }
@@ -154,7 +258,13 @@ export default {
         <div class="links-container d-flex align-center justify-end">
           <v-btn text nuxt>FAQ</v-btn>
           <v-btn text nuxt>Support</v-btn>
-          <v-btn color="error" small outlined class="mx-2" @click="logout()">
+          <v-btn
+            color="error"
+            small
+            outlined
+            class="mx-2"
+            @click.stop="logout()"
+          >
             <v-icon>mdi-power</v-icon>
           </v-btn>
         </div>
@@ -277,13 +387,6 @@ export default {
                   <div
                     class="website-actions-container d-flex justify-space-around align-center mt-2"
                   >
-                    <v-switch
-                      v-model="enableSite"
-                      :label="enableSite ? 'Enabled' : 'Disabled'"
-                      inset
-                      :disabled="!site_available"
-                      @change="activateSite()"
-                    ></v-switch>
                     <v-btn
                       v-if="site_available"
                       outlined
@@ -293,7 +396,7 @@ export default {
                       <v-icon>mdi-pencil</v-icon> Edit
                     </v-btn>
                     <v-btn
-                      :disabled="!enableSite"
+                      :disabled="site_parked"
                       color="info"
                       outlined
                       :href="`http://${user.domain}.localhost:3000/`"
@@ -308,7 +411,7 @@ export default {
                       v-if="site_available"
                       color="error"
                       outlined
-                      @click="deleteSite()"
+                      @click.stop="deleteSite()"
                     >
                       <v-icon>mdi-delete-forever</v-icon>
                     </v-btn>
@@ -433,21 +536,26 @@ export default {
                     depressed
                     width="100%"
                     class="site-setting-nav-btn pa-9"
+                    @click="scrollTo('metrics_section')"
                   >
                     Metrics
                   </v-btn>
                   <v-btn
                     depressed
-                    color="#ECEFF1"
+                    color="#ECEFF1  "
                     width="100%"
                     class="site-setting-nav-btn pa-9"
+                    @click="scrollTo('functionality_section')"
                   >
                     Functionality
                   </v-btn>
                 </div>
                 <div class="flipped-section-content-wrapper px-6">
                   <div class="flipped-section-content mt-4">
-                    <span class="display-1 ml-4 mt-3 font-weight-light">
+                    <span
+                      id="metrics_section"
+                      class="display-1 ml-4 mt-3 font-weight-light"
+                    >
                       Metrics
                     </span>
                     <v-card class="mx-2 my-2" max-width="80%">
@@ -546,11 +654,14 @@ export default {
                     </v-card>
                   </div>
                   <div class="flipped-section-content mb-3 mt-10">
-                    <span class="display-1 ml-4 my-3 font-weight-light">
+                    <span
+                      id="functionality_section"
+                      class="display-1 ml-4 my-3 font-weight-light"
+                    >
                       Functionality
                     </span>
                     <div
-                      class="function-icon-container elevation-1 pa-3 d-flex flex-column justify-center align-center"
+                      class="function-icon-container elevation-1 pa-3 my-3 d-flex flex-column justify-center align-center"
                     >
                       <span class="title">Website Icon</span>
                       <div
@@ -558,30 +669,68 @@ export default {
                       >
                         <div class="icon-btns mr-5">
                           <v-btn
-                            :disabled="user.account_type === 'Free'"
+                            :disabled="user.account_type === 'test'"
                             color="info"
                             rounded
+                            @click="favicon_dialog_upload = true"
                           >
                             <v-icon>mdi-cloud-upload</v-icon> Upload
                           </v-btn>
-                          <v-btn color="info" rounded>
+                          <v-btn
+                            color="info"
+                            rounded
+                            @click="favicon_dialog_link = true"
+                          >
                             <v-icon>mdi-link</v-icon> Link
                           </v-btn>
                         </div>
                         <div
-                          class="ml-5 icon-preview d-flex align-center justify-center"
+                          class="ml-5 icon-preview d-flex flex-column align-center justify-center"
                         >
                           <div
                             class="icon-preview-container d-flex align-center justify-center"
                           >
                             <v-img
                               class="icon-img"
-                              :src="userFavicon()"
+                              :src="userFavicon"
                               max-height="80"
                               max-width="80"
                             ></v-img>
                           </div>
+                          <v-btn
+                            v-if="site_props.favicon.use"
+                            color="error"
+                            rounded
+                            class="mt-3"
+                            @click="resetFavicon()"
+                          >
+                            Set To Default
+                          </v-btn>
                         </div>
+                      </div>
+                    </div>
+                    <div
+                      class="function-parking-container d-flex flex-column justify-center align-center elevation-1 pa-5 my-3"
+                    >
+                      <span class="title text-center">Park Website</span>
+                      <p class="subtitle text-center my-2">
+                        Have No need for your website at the moment? Or want to
+                        simply let people know its undergoing an awesome
+                        redesign?
+                      </p>
+                      <p class="subtitle text-center my-2">
+                        Set your website to 'Parked' below, and we'll display a
+                        screen for you, letting visitors know that your website
+                        is not available yet.
+                      </p>
+                      <div class="function-parking-actions">
+                        <v-switch
+                          v-model="site_parked"
+                          :label="site_parked ? 'Parked' : 'Not Parked'"
+                          inset
+                          :disabled="!site_available"
+                          @change="activateSite()"
+                        ></v-switch>
                       </div>
                     </div>
                   </div>
@@ -607,6 +756,111 @@ export default {
         </v-col>
       </v-footer>
     </v-layout>
+    <v-dialog
+      v-model="favicon_dialog_link"
+      transition="slide-y-transition"
+      width="500"
+      persistent
+    >
+      <v-card>
+        <v-card-title>Change Your Favicon</v-card-title>
+        <v-card-subtitle>Links should lead to a .ico file</v-card-subtitle>
+        <v-card-text>
+          <v-container>
+            <v-layout>
+              <v-text-field
+                v-model="favicon_url"
+                prepend-inner-icon="mdi-link"
+                placeholder="Favicon URL..."
+                outlined
+              ></v-text-field>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-btn color="success" @click.stop="validateFavicon()">
+            Save
+          </v-btn>
+          <v-btn color="error" @click="favicon_dialog_link = false">
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog
+      v-model="favicon_dialog_upload"
+      transition="slide-y-transition"
+      width="500"
+      persistent
+    >
+      <v-card>
+        <v-card-title>Upload Your Favicon</v-card-title>
+        <v-card-subtitle>Only accepts .ico files!</v-card-subtitle>
+        <v-card-text>
+          <v-container>
+            <v-layout>
+              <v-file-input
+                v-model="favicon_file"
+                label="Favicon file..."
+                color="deep-purple accent-4"
+                chips
+                prepend-icon="mdi-paperclip"
+                placeholder="Select file"
+                outlined
+                accept="image/vnd.microsoft.icon, image/x-icon"
+                :show-size="1000"
+                :rules="[
+                  (value) =>
+                    !value ||
+                    value.size < 50000 ||
+                    'File should be less than 50 KB!'
+                ]"
+              >
+                <template v-slot:selection="{ index, text }">
+                  <v-chip
+                    v-if="index < 2"
+                    color="deep-purple accent-4"
+                    dark
+                    label
+                    small
+                  >
+                    {{ text }}
+                  </v-chip>
+                </template>
+              </v-file-input>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-btn color="success" @click.stop="uploadFavicon()">
+            Save
+          </v-btn>
+          <v-btn color="error" @click="favicon_dialog_upload = false">
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-snackbar v-model="favicon_url_error" color="error">
+      Error: Inavlid URL!
+      <v-btn icon @click="favicon_url_error = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
+    <v-snackbar v-model="delete_error" color="error">
+      Error: Site Could Not Be Deleted!
+      <v-btn icon @click="delete_error = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
+    <v-snackbar v-model="delete_success" color="success">
+      Website Deleted
+      <v-btn icon @click="delete_success = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
   </v-container>
 </template>
 

@@ -316,7 +316,7 @@ export default {
           :rounded="site_props.navigation_style === '3'"
           :fab="site_props.navigation_style === '1'"
           class="sidenav-btn-right"
-          @click="changePage('right')"
+          @click.stop="changePage('right')"
         >
           <v-icon
             v-if="site_props.navigation_style === '1'"
@@ -348,7 +348,7 @@ export default {
             :fab="site_props.navigation_style === '1'"
             class="bottom-nav-btn-left"
             large
-            @click="changePage('left')"
+            @click.stop="changePage('left')"
           >
             <v-icon
               v-if="site_props.navigation_style === '1'"
@@ -379,7 +379,7 @@ export default {
             :fab="site_props.navigation_style === '1'"
             class="bottom-nav-btn-right"
             large
-            @click="changePage('right')"
+            @click.stop="changePage('right')"
           >
             <v-icon
               v-if="site_props.navigation_style === '1'"

@@ -103,16 +103,17 @@ export default {
     },
     async getValidatedURL() {
       const validation = await this.$axios
-        .$get(this.img_url)
+        .get(this.img_url)
         .then((response) => {
+          console.log(response)
           if (response.headers['content-type'].split('/')[0] === 'image') {
             return this.img_url
           } else {
-            return 'Inavlid Image URL.'
+            return 'Invalid Image URL.'
           }
         })
         .catch((error) => {
-          return error ? 'Inavlid Image URL.' : ''
+          return error ? 'Invalid Image URL.' : ''
         })
       return validation
     },

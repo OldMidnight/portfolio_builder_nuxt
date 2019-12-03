@@ -482,25 +482,25 @@ export default {
           component: selectedTemplate
         })
       }
-    },
-    loader() {
-      const l = this.loader
-      this[l] = !this[l]
-
-      this.site_name_errors = false
-      if (!this.site_props.site_name) this.site_name_errors = true
-
-      this.$refs.site_name.validate(true)
-
-      if (!this.site_name_errors) {
-        this.updateWebsite(this.site_props)
-      }
-      this.loader = null
     }
+    // loader() {
+    //   const l = this.loader
+    //   this[l] = !this[l]
+
+    //   this.site_name_errors = false
+    //   if (!this.site_props.site_name) this.site_name_errors = true
+
+    //   this.$refs.site_name.validate(true)
+
+    //   if (!this.site_name_errors) {
+    //     this.updateWebsite(this.site_props)
+    //   }
+    //   this.loader = null
+    // }
   },
   fetch({ store, $axios }) {
     return $axios.$get('/helper/auth_site_config').then((response) => {
-      store.commit('creator/setSiteProps', JSON.parse(response.site_config))
+      store.commit('creator/setSiteProps', response.site_config)
     })
   },
   mounted() {
@@ -797,6 +797,11 @@ export default {
       } else {
         this.show_page_delete_error = true
       }
+    },
+    updateSite() {
+      this.$refs.site_name.validate(true)
+      this.validating = true
+      this.updateWebsite(this.site_props)
     }
   }
 }
@@ -828,7 +833,7 @@ export default {
               'layout-selected': site_props.layout === layout.component_name,
               'layout-disabled': layout.id !== 1
             }"
-            @click="selectLayout($event, index)"
+            @click.stop="selectLayout($event, index)"
           >
             <div
               class="d-flex flex-column justify-center pa-3"
@@ -886,7 +891,7 @@ export default {
                             <v-card
                               class="d-flex align-center flex-column"
                               height="100"
-                              @click="toggle"
+                              @click.stop="toggle"
                             >
                               <v-icon class="align-self-end">{{
                                 active ? 'mdi-check' : 'mdi-plus'
@@ -906,7 +911,7 @@ export default {
                             <v-card
                               class="d-flex align-center flex-column"
                               height="100"
-                              @click="toggle"
+                              @click.stop="toggle"
                             >
                               <v-icon class="align-self-end">{{
                                 active ? 'mdi-check' : 'mdi-plus'
@@ -927,7 +932,7 @@ export default {
                             <v-card
                               class="d-flex align-center flex-column"
                               height="100"
-                              @click="toggle"
+                              @click.stop="toggle"
                             >
                               <v-icon class="align-self-end">{{
                                 active ? 'mdi-check' : 'mdi-plus'
@@ -1173,7 +1178,10 @@ export default {
                           </span>
                         </v-card-text>
                         <v-card-actions>
-                          <v-btn color="success" @click="selectTheme(theme.id)">
+                          <v-btn
+                            color="success"
+                            @click.stop="selectTheme(theme.id)"
+                          >
                             <v-icon
                               v-if="theme.id === site_props.selected_theme"
                               left
@@ -1181,12 +1189,20 @@ export default {
                             >
                             {{ themeSelected(theme.id) }}
                           </v-btn>
-                          <v-btn text color="orange" @click="nextTheme('right')"
-                            >Next</v-btn
+                          <v-btn
+                            text
+                            color="orange"
+                            @click.stop="nextTheme('right')"
                           >
-                          <v-btn text color="orange" @click="nextTheme('left')"
-                            >Previous</v-btn
+                            Next
+                          </v-btn>
+                          <v-btn
+                            text
+                            color="orange"
+                            @click.stop="nextTheme('left')"
                           >
+                            Previous
+                          </v-btn>
                         </v-card-actions>
                       </v-card>
                     </transition>
@@ -1298,7 +1314,7 @@ export default {
                             class="ma-4 d-flex flex-column"
                             width="270"
                             height="300"
-                            @click="toggle"
+                            @click.stop="toggle"
                           >
                             <v-btn
                               style="height: 10%;"
@@ -1332,7 +1348,7 @@ export default {
                           color="error"
                           class="mr-2"
                           :disabled="activeNav === 'resume'"
-                          @click="deletePage()"
+                          @click.stop="deletePage()"
                         >
                           <v-icon>mdi-delete</v-icon>
                         </v-btn>
@@ -1340,7 +1356,7 @@ export default {
                           color="success"
                           class="ml-2"
                           :disabled="activeNav === 'resume'"
-                          @click="addPage()"
+                          @click.stop="addPage()"
                         >
                           <v-icon>mdi-plus</v-icon>
                         </v-btn>
@@ -1415,7 +1431,7 @@ export default {
               :rounded="site_props.navigation_style === '3'"
               :fab="site_props.navigation_style === '1'"
               class="preview-sidenav-btn-left"
-              @click="changePreviewPage('left')"
+              @click.stop="changePreviewPage('left')"
             >
               <v-icon
                 v-if="site_props.navigation_style === '1'"
@@ -1472,7 +1488,7 @@ export default {
                     'dark-nav-text': site_props.tab_text_color === 'black',
                     'white-nav-text': site_props.tab_text_color === 'white'
                   }"
-                  @click="changeActiveNav('home')"
+                  @click.stop="changeActiveNav('home')"
                 >
                   <p class="align-self-center ma-0">
                     {{ site_props.nav_titles.home }}
@@ -1493,7 +1509,7 @@ export default {
                     'dark-nav-text': site_props.tab_text_color === 'black',
                     'white-nav-text': site_props.tab_text_color === 'white'
                   }"
-                  @click="changeActiveNav('projects')"
+                  @click.stop="changeActiveNav('projects')"
                 >
                   <p class="align-self-center ma-0">
                     {{ site_props.nav_titles.projects }}
@@ -1514,7 +1530,7 @@ export default {
                     'dark-nav-text': site_props.tab_text_color === 'black',
                     'white-nav-text': site_props.tab_text_color === 'white'
                   }"
-                  @click="changeActiveNav('resume')"
+                  @click.stop="changeActiveNav('resume')"
                 >
                   <p class="align-self-center ma-0">
                     {{ site_props.nav_titles.resume }}
@@ -1689,7 +1705,7 @@ export default {
               :rounded="site_props.navigation_style === '3'"
               :fab="site_props.navigation_style === '1'"
               class="preview-sidenav-btn-right"
-              @click="changePreviewPage('right')"
+              @click.stop="changePreviewPage('right')"
             >
               <v-icon
                 v-if="site_props.navigation_style === '1'"
@@ -1725,7 +1741,7 @@ export default {
                 :rounded="site_props.navigation_style === '3'"
                 :fab="site_props.navigation_style === '1'"
                 class="preview-bottom-nav-btn-left"
-                @click="changePreviewPage('left')"
+                @click.stop="changePreviewPage('left')"
               >
                 <v-icon
                   v-if="site_props.navigation_style === '1'"
@@ -1759,7 +1775,7 @@ export default {
                 :rounded="site_props.navigation_style === '3'"
                 :fab="site_props.navigation_style === '1'"
                 class="preview-bottom-nav-btn-right"
-                @click="changePreviewPage('right')"
+                @click.stop="changePreviewPage('right')"
               >
                 <v-icon
                   v-if="site_props.navigation_style === '1'"
@@ -1820,7 +1836,7 @@ export default {
               :loading="validating"
               :disabled="validating"
               color="info"
-              @click="loader = 'validating'"
+              @click="updateSite()"
             >
               Submit
             </v-btn>
