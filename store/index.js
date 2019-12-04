@@ -1,6 +1,8 @@
 export const actions = {
   async nuxtServerInit({ commit }, { req, $axios }) {
     const hosts = req.hostname.split('.')
+    console.log('HTRTYUKJGFTYJNB', req.hostname)
+    console.log('FSDFRESDEDFD', req)
     let hostNum = 2
     if (hosts.includes('herokuapp')) {
       hostNum = 4
