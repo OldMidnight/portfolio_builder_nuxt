@@ -1,7 +1,11 @@
 export const actions = {
   async nuxtServerInit({ commit }, { req, $axios }) {
-    // console.log('asfdsafsdaasdf', req.hostname.split('.').length)
-    if (req.hostname.split('.').length === 2) {
+    const hosts = req.hostname.split('.')
+    let hostNum = 2
+    if (hosts.includes('herokuapp')) {
+      hostNum = 4
+    }
+    if (req.hostname.split('.').length === hostNum) {
       commit('creator/setIsSubdomain')
       await $axios
         .$post('/helper/check_domain', {
