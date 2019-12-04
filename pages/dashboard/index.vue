@@ -101,7 +101,7 @@ export default {
         this.weekly_autodraw = true
       })
       this.site_screenshot =
-        'http://http://kreoh-api.herokuapp.com//uploads/screenshot/' +
+        'http://kreoh-api.herokuapp.com//uploads/screenshot/' +
         this.user.domain +
         '.kreoh.com.png'
     }
@@ -207,7 +207,7 @@ export default {
     async uploadFavicon() {
       const formData = new FormData()
       formData.append('favicon', this.favicon_file)
-      const url = 'http://http://kreoh-api.herokuapp.com//uploads/favicon/set'
+      const url = 'http://kreoh-api.herokuapp.com//uploads/favicon/set'
       const config = {
         headers: {
           'content-type': 'multipart/form-data'
@@ -223,7 +223,7 @@ export default {
         this.setFavicon({
           use: true,
           link:
-            'http://http://kreoh-api.herokuapp.com//uploads/favicon/' +
+            'http://kreoh-api.herokuapp.com//uploads/favicon/' +
             this.user.id +
             '_' +
             this.user.domain +

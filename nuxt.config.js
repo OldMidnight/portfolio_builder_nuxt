@@ -96,7 +96,7 @@ module.exports = {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: 'http://http://kreoh-api.herokuapp.com/'
+    baseURL: 'http://kreoh-api.herokuapp.com/'
   },
   /*
    ** vuetify module configuration
