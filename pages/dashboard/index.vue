@@ -399,7 +399,7 @@ export default {
                       :disabled="site_parked"
                       color="info"
                       outlined
-                      :href="`http://${user.domain}.localhost:3000/`"
+                      :href="`http://${user.domain}.kreoh-client.herokuapp.com/`"
                       target="_blank"
                     >
                       <v-icon>mdi-open-in-new</v-icon> Visit
