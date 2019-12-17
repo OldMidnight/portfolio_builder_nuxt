@@ -21,6 +21,10 @@ export default {
         height: null,
         width: null
       })
+    },
+    editor: {
+      default: null,
+      type: Object
     }
   },
   data() {
@@ -42,9 +46,21 @@ export default {
   computed: {
     site_props() {
       return this.$store.state.creator.site_props
+    },
+    html() {
+      return this.site_props[this.options.input_dict_name].html
+    },
+    img_1_props() {
+      return this.site_props[this.options.input_dict_name].img_1_props
+    },
+    img_2_props() {
+      return this.site_props[this.options.input_dict_name].img_2_props
     }
   },
   mounted() {
+    if (this.editor) {
+      this.editor.setContent(this.html)
+    }
     this.para_1_model =
       !this.options.preview &&
       this.site_props[this.options.input_dict_name].para_1
@@ -157,7 +173,7 @@ export default {
         }"
       >
         <v-tooltip v-model="edit_img_tooltip_1" right>
-          <template v-slot:activator="{ on }">
+          <template v-slot:activator>
             <v-img
               :class="{
                 'slate-border':
@@ -255,7 +271,7 @@ export default {
         }"
       >
         <v-tooltip v-model="edit_img_tooltip_2" right>
-          <template v-slot:activator="{ on }">
+          <template v-slot:activator>
             <v-img
               :class="{
                 'slate-border':

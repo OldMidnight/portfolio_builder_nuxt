@@ -7,7 +7,7 @@ export default {
     leaveActiveClass: 'animated fadeOutRight fast'
   },
   auth: false,
-  middleware: 'available_route_check',
+  middleware: 'isLoggedIn',
   layout: 'auth_layout',
   data() {
     return {
@@ -24,9 +24,8 @@ export default {
           return pattern.test(value) || 'Invalid e-mail.'
         }
       },
-      domainEntry: false,
-      formHasErrors: false,
-      domainValid: null
+      domainInvalid: false,
+      regFormValid: true
     }
   },
   computed: {
@@ -60,32 +59,17 @@ export default {
     ...mapActions({
       register: 'user_auth/register'
     }),
-    validateInfo() {
-      this.formHasErrors = false
-      Object.keys(this.form).forEach((f) => {
-        if (!this.form[f]) this.formHasErrors = true
-        this.$refs[f].validate(true)
-      })
-      if (!this.formHasErrors) {
-        this.formHasErrors = false
-      }
-    },
-    validateDomain() {
-      this.validateInfo()
-      this.formHasErrors = false
-      if (!this.domain) this.formHasErrors = true
-
-      this.$refs.domain.validate(true)
-
-      if (!this.formHasErrors) {
+    validateForm() {
+      if (this.$refs.reg_form.validate(true)) {
         this.$axios
-          .$post('create/validate_domain', { domain: this.user.domain })
+          .post('create/validate_domain', { domain: this.user.domain })
           .then((response) => {
-            if (response.validated) {
+            if (response.data.validated) {
               this.register(this.user)
-            } else {
-              this.domainValid = false
             }
+          })
+          .catch(() => {
+            this.domainInvalid = true
           })
       }
     }
@@ -95,8 +79,12 @@ export default {
 
 <template>
   <v-layout column align-center>
-    <div v-if="!domainEntry" class="pa-2 d-flex flex-column align-center">
-      <div class="headline mb-4">Create Your Account</div>
+    <v-form
+      ref="reg_form"
+      v-model="regFormValid"
+      class="pa-2 d-flex flex-column align-center"
+    >
+      <span class="headline mb-4">Create Your Account</span>
       <v-text-field
         ref="f_name"
         v-model="f_name"
@@ -152,34 +140,21 @@ export default {
         ]"
         class="auth-input"
         outlined
-        @click="domainValid = null"
       >
       </v-text-field>
       <!-- <v-btn color="success" @click.stop="validateInfo()">Submit</v-btn> -->
-      <v-btn color="success" @click="validateDomain()">Submit</v-btn>
-    </div>
-    <!-- <div v-if="domainEntry" class="d-flex flex-column align-center">
-      <div>Enter Your Domain</div>
-      <v-text-field
-        ref="domain"
-        v-model="domain"
-        label="Domain"
-        :rules="[
-          rules.required,
-          () => (!!domain && domain.length >= 3) || 'Min 3 characters',
-          () => (!!domain && domain.length <= 20) || 'Max 20 characters'
-        ]"
-        class="auth-input"
-        outlined
-        @click="domainValid = null"
-      >
-      </v-text-field>
-      <v-btn color="success" @click.stop="validateDomain()">Submit</v-btn>
-    </div> -->
+      <v-btn color="success" @click="validateForm()">Submit</v-btn>
+    </v-form>
     <v-flex class="d-flex flex-column align-center auth-link">
       <span class="caption">Already have an account?</span>
       <nuxt-link to="/auth/login" class="caption auth-link">Login</nuxt-link>
     </v-flex>
+    <v-snackbar v-model="domainInvalid" color="error">
+      Domain is unavailable.
+      <v-btn icon @click="domainInvalid = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
   </v-layout>
 </template>
 

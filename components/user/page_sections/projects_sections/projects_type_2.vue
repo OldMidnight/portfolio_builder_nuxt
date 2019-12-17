@@ -15,6 +15,10 @@ export default {
     options: {
       type: Object,
       default: () => ({})
+    },
+    editor: {
+      type: Object,
+      default: () => ({})
     }
   },
   data() {
@@ -215,7 +219,7 @@ export default {
         @edit_project="editProject($event)"
       ></ProjectItem>
       <v-tooltip v-model="add_hover" bottom>
-        <template v-slot:activator="{ on }">
+        <template>
           <v-layout
             v-if="!options.live && !options.preview"
             class="mx-auto project-item-add d-flex flex-column justify-center"
@@ -432,10 +436,7 @@ export default {
   min-height: 100%;
   max-height: 100%;
   width: 100%;
-  // border: 1px solid;
-  display: flex;
   overflow: auto;
-  flex-direction: column;
 }
 
 .project-item-add {

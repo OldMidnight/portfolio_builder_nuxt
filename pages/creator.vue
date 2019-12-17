@@ -1,10 +1,29 @@
 <script>
+import _ from 'lodash'
 import { mapMutations, mapActions } from 'vuex'
+import { Editor, EditorMenuBar } from 'tiptap'
+import {
+  Bold,
+  BulletList,
+  CodeBlock,
+  Code,
+  Blockquote,
+  ListItem,
+  Italic,
+  Link,
+  History,
+  OrderedList,
+  Strike,
+  Underline,
+  Heading,
+  TrailingNode
+} from 'tiptap-extensions'
+import Align from '@/components/tiptap-custom-nodes/UnifiedAlign'
+import FontSize from '@/components/tiptap-custom-nodes/FontSize'
 import LoadableComponent from '@/components/helpers/loadable_component'
 export default {
   layout: 'creation_layout',
-  components: { LoadableComponent },
-  middleware: 'check_site_created',
+  components: { LoadableComponent, EditorMenuBar },
   transitions: {
     enterActiveClass: 'animated fadeInLeft',
     leaveActiveClass: 'animated fadeOutRight'
@@ -19,19 +38,34 @@ export default {
           id: 1,
           component_name: 'Layout_Type_1',
           name: 'ORIGINAL',
-          img_path: 'Layout_1_img.png'
+          img_path: 'Layout_1_img.png',
+          preview_images: [
+            { id: 0, src: '/layout_images/kreoh_layout_1_fresh.png' },
+            { id: 1, src: '/layout_images/kreoh_layout_1_slate.png' },
+            { id: 2, src: '/layout_images/kreoh_layout_1_matrix.png' }
+          ]
         },
         {
           id: 2,
           component_name: 'Layout_Type_2',
           name: 'STARK',
-          img_path: '#'
+          img_path: '#',
+          preview_images: [
+            { id: 0, src: '/layout_images/kreoh_layout_1_fresh.png' },
+            { id: 1, src: '/layout_images/kreoh_layout_1_slate.png' },
+            { id: 2, src: '/layout_images/kreoh_layout_1_matrix.png' }
+          ]
         },
         {
           id: 3,
           component_name: 'Layout_Type_3',
           name: 'CLEAR',
-          img_path: '#'
+          img_path: '#',
+          preview_images: [
+            { id: 0, src: '/layout_images/kreoh_layout_1_fresh.png' },
+            { id: 1, src: '/layout_images/kreoh_layout_1_slate.png' },
+            { id: 2, src: '/layout_images/kreoh_layout_1_matrix.png' }
+          ]
         }
       ],
       site_nav: 0,
@@ -114,7 +148,27 @@ export default {
       show_page_delete_success: false,
       current_page_type: 1,
       resume_not_created: false,
-      loader: null
+      loader: null,
+      preview_images_interval: '',
+      current_preview_img: 0,
+      editor: null,
+      is_editing: false,
+      editor_timeout: null,
+      linkUrl: null,
+      linkMenuIsActive: false,
+      font_size_classes: [
+        { text: 'Overline', value: 'overline' },
+        { text: 'Caption', value: 'caption' },
+        { text: 'Body-2', value: 'body-2' },
+        { text: 'Body-1', value: 'body-1' },
+        { text: 'Title', value: 'title' },
+        { text: 'Headline', value: 'headline' },
+        { text: 'Display-1', value: 'display-1' },
+        { text: 'Display-2', value: 'display-2' }
+      ],
+      editing_font_size: false,
+      editor_font_size: 'overline',
+      editor_align_btn: 0
     }
   },
   computed: {
@@ -483,35 +537,86 @@ export default {
           component: selectedTemplate
         })
       }
+    },
+    linkMenuIsActive(value) {
+      if (value) {
+        clearTimeout(this.editor_timeout)
+      }
+    },
+    editing_font_size(value) {
+      if (value) {
+        clearTimeout(this.editor_timeout)
+      }
     }
-    // loader() {
-    //   const l = this.loader
-    //   this[l] = !this[l]
-
-    //   this.site_name_errors = false
-    //   if (!this.site_props.site_name) this.site_name_errors = true
-
-    //   this.$refs.site_name.validate(true)
-
-    //   if (!this.site_name_errors) {
-    //     this.registerWebsite(this.site_props)
-    //   }
-    //   this.loader = null
-    // }
   },
   mounted() {
+    this.editor = new Editor({
+      editable: this.preview || this.live,
+      extensions: [
+        new Align(),
+        new FontSize(),
+        new Heading(),
+        new Bold(),
+        new BulletList(),
+        new Blockquote(),
+        new ListItem(),
+        new Italic(),
+        new Link(),
+        new OrderedList(),
+        new Strike(),
+        new Underline(),
+        new History(),
+        new CodeBlock(),
+        new Code(),
+        new TrailingNode({
+          node: 'paragraph',
+          notAfter: ['paragraph']
+        })
+      ],
+      onFocus: () => {
+        this.is_editing = true
+      },
+      onUpdate: _.debounce((e) => {
+        console.log('sdfasdfasda', e.getHTML())
+        this.updatePage(e.getHTML())
+      }, 3000)
+      // onBlur: () => {
+      //   this.editor_timeout = setTimeout(() => {
+      //     this.is_editing = false
+      //   }, 1200)
+      // }
+    })
+    this.preview_images_interval = setInterval(() => {
+      if (this.current_preview_img === 2) {
+        this.current_preview_img = 0
+      } else {
+        this.current_preview_img += 1
+      }
+    }, 5000)
     this.setHomePages([
       // { id: #, component: () => import(COMPONENT_PATH) }
       { id: 1, page_num: 1, component: 'home_sections/home_type_1' },
       { id: 2, page_num: 2, component: 'home_sections/home_type_3' },
       { id: 3, page_num: 3, component: 'home_sections/home_type_4' }
     ])
-    let inputDict = 'home_page_1_inputs'
-    this.setInputDictValues({
-      inputDict,
-      input_dict_values: {
-        name: 'Your Name Here',
-        tagline: 'Insert Your Epic Tagline Here!',
+    let inputDict = 'home_page_1_data'
+    this.updatePageData({
+      page_label: inputDict,
+      data: {
+        html: `
+<p>
+  <span class="d-flex justify-center">
+    <span class="display-1">Your Name Here</span>
+  </span>
+</p>
+<p>
+  <span class="d-flex justify-center">
+    <span class="caption">
+      Insert Your Epic Tagline Here!
+    </span>
+  </span>
+</p>
+        `,
         img_props: {
           url:
             'https://images.unsplash.com/photo-1502791451862-7bd8c1df43a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=900&q=60',
@@ -519,7 +624,7 @@ export default {
         }
       }
     })
-    inputDict = 'home_page_2_inputs'
+    inputDict = 'home_page_2_data'
     this.setInputDictValues({
       inputDict,
       input_dict_values: {
@@ -537,14 +642,15 @@ export default {
         }
       }
     })
-    inputDict = 'home_page_3_inputs'
-    this.setInputDictValues({
-      inputDict,
-      input_dict_values: {
-        header: 'Text Header Goes Here',
-        content:
-          'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.'
-      }
+    inputDict = 'home_page_3_data'
+    this.updatePageData({
+      page_label: inputDict,
+      data: `
+        <p>
+          <span class="display-1">An Awesome Title</span>
+        </p>
+        <p>C'mon! Get Writing!</p>
+      `
     })
 
     this.setProjectsPages([
@@ -630,6 +736,9 @@ export default {
       value: this.$store.state.auth.user.email
     })
   },
+  beforeDestroy() {
+    this.editor.destroy()
+  },
   head() {
     return {
       title: 'Creator - Kreoh.com'
@@ -670,7 +779,9 @@ export default {
       modifyComponent: 'creator/modifyComponent',
       setSiteProps: 'creator/setSiteProps',
       restoreSiteProps: 'creator/restoreSiteProps',
-      setResumeSection: 'creator/setResumeSection'
+      setResumeSection: 'creator/setResumeSection',
+      updatePageData: 'creator/updatePageData',
+      updatePageDataObject: 'creator/updatePageDataObject'
     }),
     ...mapActions({
       registerWebsite: 'creator/registerWebsite'
@@ -778,36 +889,49 @@ export default {
         this.setNavColor('success')
       }
     },
-    sortInputs(e) {
-      // ActiveNav = current tab, activeNav_index = tab page
-      const inputDict =
-        this.activeNav + '_page_' + this.activeNav_index + '_inputs'
-      this.setInputDictValues({ inputDict, input_dict_values: e })
-    },
-    updateInput(e) {
-      const inputDict =
-        this.activeNav + '_page_' + this.activeNav_index + '_inputs'
-      if (e.data_struct && e.data_struct === 'Array') {
-        if (e.id) {
-          this.updateInputArrayValue({
-            inputDict,
-            input_type: e.type,
-            input_value: e.value,
-            update_type: e.update_type,
-            id: e.id
-          })
-        } else {
-          this.addInputArrayValue({
-            inputDict,
-            input_type: e.type,
-            input_value: e.value
-          })
-        }
+    updatePage(html) {
+      // Function to update the html state of a page of a website
+      // Takes a html string as an argument
+
+      // const inputDict =
+      //   this.activeNav + '_page_' + this.activeNav_index + '_inputs'
+      // if (e.data_struct && e.data_struct === 'Array') {
+      //   if (e.id) {
+      //     this.updateInputArrayValue({
+      //       inputDict,
+      //       input_type: e.type,
+      //       input_value: e.value,
+      //       update_type: e.update_type,
+      //       id: e.id
+      //     })
+      //   } else {
+      //     this.addInputArrayValue({
+      //       inputDict,
+      //       input_type: e.type,
+      //       input_value: e.value
+      //     })
+      //   }
+      // } else {
+      //   this.updateInputDictValue({
+      //     inputDict,
+      //     input_type: e.type,
+      //     input_value: e.value
+      //   })
+      // }
+      // eslint-disable-next-line prettier/prettier
+      const data = this.site_props[this.activeNav + '_page_' + this.activeNav_index + '_data']
+      if (typeof data === 'object' && data !== null) {
+        this.updatePageDataObject({
+          page_label:
+            this.activeNav + '_page_' + this.activeNav_index + '_data',
+          type: 'html',
+          data: html
+        })
       } else {
-        this.updateInputDictValue({
-          inputDict,
-          input_type: e.type,
-          input_value: e.value
+        this.updatePageData({
+          page_label:
+            this.activeNav + '_page_' + this.activeNav_index + '_data',
+          data: html
         })
       }
       this.hideNextStep()
@@ -923,9 +1047,25 @@ export default {
       }
     },
     registerSite() {
-      this.$refs.site_name.validate(true)
-      this.validating = true
-      this.registerWebsite(this.site_props)
+      if (this.$refs.creator_site_name_form.validate()) {
+        this.validating = true
+        this.registerWebsite(this.site_props)
+      }
+    },
+    showLinkMenu(attrs) {
+      this.linkUrl = attrs.href
+      this.linkMenuIsActive = true
+      this.$nextTick(() => {
+        this.$refs.linkInput.focus()
+      })
+    },
+    hideLinkMenu() {
+      this.linkUrl = null
+      this.linkMenuIsActive = false
+    },
+    setLinkUrl(command, url) {
+      command({ href: url })
+      this.hideLinkMenu()
     }
   }
 }
@@ -967,10 +1107,37 @@ export default {
                 'layout-selected-2': site_props.layout === layout.component_name
               }"
             >
-              <img
+              <!-- <img
                 :alt="'Layout Image: ' + layout.name"
                 :src="'/layout_images/' + layout.img_path"
-              />
+              /> -->
+              <transition
+                enter-active-class="animated fadeIn"
+                leave-active-class="animated fadeOut"
+                mode="out-in"
+              >
+                <v-img
+                  v-if="current_preview_img === 0"
+                  key="0"
+                  class="website-img"
+                  contain
+                  :src="layout.preview_images[current_preview_img].src"
+                ></v-img>
+                <v-img
+                  v-if="current_preview_img === 1"
+                  key="1"
+                  class="website-img"
+                  contain
+                  :src="layout.preview_images[current_preview_img].src"
+                ></v-img>
+                <v-img
+                  v-if="current_preview_img === 2"
+                  key="2"
+                  class="website-img"
+                  contain
+                  :src="layout.preview_images[current_preview_img].src"
+                ></v-img>
+              </transition>
             </div>
             <p class="text-center font-weight-light">{{ layout.name }}</p>
           </v-flex>
@@ -1707,11 +1874,12 @@ export default {
                         :component-name="preview_page.component"
                         :options="{
                           input_dict_name:
-                            activeNav + '_page_' + activeNav_index + '_inputs',
+                            activeNav + '_page_' + activeNav_index + '_data',
                           preview: false,
                           height: '150',
                           width: '150'
                         }"
+                        :editor="editor"
                         @update="updateInput($event)"
                       ></LoadableComponent>
                     </v-flex>
@@ -1749,6 +1917,7 @@ export default {
                           height: '150',
                           width: '150'
                         }"
+                        :editor="editor"
                         @update="updateInput($event)"
                       ></LoadableComponent>
                     </v-flex>
@@ -1869,7 +2038,7 @@ export default {
             v-if="site_props.navigation === 0"
             class="preview-bottom-nav-arrows"
           >
-            <v-flex>
+            <v-flex class="mx-2">
               <v-btn
                 v-if="site_props.navigation === 0"
                 :icon="
@@ -1903,7 +2072,7 @@ export default {
                 </p>
               </v-btn>
             </v-flex>
-            <v-flex class="d-flex justify-end">
+            <v-flex class="d-flex justify-end mx-2">
               <v-btn
                 v-if="site_props.navigation === 0"
                 :icon="
@@ -1955,7 +2124,7 @@ export default {
             <div class="subtitle-2">Your site in your browser tabs</div>
           </v-flex>
 
-          <v-flex class="">
+          <v-form ref="creator_site_name_form">
             <v-text-field
               ref="site_name"
               v-model="site_name"
@@ -1966,8 +2135,8 @@ export default {
                 rules.required,
                 () =>
                   (!!site_props.site_name &&
-                    site_props.site_name.length <= 20) ||
-                  'Max 20 characters'
+                    site_props.site_name.length <= 40) ||
+                  'Max 40 characters'
               ]"
               outline
             >
@@ -1980,7 +2149,7 @@ export default {
             >
               Submit
             </v-btn>
-          </v-flex>
+          </v-form>
         </div>
       </v-layout>
     </transition>
@@ -2017,6 +2186,150 @@ export default {
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-snackbar>
+    <transition
+      enter-active-class="animated fadeIn faster"
+      leave-active-class="animated fadeOut faster"
+      mode="out-in"
+    >
+      <v-toolbar v-show="is_editing" class="editor-toolbar">
+        <editor-menu-bar
+          :editor="editor"
+          v-slot="{ commands, isActive, getMarkAttrs }"
+        >
+          <div
+            class="d-flex justify-space-between align-center edit-items-container"
+          >
+            <v-btn icon class="mr-1" color="error" @click="is_editing = false">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+            <v-divider vertical></v-divider>
+            <v-overflow-btn
+              :items="font_size_classes"
+              label="Select size"
+              class="font-size-btn"
+              hide-details
+              v-model="editor_font_size"
+              overflow
+              @change="commands.font_size({ class: $event })"
+            ></v-overflow-btn>
+            <v-divider vertical></v-divider>
+            <v-btn-toggle dense group multiple color="primary">
+              <v-btn
+                :class="{ 'is-active': isActive.bold() }"
+                @click="commands.bold"
+              >
+                <v-icon>mdi-format-bold</v-icon>
+              </v-btn>
+              <v-btn
+                :class="{ 'is-active': isActive.italic() }"
+                @click="commands.italic"
+              >
+                <v-icon>mdi-format-italic</v-icon>
+              </v-btn>
+              <v-btn
+                :class="{ 'is-active': isActive.underline() }"
+                @click="commands.underline"
+              >
+                <v-icon>mdi-format-underline</v-icon>
+              </v-btn>
+              <v-btn
+                :class="{ 'is-active': isActive.strike() }"
+                @click="commands.strike"
+              >
+                <v-icon>mdi-format-strikethrough</v-icon>
+              </v-btn>
+              <v-divider vertical></v-divider>
+              <v-btn
+                :class="{ 'is-active': isActive.blockquote() }"
+                @click="commands.blockquote"
+              >
+                <v-icon>mdi-format-quote-close</v-icon>
+              </v-btn>
+              <v-btn
+                :class="{ 'is-active': isActive.link() }"
+                @click="showLinkMenu(getMarkAttrs('link'))"
+              >
+                <v-icon>mdi-link</v-icon>
+              </v-btn>
+              <v-btn
+                :class="{ 'is-active': isActive.ordered_list() }"
+                @click="commands.ordered_list"
+              >
+                <v-icon>mdi-format-list-numbered</v-icon>
+              </v-btn>
+              <v-btn
+                :class="{ 'is-active': isActive.bullet_list() }"
+                @click="commands.bullet_list"
+              >
+                <v-icon>mdi-format-list-bulleted</v-icon>
+              </v-btn>
+              <v-btn
+                :class="{ 'is-active': isActive.code_block() }"
+                @click="commands.code_block"
+              >
+                <v-icon>mdi-code-tags</v-icon>
+              </v-btn>
+              <v-btn @click="commands.undo">
+                <v-icon>mdi-arrow-left</v-icon>
+              </v-btn>
+              <v-btn @click="commands.redo">
+                <v-icon>mdi-arrow-right</v-icon>
+              </v-btn>
+              <v-divider vertical></v-divider>
+              <v-btn-toggle
+                v-model="editor_align_btn"
+                mandatory
+                dense
+                group
+                color="primary"
+              >
+                <v-btn @click="commands.align({ class: 'text-left' })">
+                  <v-icon>mdi-format-align-left</v-icon>
+                </v-btn>
+                <v-btn @click="commands.align({ class: 'text-center' })">
+                  <v-icon>mdi-format-align-center</v-icon>
+                </v-btn>
+                <v-btn @click="commands.align({ class: 'text-right' })">
+                  <v-icon>mdi-format-align-right</v-icon>
+                </v-btn>
+              </v-btn-toggle>
+            </v-btn-toggle>
+            <v-dialog v-model="linkMenuIsActive" width="500">
+              <v-card>
+                <v-card-title>Add Link</v-card-title>
+                <v-card-text>
+                  <v-container>
+                    <v-sheet>
+                      <v-text-field
+                        v-model="linkUrl"
+                        dense
+                        placeholder="https://"
+                        ref="linkInput"
+                        prepend-inner-icon="mdi-link"
+                        @keydown.esc="hideLinkMenu"
+                        @keydown.enter="setLinkUrl(commands.link, linkUrl)"
+                        clearable
+                      ></v-text-field>
+                    </v-sheet>
+                  </v-container>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn
+                    color="success"
+                    @click.stop="setLinkUrl(commands.link, linkUrl)"
+                  >
+                    <v-icon>mdi-content-save</v-icon> Save
+                  </v-btn>
+                  <v-btn color="error" @click="hideLinkMenu">
+                    <v-icon>mdi-close</v-icon> Close
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </div>
+        </editor-menu-bar>
+      </v-toolbar>
+    </transition>
   </div>
 </template>
 
@@ -2440,5 +2753,9 @@ export default {
 
 .save-btn-container {
   width: 100%;
+}
+
+.font-size-btn {
+  width: 150px;
 }
 </style>

@@ -8,6 +8,10 @@ export default {
     options: {
       type: Object,
       default: () => {}
+    },
+    editor: {
+      type: Object,
+      default: null
     }
   },
   computed: {
@@ -39,6 +43,7 @@ export default {
   <component
     :is="componentLoader"
     :options="options"
+    :editor="editor"
     @load="emitLoad($event)"
     @update="emitUpdate($event)"
   >

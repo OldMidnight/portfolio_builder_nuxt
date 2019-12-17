@@ -1,19 +1,13 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 export default {
-  name: 'Login',
+  name: 'login',
   transitions: {
     enterActiveClass: 'animated fadeInLeft',
     leaveActiveClass: 'animated fadeOutRight'
   },
-  middleware: 'available_route_check',
+  // middleware: 'available_route_check',
   layout: 'auth_layout',
-  props: {
-    nextPath: {
-      type: String,
-      default: 'home'
-    }
-  },
   data() {
     return {
       email: null,
@@ -26,7 +20,10 @@ export default {
           return pattern.test(value) || 'Invalid e-mail.'
         }
       },
-      formHasErrors: false
+      formHasErrors: false,
+      from_path: '/',
+      login_fail: false,
+      loginFormValid: true
     }
   },
   computed: {
@@ -43,17 +40,23 @@ export default {
       title: 'Login - Kreoh.com'
     }
   },
+  // beforeRouteEnter(to, from, next) {
+  //   console.log('asdfsd')
+  //   console.log(from)
+  //   next()
+  // },
+  asyncData({ $auth }) {
+    return { from_path: $auth.$storage.getUniversal('redirect-path') }
+  },
   methods: {
     ...mapActions('user_auth', ['login']),
     validateInfo() {
-      this.formHasErrors = false
-      Object.keys(this.user).forEach((f) => {
-        if (!this.user[f]) this.formHasErrors = true
-        this.$refs[f].validate(true)
-      })
-      if (!this.formHasErrors) {
-        this.user.nextPath = this.nextPath
-        this.login(this.user)
+      if (this.$refs.loginForm.validate()) {
+        this.login(this.user).then(() => {
+          if (!this.$store.state.auth.loggedIn) {
+            this.login_fail = true
+          }
+        })
       }
     }
   }
@@ -61,7 +64,11 @@ export default {
 </script>
 
 <template>
-  <div class="pa-2 d-flex flex-column align-center">
+  <v-form
+    v-model="loginFormValid"
+    ref="loginForm"
+    class="pa-2 d-flex flex-column align-center"
+  >
     <span class="headline mb-4">Login</span>
     <v-text-field
       ref="email"
@@ -89,14 +96,26 @@ export default {
       @click:append="show_password = !show_password"
     >
     </v-text-field>
-    <v-btn color="success" @click.stop="validateInfo()">Submit</v-btn>
+    <v-btn
+      color="success"
+      @keydown.enter="validateInfo()"
+      @click.stop="validateInfo()"
+    >
+      Submit
+    </v-btn>
     <v-flex class="mt-2 auth-link d-flex flex-column align-center">
       <span class="caption">New to Kreoh?</span>
       <nuxt-link to="/auth/registration" class="auth-link caption">
         Create an account
       </nuxt-link>
     </v-flex>
-  </div>
+    <v-snackbar v-model="login_fail" color="error">
+      Incorrect email or password.
+      <v-btn icon @click="login_fail = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
+  </v-form>
 </template>
 
 <style lang="scss" scoped>

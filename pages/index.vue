@@ -1,5 +1,6 @@
 <script>
 export default {
+  name: 'home',
   auth: false,
   transitions: {
     enterActiveClass: 'animated fadeInLeft',
@@ -91,6 +92,11 @@ export default {
     <client-only placeholder="Built Using Kreoh.com">
       <component :is="getLayout"></component>
       <v-footer
+        v-if="
+          !this.$store.state.creator.is_subdomain ||
+            (this.$store.state.creator.is_subdomain &&
+              !this.$store.state.creator.domain.available)
+        "
         padless
         height="30"
         class="user-footer caption font-weight-light d-flex flex-column align-center justify-center"

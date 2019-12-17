@@ -9,15 +9,15 @@ export const actions = {
   login({ commit }, { email, password }) {
     commit('loginRequest', { email })
 
-    this.$auth
+    return this.$auth
       .loginWith('local', {
         data: {
           email,
           password
         }
       })
-      .then(() => {
-        this.$router.push({ path: '/dashboard' })
+      .catch((error) => {
+        commit('loginFailure', error)
       })
   },
   logout({ commit }) {
@@ -40,6 +40,9 @@ export const actions = {
           .then(() => {
             this.$router.push({ path: '/dashboard' })
           })
+          .catch((error) => {
+            commit('loginFailure', error)
+          })
       })
       .catch((error) => {
         commit('registerFailure', error)
@@ -57,7 +60,7 @@ export const mutations = {
     state.user = user
   },
   loginFailure(state) {
-    state.status = {}
+    state.status = { loggingIn: false }
     state.user = null
   },
   logout(state) {

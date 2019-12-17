@@ -27,6 +27,21 @@ export default class LocalScheme {
     }
   }
 
+  // _isAuthenticated() {
+  //   const token = localStorage.getItem('token');
+  //   const refreshToken = localStorage.getItem('refreshToken');
+  //   try {
+  //     decode(token);
+  //     const { exp } = decode(refreshToken);
+  //     if (exp < (new Date().getTime() + 1) / 1000) {
+  //       return false;
+  //     }
+  //   } catch (err) {
+  //     return false;
+  //   }
+  //   return true;
+  // }
+
   mounted() {
     if (this.options.tokenRequired) {
       const token = this.$auth.syncToken(this.name)
@@ -34,23 +49,23 @@ export default class LocalScheme {
       this._setToken(token)
     }
 
-    if (process.client) {
-      const token = this.$auth.getRefreshToken(this.name)
-      if (token) {
-        this.$auth.ctx.app.$axios.setHeader('Authorization', token)
-        let newToken = null
-        this.$auth.ctx.app.$axios
-          .$post('/helper/refresh_token')
-          .then((response) => {
-            newToken = response.access_token
-            this.$auth.setToken(this.name, 'Bearer ' + newToken)
-            this._setToken(newToken)
-            this.$auth.ctx.app.$axios.$get('/auth/user').then((response) => {
-              this.$auth.setUser(response)
-            })
-          })
-      }
-    }
+    // if (process.client) {
+    //   const token = this.$auth.getRefreshToken(this.name)
+    //   if (token) {
+    //     this.$auth.ctx.app.$axios.setHeader('Authorization', token)
+    //     let newToken = null
+    //     this.$auth.ctx.app.$axios
+    //       .$post('/helper/refresh_token')
+    //       .then((response) => {
+    //         newToken = response.access_token
+    //         this.$auth.setToken(this.name, 'Bearer ' + newToken)
+    //         this._setToken(newToken)
+    //         this.$auth.ctx.app.$axios.$get('/auth/user').then((response) => {
+    //           this.$auth.setUser(response)
+    //         })
+    //       })
+    //   }
+    // }
 
     return this.$auth.fetchUserOnce()
   }
@@ -77,6 +92,7 @@ export default class LocalScheme {
 
     return this.fetchUser()
   }
+
   async setUserToken(tokenValue) {
     // Ditch any leftover local tokens before attempting to log in
     await this._logoutLocally()
@@ -114,13 +130,13 @@ export default class LocalScheme {
     this.$auth.setUser(user)
   }
 
-  async logout(endpoint) {
+  logout(endpoint) {
     // Only connect to logout endpoint if it's configured
-    if (this.options.endpoints.logout) {
-      await this.$auth
-        .requestWith(this.name, endpoint, this.options.endpoints.logout)
-        .catch(() => {})
-    }
+    // if (this.options.endpoints.logout) {
+    //   await this.$auth
+    //     .requestWith(this.name, endpoint, this.options.endpoints.logout)
+    //     .catch(() => {})
+    // }
 
     // But logout locally regardless
     return this._logoutLocally()

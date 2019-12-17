@@ -64,6 +64,7 @@ module.exports = {
   },
   // auth Config
   auth: {
+    plugins: ['~/plugins/auth'],
     strategies: {
       local: {
         _scheme: '~/plugins/jwtAuth.js',
@@ -89,6 +90,10 @@ module.exports = {
       login: '/auth/login',
       logout: '/',
       home: '/dashboard'
+    },
+    rewriteRedirects: true,
+    refresh_token: {
+      prefix: '_refesh_token'
     }
   },
   /*
@@ -96,7 +101,10 @@ module.exports = {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: 'http://kreoh-api.herokuapp.com/'
+    baseURL:
+      process.env.NODE_ENV === 'production'
+        ? 'http://kreoh-api.herokuapp.com/'
+        : 'http://127.0.0.1:5000/'
   },
   /*
    ** vuetify module configuration

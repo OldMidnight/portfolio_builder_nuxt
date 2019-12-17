@@ -18,19 +18,34 @@ export default {
           id: 1,
           component_name: 'Layout_Type_1',
           name: 'ORIGINAL',
-          img_path: 'Layout_1_img.png'
+          img_path: 'Layout_1_img.png',
+          preview_images: [
+            { id: 0, src: '/layout_images/kreoh_layout_1_fresh.png' },
+            { id: 1, src: '/layout_images/kreoh_layout_1_slate.png' },
+            { id: 2, src: '/layout_images/kreoh_layout_1_matrix.png' }
+          ]
         },
         {
           id: 2,
           component_name: 'Layout_Type_2',
           name: 'STARK',
-          img_path: '#'
+          img_path: '#',
+          preview_images: [
+            { id: 0, src: '/layout_images/kreoh_layout_1_fresh.png' },
+            { id: 1, src: '/layout_images/kreoh_layout_1_slate.png' },
+            { id: 2, src: '/layout_images/kreoh_layout_1_matrix.png' }
+          ]
         },
         {
           id: 3,
           component_name: 'Layout_Type_3',
           name: 'CLEAR',
-          img_path: '#'
+          img_path: '#',
+          preview_images: [
+            { id: 0, src: '/layout_images/kreoh_layout_1_fresh.png' },
+            { id: 1, src: '/layout_images/kreoh_layout_1_slate.png' },
+            { id: 2, src: '/layout_images/kreoh_layout_1_matrix.png' }
+          ]
         }
       ],
       site_nav: 0,
@@ -113,7 +128,9 @@ export default {
       show_page_delete_success: false,
       current_page_type: 1,
       temp_site_props: null,
-      loader: null
+      loader: null,
+      preview_images_interval: '',
+      current_preview_img: 0
     }
   },
   computed: {
@@ -504,6 +521,13 @@ export default {
     })
   },
   mounted() {
+    this.preview_images_interval = setInterval(() => {
+      if (this.current_preview_img === 2) {
+        this.current_preview_img = 0
+      } else {
+        this.current_preview_img += 1
+      }
+    }, 5000)
     this.customise_background_color = this.site_props.background.color
     this.customise_foreground_color = this.site_props.foreground.color
     this.site_nav = this.site_props.navigation
@@ -799,9 +823,10 @@ export default {
       }
     },
     updateSite() {
-      this.$refs.site_name.validate(true)
-      this.validating = true
-      this.updateWebsite(this.site_props)
+      if (this.$refs.editor_site_name_form.validate()) {
+        this.validating = true
+        this.updateWebsite(this.site_props)
+      }
     }
   }
 }
@@ -843,10 +868,37 @@ export default {
                 'layout-selected-2': site_props.layout === layout.component_name
               }"
             >
-              <img
+              <!-- <img
                 :alt="'Layout Image: ' + layout.name"
                 :src="'/layout_images/' + layout.img_path"
-              />
+              /> -->
+              <transition
+                enter-active-class="animated fadeIn"
+                leave-active-class="animated fadeOut"
+                mode="out-in"
+              >
+                <v-img
+                  v-if="current_preview_img === 0"
+                  key="0"
+                  class="website-img"
+                  contain
+                  :src="layout.preview_images[current_preview_img].src"
+                ></v-img>
+                <v-img
+                  v-if="current_preview_img === 1"
+                  key="1"
+                  class="website-img"
+                  contain
+                  :src="layout.preview_images[current_preview_img].src"
+                ></v-img>
+                <v-img
+                  v-if="current_preview_img === 2"
+                  key="2"
+                  class="website-img"
+                  contain
+                  :src="layout.preview_images[current_preview_img].src"
+                ></v-img>
+              </transition>
             </div>
             <p class="text-center font-weight-light">{{ layout.name }}</p>
           </v-flex>
@@ -1815,7 +1867,7 @@ export default {
             <div class="subtitle-2">Your site in your browser tabs</div>
           </v-flex>
 
-          <v-flex class="">
+          <v-form ref="editor_site_name_form">
             <v-text-field
               ref="site_name"
               v-model="site_name"
@@ -1826,8 +1878,8 @@ export default {
                 rules.required,
                 () =>
                   (!!site_props.site_name &&
-                    site_props.site_name.length <= 20) ||
-                  'Max 20 characters'
+                    site_props.site_name.length <= 40) ||
+                  'Max 40 characters'
               ]"
               outline
             >
@@ -1840,7 +1892,7 @@ export default {
             >
               Submit
             </v-btn>
-          </v-flex>
+          </v-form>
         </div>
       </v-layout>
     </transition>

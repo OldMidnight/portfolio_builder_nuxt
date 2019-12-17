@@ -19,6 +19,10 @@ export default {
         height: null,
         width: null
       })
+    },
+    editor: {
+      type: Object,
+      default: () => ({})
     }
   },
   data() {
@@ -170,7 +174,7 @@ export default {
     <div class="user-img-container">
       <div :style="[imgStyle, check_color_style]">
         <v-tooltip v-model="edit_img_tooltip" right>
-          <template v-slot:activator="{ on }">
+          <template v-slot:activator>
             <v-img
               :style="imgStyle"
               alt="User Profile Picture"

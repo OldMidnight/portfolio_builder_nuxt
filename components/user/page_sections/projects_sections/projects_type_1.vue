@@ -15,6 +15,10 @@ export default {
     options: {
       type: Object,
       default: () => ({})
+    },
+    editor: {
+      type: Object,
+      default: () => ({})
     }
   },
   data() {
@@ -237,7 +241,7 @@ export default {
         ></ProjectItem>
       </div>
       <v-tooltip v-model="add_hover" bottom>
-        <template v-slot:activator="{ on }">
+        <template>
           <v-layout
             v-if="!options.live && !options.preview"
             class="mx-auto project-item-add d-flex flex-column justify-center"

@@ -1,5 +1,7 @@
 <script>
+import { EditorContent } from 'tiptap'
 export default {
+  components: { EditorContent },
   props: {
     name: {
       type: String,
@@ -27,6 +29,10 @@ export default {
         height: null,
         width: null
       })
+    },
+    editor: {
+      type: Object,
+      default: null
     }
   },
   data() {
@@ -62,23 +68,32 @@ export default {
       } else {
         return {}
       }
+    },
+    html() {
+      return this.site_props[this.options.input_dict_name].html
+    },
+    img_props() {
+      return this.site_props[this.options.input_dict_name].img_props
     }
   },
   watch: {
     img_dialog(value) {
       if (value === false) {
-        if (!this.site_props[this.options.input_dict_name].img_props.url) {
+        if (!this.img_props.url) {
           this.img_url = ''
         } else {
           // eslint-disable-next-line prettier/prettier
-          this.img_url = this.site_props[this.options.input_dict_name].img_props.url
+          this.img_url = this.img_props.url
         }
         // eslint-disable-next-line prettier/prettier
-        this.img_contain = this.site_props[this.options.input_dict_name].img_props.contain
+        this.img_contain = this.img_props.contain
       }
     }
   },
   mounted() {
+    if (this.editor) {
+      this.editor.setContent(this.html)
+    }
     this.name_model =
       !this.options.preview &&
       this.site_props[this.options.input_dict_name].name
@@ -89,11 +104,11 @@ export default {
       this.site_props[this.options.input_dict_name].tagline
         ? this.site_props[this.options.input_dict_name].tagline
         : this.tagline
-    this.img_url = this.site_props[this.options.input_dict_name].img_props.url
+    this.img_url = this.img_props.url
     // eslint-disable-next-line prettier/prettier
-    this.validated_img_url = this.site_props[this.options.input_dict_name].img_props.url
+    this.validated_img_url = this.img_props.url
     // eslint-disable-next-line prettier/prettier
-    this.img_contain = this.site_props[this.options.input_dict_name].img_props.contain
+    this.img_contain = this.img_props.contain
   },
   methods: {
     validateURL() {
@@ -161,7 +176,7 @@ export default {
             alt="User Profile Picture"
             :src="
               !options.preview
-                ? site_props[options.input_dict_name].img_props.url
+                ? img_props.url
                 : 'https://images.unsplash.com/photo-1542103749-8ef59b94f47e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80   '
             "
             :class="{
@@ -173,16 +188,13 @@ export default {
               editable: !options.preview && !options.live
             }"
             class="user-hero-image elevation-2"
-            :contain="
-              site_props[options.input_dict_name]
-                ? site_props[options.input_dict_name].img_props.contain
-                : false
-            "
+            :contain="img_props.contain"
             @click.stop="
               !options.preview && !options.live
                 ? (img_dialog = true)
                 : (img_dialog = false)
             "
+            v-on="on"
             @mouseover="edit_img_tooltip = !options.preview && !options.live"
             @mouseout="edit_img_tooltip = false"
           >
@@ -193,9 +205,12 @@ export default {
     </div>
     <v-flex
       :style="check_color_style"
-      class="user-landing-text d-flex flex-column pa-0 align-center"
+      class="user-landing-text d-flex flex-column pa-0 pt-4 align-center"
     >
-      <span
+      <client-only>
+        <editor-content :editor="editor" />
+      </client-only>
+      <!-- <span
         v-if="!options.preview && !options.live"
         class="display-1"
         contenteditable="true"
@@ -224,7 +239,7 @@ export default {
         class="tag"
       >
         {{ tagline_model }}
-      </span>
+      </span> -->
     </v-flex>
     <v-dialog v-model="img_dialog" width="500">
       <v-card>

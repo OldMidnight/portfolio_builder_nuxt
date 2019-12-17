@@ -114,7 +114,7 @@ export default {
       >
     </v-flex>
     <v-tooltip v-model="edit_project_tooltip" bottom>
-      <template v-slot:activator="{ on }">
+      <template>
         <v-icon
           v-if="!options.live && !options.preview"
           class="edit-icon mt-4 ml-3 pa-1"

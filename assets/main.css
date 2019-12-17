@@ -1,3 +1,76 @@
 * {
   font-family: 'Comfortaa', cursive !important;
 }
+
+.ProseMirror img {
+  max-width: 100% !important;
+  border-radius: 3px;
+}
+
+.ProseMirror p {
+  font-size: 18px !important;
+}
+
+.ProseMirror {
+  /* outline: none; */
+  word-wrap: break-word;
+  font-variant-ligatures: none;
+  word-break: break-word;
+}
+
+.ProseMirror blockquote {
+  border-left: 3px solid rgba(0,0,0,.1);
+  color: rgba(0,0,0,.8);
+  padding-left: .8rem;
+  font-style: italic;
+}
+
+.ProseMirror pre {
+  padding: .7rem 1rem;
+  border-radius: 5px;
+  background: #000 !important;
+  color: #fff !important;
+  font-size: .8rem;
+  overflow-x: auto;
+}
+
+.ProseMirror, .ProseMirror pre {
+  white-space: pre-wrap
+}
+
+.ProseMirror pre code {
+  background: #000 !important;
+  color: #fff !important;
+  display: block;
+}
+
+.ProseMirror ul {
+  padding-left: 1rem
+}
+
+.ProseMirror
+blockquote,
+h1,
+h2,
+h3,
+h4,
+ol,
+ul,
+p,
+pre {
+  margin: 0 !important;
+}
+
+.editor-toolbar {
+  z-index: 100;
+  position: fixed;
+  left: 50%;
+  bottom: 5%;
+  transform: translateX(-50%);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.is-active {
+  background-color: #E3F2FD;
+}

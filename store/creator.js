@@ -36,9 +36,10 @@ export const state = () => ({
     tab_text_color: null,
     text_border_color: false,
     text_border_color_value: '#000000',
-    home_page_1_inputs: {},
-    home_page_2_inputs: {},
-    home_page_3_inputs: {},
+    home_page_img_1: null,
+    home_page_1_data: null,
+    home_page_2_data: {},
+    home_page_3_data: null,
     projects_page_1_inputs: {},
     projects_page_2_inputs: {},
     projects_page_3_inputs: {},
@@ -263,6 +264,12 @@ export const mutations = {
   },
   setInputDictValues(state, payload) {
     state.site_props[payload.inputDict] = payload.input_dict_values
+  },
+  updatePageData(state, payload) {
+    state.site_props[payload.page_label] = payload.data
+  },
+  updatePageDataObject(state, payload) {
+    state.site_props[payload.page_label][payload.type] = payload.data
   },
   updateInputDictValue(state, payload) {
     state.site_props[payload.inputDict][payload.input_type] =
