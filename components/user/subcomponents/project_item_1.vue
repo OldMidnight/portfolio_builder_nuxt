@@ -1,9 +1,12 @@
 <script>
-import { mapState } from 'vuex'
 export default {
   props: {
     id: {
       type: String,
+      required: true
+    },
+    index: {
+      type: Number,
       required: true
     },
     title: {
@@ -16,11 +19,11 @@ export default {
     },
     img: {
       type: Object,
-      default: () => ({})
+      required: true
     },
     link: {
-      type: String,
-      default: () => ({})
+      type: Object,
+      required: true
     },
     options: {
       type: Object,
@@ -28,13 +31,10 @@ export default {
       default: () => ({})
     }
   },
-  data() {
-    return {
-      edit_project_tooltip: false
-    }
-  },
   computed: {
-    ...mapState('creator', ['site_props']),
+    site_props() {
+      return this.$store.state.creator.site_props
+    },
     check_custom_style() {
       const style = {}
 
@@ -52,24 +52,18 @@ export default {
   methods: {
     editProject() {
       this.$emit(
-        'edit_project',
+        'edit',
         JSON.stringify({
-          id: this.id,
-          title: this.title,
-          description: this.description,
-          img: this.img,
-          link: this.link
+          index: this.index,
+          project: {
+            id: this.id,
+            title: this.title,
+            description: this.description,
+            img: this.img,
+            link: this.link
+          }
         })
       )
-    },
-    truncate(text, length, clamp) {
-      clamp = clamp || '...'
-      const node = document.createElement('div')
-      node.innerHTML = text
-      const content = node.textContent
-      return content.length > length
-        ? content.slice(0, length) + clamp
-        : content
     }
   }
 }
@@ -79,51 +73,37 @@ export default {
   <v-layout
     :style="[check_custom_style]"
     :class="{
-      'item-container mb-2 mx-auto': !options.live && !options.preview,
-      'live-item-container mb-2 mx-auto': options.live,
-      'preview-item-container ml-3': options.preview,
       'matrix-border': site_props.selected_theme === 3
     }"
-    class="elevation-1"
+    class="item-container mb-2 mx-auto"
   >
-    <v-flex class="project-img-container pa-2">
+    <v-flex v-if="img.use" class="project-img-container pa-2">
       <v-img class="project-img" :src="img.url" :contain="img.contain"></v-img>
     </v-flex>
     <v-flex class="d-flex flex-column project-content-container my-3 pa-2">
       <v-flex class="d-flex flex-column project-content">
-        <p
-          class="project-title"
-          :class="{
-            headline: !options.preview,
-            'preview-title': options.preview
-          }"
-        >
+        <p class="project-title headline">
           {{ title }}
         </p>
-        <p v-if="options.preview" class="preview-desc project-desc">
-          {{ truncate(description, 30, '...') }}
+        <p class="body-2 project-desc pt-3 mb-2">
+          {{ description }}
         </p>
-        <p v-else class="body-2 project-desc pt-3">{{ description }}</p>
+        <v-divider v-if="link.use"></v-divider>
+        <a v-if="link.use" class="caption mt-1 primary--text">
+          {{ link.link_text }}
+        </a>
       </v-flex>
-      <a
-        v-if="link || options.preview"
-        :href="link"
-        class="mt-2 project-link"
-        :class="{ caption: !options.preview, 'preview-link': options.preview }"
-        >Learn More</a
-      >
     </v-flex>
-    <v-tooltip v-model="edit_project_tooltip" bottom>
-      <template>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on }">
         <v-icon
-          v-if="!options.live && !options.preview"
           class="edit-icon mt-4 ml-3 pa-1"
           :color="site_props.selected_theme === 3 ? '#00E676' : 'warning'"
           @click.stop="editProject()"
-          @mouseover="edit_project_tooltip = true"
-          @mouseout="edit_project_tooltip = false"
-          >mdi-pencil</v-icon
+          v-on="on"
         >
+          mdi-pencil
+        </v-icon>
       </template>
       <span>Edit</span>
     </v-tooltip>
@@ -135,39 +115,20 @@ export default {
   position: absolute;
   right: 2%;
   border: 1px solid;
+  opacity: 0.4;
   border-radius: 50%;
   cursor: pointer;
 }
 
 .edit-icon:hover {
-  font-size: 30px;
+  opacity: 1;
 }
 
 .item-container {
-  // border: 1px solid;
-  position: relative;
-  width: 90%;
-  max-height: 50%;
-  min-height: 50%;
-  border-radius: 20px;
-}
-
-.live-item-container {
-  position: relative;
-  width: 90%;
-  max-height: 35%;
-  min-height: 35%;
-  border-radius: 20px;
-}
-
-.preview-item-container {
+  // border-bottom: 1px solid #777;
   position: relative;
   width: 100%;
-  max-height: 35%;
-  min-height: 35%;
-  margin: 0 !important;
-  padding: 0 !important;
-  border-radius: 20px;
+  // border-radius: 20px;
 }
 
 .project-img-container {
@@ -176,7 +137,8 @@ export default {
 }
 
 .project-img {
-  height: 100%;
+  min-height: 200px;
+  max-height: 250px;
   width: 250px;
   border-radius: 20px;
   background-color: black;
@@ -187,42 +149,47 @@ export default {
   border-left: 1px solid #b6b6b6;
 }
 
-.project-content {
-  height: 80%;
-}
+// .project-content {
+//   height: 80%;
+// }
 
-.preview-title {
-  font-size: 10px;
-}
+// .preview-title {
+//   font-size: 10px;
+// }
 
-.project-title {
-  // height: 20%;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-.preview-desc {
-  font-size: 8px;
-  white-space: pre-wrap;
-  text-align: center;
-  word-wrap: break-word;
-}
+// .project-title {
+//   // height: 20%;
+//   padding: 0 !important;
+//   margin: 0 !important;
+// }
 
 .project-desc {
   // height: 80%;
   overflow: auto;
   margin: 0 !important;
   white-space: pre-wrap;
-  text-align: center;
   word-wrap: break-word;
+  // text-align: justify;
 }
 
-.project-link {
-  // height: 20%;
-  margin: 0 !important;
+.img-preview-container {
+  // border: 1px solid #b6b6b6;
+  min-height: 150px;
+  // width: 50%;
 }
 
-.preview-link {
-  font-size: 8px;
+.img-preview {
+  // border: 1px solid #b6b6b6;
+  border-radius: 20px;
+  height: 200px;
+  width: 200px;
+  background-color: rgba(0, 0, 0, 0.465);
+}
+
+.editable:hover {
+  background-color: #bdbdbd;
+  opacity: 0.2;
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
 }
 </style>

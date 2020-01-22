@@ -1,8 +1,9 @@
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
+import { EditorContent } from 'tiptap'
 import ProjectItem from '@/components/user/subcomponents/project_item_1'
 export default {
-  components: { ProjectItem },
+  components: { ProjectItem, EditorContent },
   props: {
     height: {
       type: String,
@@ -18,15 +19,16 @@ export default {
     },
     editor: {
       type: Object,
-      default: () => ({})
+      default: null
     }
   },
   data() {
     return {
       project_valid: true,
       add_hover: false,
-      add_project_dialog: false,
       delete_project_dialog: false,
+      add_project_dialog: false,
+      editing_index: null,
       add_project_img: false,
       add_project_link: false,
       temp_project: {
@@ -34,10 +36,15 @@ export default {
         title: null,
         description: null,
         img: {
+          use: false,
           url: '',
           contain: false
         },
-        link: null
+        link: {
+          use: false,
+          url: null,
+          link_text: null
+        }
       },
       validated_img_url: '',
       rules: {
@@ -45,37 +52,19 @@ export default {
       },
       dialog_has_errors: false,
       editing_project: false,
-      invalid_url: false,
-      preview_projects: [
-        {
-          id: '1',
-          title: 'Project Title Here',
-          description:
-            'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
-          img: {
-            url:
-              'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1682&q=80',
-            contain: false
-          },
-          link: null
-        },
-        {
-          id: '2',
-          title: 'Project Title Here',
-          description:
-            'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
-          img: {
-            url:
-              'https://images.unsplash.com/photo-1494959764136-6be9eb3c261e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80',
-            contain: false
-          },
-          link: null
-        }
-      ]
+      invalid_url: false
     }
   },
   computed: {
-    ...mapState('creator', ['site_props'])
+    ...mapState('creator', ['site_props']),
+    projects() {
+      // eslint-disable-next-line prettier/prettier
+      return this.$store.state.creator.site_props[this.options.input_dict_name].projects
+    },
+    html() {
+      // eslint-disable-next-line prettier/prettier
+      return this.$store.state.creator.site_props[this.options.input_dict_name].html
+    }
   },
   watch: {
     add_project_dialog(value) {
@@ -85,22 +74,32 @@ export default {
           title: null,
           description: null,
           img: {
+            use: false,
             url: '',
             contain: false
           },
-          link: null
+          link: {
+            use: false,
+            url: null,
+            link_text: null
+          }
         }
         this.validated_img_url = ''
-        this.add_project_img = false
         this.add_project_link = false
         this.editing_project = false
       }
-    },
-    'temp_project.img.url'(value) {
-      // this.validateURL()
+    }
+  },
+  mounted() {
+    if (this.editor) {
+      this.editor.setContent(this.html)
     }
   },
   methods: {
+    ...mapMutations({
+      addProject: 'creator/addProject',
+      updateProject: 'creator/updateProject'
+    }),
     validateURL() {
       if (this.temp_project.img.url !== '') {
         this.getValidatedURL().then((result) => {
@@ -137,53 +136,38 @@ export default {
       }
     },
     saveProject() {
-      this.validated_img_url = this.temp_project.img.url
-
-      this.temp_project.id = this.editing_project
-        ? this.temp_project.id
-        : Date.now().toString()
-
-      if (this.editing_project) {
-        this.$emit('update', {
-          data_struct: 'Array',
-          type: 'projects',
-          value: this.temp_project,
-          id: this.temp_project.id,
-          update_type: 'update'
-        })
-        this.editing_project = false
-      } else {
-        this.$emit('update', {
-          data_struct: 'Array',
-          type: 'projects',
-          value: this.temp_project,
-          update_type: 'update'
-        })
+      this.updateProject({
+        page_label: this.options.input_dict_name,
+        index: this.editing_index,
+        project: this.temp_project
+      })
+    },
+    editProject(e) {
+      e = JSON.parse(e)
+      this.temp_project = e.project
+      this.editing_index = e.index
+      this.add_project_dialog = true
+      if (e.project.img.use) {
+        this.validated_img_url = this.temp_project.img.url
       }
-
+    },
+    resetTempProject() {
       this.temp_project = {
         id: null,
         title: null,
         description: null,
         img: {
+          use: false,
           url: '',
           contain: false
         },
-        link: null
+        link: {
+          use: false,
+          url: null,
+          link_text: null
+        }
       }
-    },
-    editProject(e) {
-      e = JSON.parse(e)
-      this.temp_project = e
-      this.add_project_dialog = true
-      if (e.img.url !== '') {
-        this.add_project_img = true
-        this.validated_img_url = this.temp_project.img.url
-      }
-      if (e.link !== null) {
-        this.add_project_link = true
-      }
-      this.editing_project = true
+      this.validated_img_url = ''
     },
     deleteProject() {
       this.$emit('update', {
@@ -195,181 +179,64 @@ export default {
       })
       this.delete_project_dialog = false
       this.add_project_dialog = false
+    },
+    addPageProject() {
+      this.addProject({
+        page_label: this.options.input_dict_name,
+        project: {
+          id: this.projects.length.toString(),
+          title: 'Project Title Here',
+          description:
+            'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
+          img: {
+            use: true,
+            url:
+              'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1682&q=80',
+            contain: false
+          },
+          link: {
+            use: true,
+            url: 'https://www.kreoh.com/',
+            link_text: 'Learn More...'
+          }
+        }
+      })
     }
   }
 }
 </script>
 
 <template>
-  <v-container
-    fill-height
-    :class="{
-      'projects-container': !options.preview,
-      'preview-projects-container': options.preview
-    }"
-  >
-    <div
-      class="align-self-start"
-      :class="{
-        'page-layout': !options.preview,
-        'preview-page-layout pt-4': options.preview
-      }"
-    >
-      <div v-if="!options.preview">
+  <v-container fill-height class="projects-container">
+    <v-layout class="d-flex flex-column">
+      <v-flex>
+        <editor-content :editor="editor" />
+      </v-flex>
+      <v-flex>
         <ProjectItem
-          v-for="project in site_props[options.input_dict_name].projects"
+          v-for="(project, index) in projects"
           :id="project.id"
           :key="project.id"
+          :index="index"
           :title="project.title"
           :description="project.description"
           :img="project.img"
           :link="project.link"
           :options="options"
-          @edit_project="editProject($event)"
+          @edit="editProject($event)"
         ></ProjectItem>
-      </div>
-      <div v-if="options.preview">
-        <ProjectItem
-          v-for="preview_project in preview_projects"
-          :id="preview_project.id"
-          :key="preview_project.id"
-          :title="preview_project.title"
-          :description="preview_project.description"
-          :img="preview_project.img"
-          :link="preview_project.link"
-          :options="options"
-        ></ProjectItem>
-      </div>
-      <v-tooltip v-model="add_hover" bottom>
-        <template>
-          <v-layout
-            v-if="!options.live && !options.preview"
-            class="mx-auto project-item-add d-flex flex-column justify-center"
-            :class="{ 'grey lighten-2': add_hover }"
-            @mouseenter="add_hover = true"
-            @mouseleave="add_hover = false"
-            @click="add_project_dialog = true"
-          >
-            <v-icon :size="add_hover ? '100' : '80'" color="#9e9e9e"
-              >mdi-plus</v-icon
-            >
-          </v-layout>
-        </template>
-        <span>Add a project card</span>
-      </v-tooltip>
-    </div>
-    <v-dialog v-model="add_project_dialog" width="500">
-      <v-card>
-        <v-card-title class="headline grey lighten-2" primary-title>
-          Add Project
-        </v-card-title>
-        <v-card-text>
-          <v-container>
-            <v-form
-              ref="project_form"
-              v-model="project_valid"
-              :lazy-validation="true"
-            >
-              <v-flex>
-                <v-text-field
-                  ref="title"
-                  v-model="temp_project.title"
-                  outlined
-                  label="Project title..."
-                  :rules="[rules.required]"
-                ></v-text-field>
-              </v-flex>
-
-              <v-flex>
-                <v-textarea
-                  ref="description"
-                  v-model="temp_project.description"
-                  outlined
-                  label="Project Description..."
-                  :rules="[rules.required]"
-                ></v-textarea>
-              </v-flex>
-
-              <v-switch
-                v-model="add_project_img"
-                label="Add Project Image"
-                inset
-              ></v-switch>
-              <v-flex v-if="add_project_img">
-                <v-text-field
-                  ref="img_url"
-                  v-model="temp_project.img.url"
-                  :error="invalid_url"
-                  :error-messages="invalid_url ? 'Inavlid Image URL.' : ''"
-                  outlined
-                  label="Image URL..."
-                  :rules="[rules.required]"
-                ></v-text-field>
-                <span class="caption">Image Preview</span>
-                <div class="project-img-container">
-                  <v-img
-                    :src="temp_project.img.url"
-                    class="project-img elevation-2"
-                    :contain="temp_project.img.contain"
-                  ></v-img>
-                </div>
-                <v-switch
-                  v-model="temp_project.img.contain"
-                  label="Show Entire Image"
-                  hint="If parts of the image are cropped, this will contain the image."
-                  :persistent-hint="true"
-                  inset
-                ></v-switch>
-              </v-flex>
-
-              <v-flex>
-                <v-switch
-                  v-model="add_project_link"
-                  label="Add Project Link"
-                  inset
-                ></v-switch>
-                <v-text-field
-                  v-if="add_project_link"
-                  ref="link"
-                  v-model="temp_project.link"
-                  outlined
-                  label="URL..."
-                  :rules="[rules.required]"
-                ></v-text-field>
-              </v-flex>
-            </v-form>
-          </v-container>
-        </v-card-text>
-
-        <v-divider></v-divider>
-
-        <v-card-actions>
-          <v-flex>
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="add_project_dialog = false"
-              >Close</v-btn
-            >
-            <v-btn
-              :disabled="!project_valid"
-              color="blue darken-1"
-              text
-              @click.stop="validateProject()"
-              >Save</v-btn
-            >
-            <v-btn
-              v-if="temp_project.id"
-              class="align-self-right"
-              color="red"
-              text
-              @click.stop="delete_project_dialog = true"
-              >Delete</v-btn
-            >
-          </v-flex>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+        <v-flex class="d-flex justify-center">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-btn color="info" @click="addPageProject()" v-on="on">
+                <v-icon>mdi-plus</v-icon> Add project
+              </v-btn>
+            </template>
+            <span>Add a project card</span>
+          </v-tooltip>
+        </v-flex>
+      </v-flex>
+    </v-layout>
     <v-dialog v-model="delete_project_dialog" width="400">
       <v-card>
         <v-card-title>Delete {{ temp_project.title }}?</v-card-title>
@@ -398,57 +265,158 @@ export default {
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="add_project_dialog" persistent scrollable width="600">
+      <v-card>
+        <v-card-title>
+          <span>Edit Project</span>
+        </v-card-title>
+        <v-card-subtitle>
+          <span>Customize the different aspects of your project cards</span>
+        </v-card-subtitle>
+        <v-divider></v-divider>
+        <v-card-text>
+          <v-container>
+            <!-- <span class="body-1">Edit Image</span> -->
+            <v-switch
+              v-model="temp_project.img.use"
+              inset
+              label="Edit Project Image"
+            ></v-switch>
+            <v-layout v-if="temp_project.img.use" class="d-flex flex-column">
+              <span class="caption">Insert the url to your image</span>
+              <v-text-field
+                v-model="temp_project.img.url"
+                label="Image URL..."
+                outlined
+                @input="validateURL()"
+              >
+              </v-text-field>
+              <v-layout column justify-center align-center>
+                <span>Preview</span>
+                <v-flex class="img-preview-container">
+                  <v-img
+                    :src="validated_img_url"
+                    class="img-preview elevation-2"
+                    :contain="temp_project.img.contain"
+                  >
+                    <template v-slot:placeholder>
+                      <v-row
+                        class="fill-height ma-0"
+                        align="center"
+                        justify="center"
+                      >
+                        <v-progress-circular
+                          indeterminate
+                          color="grey lighten-1"
+                        ></v-progress-circular>
+                      </v-row>
+                    </template>
+                  </v-img>
+                </v-flex>
+              </v-layout>
+              <v-switch
+                v-model="temp_project.img.contain"
+                label="Contain image"
+                hint="Show entire image"
+                :persistent-hint="true"
+                inset
+              >
+              </v-switch>
+            </v-layout>
+            <v-switch
+              v-model="temp_project.link.use"
+              inset
+              label="Edit Project Link"
+            ></v-switch>
+            <v-layout v-if="temp_project.link.use" class="d-flex flex-column">
+              <span class="caption mb-1">
+                Insert the url to your project's page
+              </span>
+              <v-text-field
+                v-model="temp_project.link.url"
+                label="Project URL"
+                outlined
+              >
+              </v-text-field>
+              <span class="caption mb-1">
+                Specify a custom text for the link
+              </span>
+              <v-text-field
+                v-model="temp_project.link.link_text"
+                label="Link Text"
+                outlined
+              >
+              </v-text-field>
+            </v-layout>
+            <v-layout class="d-flex flex-column">
+              <span class="caption">Edit Project Title</span>
+              <v-text-field v-model="temp_project.title" label="Title" outlined>
+              </v-text-field>
+              <span class="caption">Edit Project Description</span>
+              <v-textarea
+                v-model="temp_project.description"
+                label="Description"
+                outlined
+              >
+              </v-textarea>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-flex>
+            <v-btn
+              color="blue darken-1 white--text"
+              @click="
+                resetTempProject()
+                add_project_dialog = false
+              "
+            >
+              Close
+            </v-btn>
+            <v-btn
+              color="success"
+              @click="
+                saveProject()
+                add_project_dialog = false
+              "
+            >
+              Save
+            </v-btn>
+          </v-flex>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <style lang="scss" scoped>
 .projects-container {
-  height: 85%;
+  // height: 85%;
   // border: 1px solid;
-  padding: 20px;
+  // padding: 20px;
   overflow: auto;
-}
-
-.preview-projects-container {
-  // width: 100%;
-  height: 85%;
-  // border: 1px solid black !important;
-}
-
-.page-layout {
-  // border: 1px solid;
-  height: 100%;
-  width: 90%;
-  margin: auto;
-  padding: 0 !important;
-}
-
-.preview-page-layout {
-  height: 100%;
-  width: 90%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  margin: auto;
-  padding: 0 !important;
 }
 
 .project-item-add {
   border: 1px dashed;
-  width: 90%;
-  max-height: 40%;
-  min-height: 40%;
+  width: 50%;
+  height: 150px;
   border-radius: 20px;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.project-img-container {
-  min-height: 200px;
+.img-preview-container {
+  // border: 1px solid #b6b6b6;
+  min-height: 150px;
+  // width: 50%;
 }
 
-.project-img {
-  margin: auto;
+.img-preview {
+  // border: 1px solid #b6b6b6;
   border-radius: 20px;
   height: 200px;
-  width: 250px;
+  width: 200px;
+  background-color: rgba(0, 0, 0, 0.465);
 }
 </style>

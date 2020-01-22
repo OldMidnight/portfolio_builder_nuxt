@@ -38,11 +38,11 @@ export const state = () => ({
     text_border_color_value: '#000000',
     home_page_img_1: null,
     home_page_1_data: null,
-    home_page_2_data: {},
-    home_page_3_data: null,
-    projects_page_1_inputs: {},
-    projects_page_2_inputs: {},
-    projects_page_3_inputs: {},
+    home_page_2_data: null,
+    // home_page_3_data: null,
+    projects_page_1_data: null,
+    projects_page_2_data: {},
+    // projects_page_3_inputs: {},
     resume_page_inputs: {
       resume_created: false,
       resume_sections: {},
@@ -182,7 +182,14 @@ export const state = () => ({
     },
     homePages: [],
     projectsPages: [],
-    resumePages: []
+    resumePages: [],
+    social_media_bar: [0, 1, 2, 3],
+    social_media_bar_urls: {
+      0: null,
+      1: null,
+      2: null,
+      3: null
+    }
   },
   is_subdomain: false,
   domain: {
@@ -265,6 +272,35 @@ export const mutations = {
   setInputDictValues(state, payload) {
     state.site_props[payload.inputDict] = payload.input_dict_values
   },
+  addProject(state, payload) {
+    /*
+    Payload contains:
+      page_label: String - dictionary for page data
+      project: Object - a dictionary containing the new project data
+    */
+    state.site_props[payload.page_label].projects.push(payload.project)
+  },
+  updateProject(state, payload) {
+    /*
+    Payload contains 3 varaibles:
+      page_label: String - dictionary for page data
+      index: Number - the index in the projects list the editing project appears
+      project: Object - a dictionary containing the new project data
+    */
+    state.site_props[payload.page_label].projects[payload.index] =
+      payload.project
+  },
+  updatePageHTML(state, payload) {
+    /*
+    Payload contains:
+      page_label: String - dictionary for page data
+      html: Html content from tiptap editor for the page
+    */
+    state.site_props[payload.page_label].html = payload.html
+  },
+  updatePageImg(state, payload) {
+    state.site_props[payload.page_label][payload.img_props] = payload.data
+  },
   updatePageData(state, payload) {
     state.site_props[payload.page_label] = payload.data
   },
@@ -277,7 +313,9 @@ export const mutations = {
   },
   updateInputArrayValue(state, payload) {
     // eslint-disable-next-line prettier/prettier
-    for (const item in state.site_props[payload.inputDict][payload.input_type]) {
+    for (const item in state.site_props[payload.inputDict][
+      payload.input_type
+    ]) {
       if (
         state.site_props[payload.inputDict][payload.input_type][item].id ===
         payload.id
@@ -358,36 +396,54 @@ export const mutations = {
     ) {
       if (payload.prop === 'address') {
         // eslint-disable-next-line prettier/prettier
-        state.site_props.resume_page_inputs.education_section[payload.id].address['line_' + payload.address_line] = payload.value
+        state.site_props.resume_page_inputs.education_section[
+          payload.id
+        ].address['line_' + payload.address_line] = payload.value
       } else if (payload.append) {
         // IF APPENDING TO LIST
         // eslint-disable-next-line prettier/prettier
-        state.site_props.resume_page_inputs[payload.section_type + '_section'][payload.id][payload.prop][payload.type].push(payload.value)
+        state.site_props.resume_page_inputs[payload.section_type + '_section'][
+          payload.id
+        ][payload.prop][payload.type].push(payload.value)
       } else if (payload.type) {
         // IF MUTATING NESTED VALUE
         if (payload.nested) {
           // IF MUTATING NESTED VALUE IN A NESTED VALUE
           // eslint-disable-next-line prettier/prettier
-          state.site_props.resume_page_inputs[payload.section_type + '_section'][payload.id][payload.prop][payload.type][payload.type_id][payload.type_value] = payload.value
+          state.site_props.resume_page_inputs[
+            payload.section_type + '_section'
+          ][payload.id][payload.prop][payload.type][payload.type_id][
+            payload.type_value
+          ] = payload.value
         } else {
           // eslint-disable-next-line prettier/prettier
-          state.site_props.resume_page_inputs[payload.section_type + '_section'][payload.id][payload.prop][payload.type] = payload.value
+          state.site_props.resume_page_inputs[
+            payload.section_type + '_section'
+          ][payload.id][payload.prop][payload.type] = payload.value
         }
       } else {
         // eslint-disable-next-line prettier/prettier
-        state.site_props.resume_page_inputs[payload.section_type + '_section'][payload.id][payload.prop] = payload.value
+        state.site_props.resume_page_inputs[payload.section_type + '_section'][
+          payload.id
+        ][payload.prop] = payload.value
       }
     } else if (payload.prop === 'address') {
       // eslint-disable-next-line prettier/prettier
-      state.site_props.resume_page_inputs[payload.section_type + '_section'].address['line_' + payload.address_line] = payload.value
+      state.site_props.resume_page_inputs[
+        payload.section_type + '_section'
+      ].address['line_' + payload.address_line] = payload.value
     } else {
       // eslint-disable-next-line prettier/prettier
-      state.site_props.resume_page_inputs[payload.section_type + '_section'][payload.prop] = payload.value
+      state.site_props.resume_page_inputs[payload.section_type + '_section'][
+        payload.prop
+      ] = payload.value
     }
   },
   deleteCertificationsCertSection(state, payload) {
     // eslint-disable-next-line prettier/prettier
-    state.site_props.resume_page_inputs.certifications_section[payload.grade_id].certificate_sections.values.splice(payload.section_id, 1)
+    state.site_props.resume_page_inputs.certifications_section[
+      payload.grade_id
+    ].certificate_sections.values.splice(payload.section_id, 1)
   },
   addCertification(state) {
     state.site_props.resume_page_inputs.certifications_section.push({
@@ -470,6 +526,10 @@ export const mutations = {
   },
   setFavicon(state, payload) {
     state.site_props.favicon = payload
+  },
+  saveSocialBar(state, payload) {
+    state.site_props.social_media_bar = payload.btns
+    state.site_props.social_media_bar_urls = payload.urls
   }
 }
 

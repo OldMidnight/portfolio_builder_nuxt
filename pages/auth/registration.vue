@@ -24,8 +24,7 @@ export default {
           return pattern.test(value) || 'Invalid e-mail.'
         }
       },
-      domainInvalid: false,
-      regFormValid: true
+      domainInvalid: false
     }
   },
   computed: {
@@ -79,11 +78,7 @@ export default {
 
 <template>
   <v-layout column align-center>
-    <v-form
-      ref="reg_form"
-      v-model="regFormValid"
-      class="pa-2 d-flex flex-column align-center"
-    >
+    <v-form ref="reg_form" class="pa-2 d-flex flex-column align-center">
       <span class="headline mb-4">Create Your Account</span>
       <v-text-field
         ref="f_name"

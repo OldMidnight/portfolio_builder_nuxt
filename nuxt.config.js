@@ -35,8 +35,9 @@ module.exports = {
    */
   css: [
     'animate.css/animate.min.css',
-    '~/assets/main.css',
-    '~/assets/variables.scss'
+    '~/assets/main.scss',
+    '~/assets/variables.scss',
+    '~/assets/creator.scss'
   ],
   /*
    ** Plugins to load before mounting the App
@@ -153,11 +154,11 @@ module.exports = {
     }
   },
   pageTransition: {
-    enterActiveClass: 'animated fadeIn fast',
-    leaveActiveClass: 'animated fadeOut fast'
+    enterActiveClass: 'animated fadeIn faster',
+    leaveActiveClass: 'animated fadeOut faster'
   },
   layoutTransition: {
-    enterActiveClass: 'animated fadeIn',
-    leaveActiveClass: 'animated fadeOut'
+    enterActiveClass: 'animated fadeInUp',
+    leaveActiveClass: 'animated fadeOutUp'
   }
 }

@@ -16,7 +16,14 @@ export default {
           Kreoh.com
         </span>
         <v-flex pa-7 xs1 class="form elevation-2">
-          <nuxt />
+          <transition
+            name="auth-transition"
+            enter-active-class="animated fadeIn fast"
+            leave-active-class="animated fadeOut fast"
+            mode="out-in"
+          >
+            <nuxt />
+          </transition>
         </v-flex>
         <p class="text-center mt-2 terms">
           By creating an account or signing in you agree to our

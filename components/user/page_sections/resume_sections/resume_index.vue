@@ -621,6 +621,7 @@ export default {
                 :disabled="transitioning"
                 v-if="resume_wizard_step <= wizard_layout_list.length + 2"
                 color="info"
+                class="mx-1"
                 @click="
                   resume_wizard_step += 1
                   progress += 100 / (wizard_layout_list.length + 3)
@@ -631,6 +632,7 @@ export default {
               <v-btn
                 :disabled="transitioning"
                 color="error"
+                class="mx-1"
                 @click="
                   resume_wizard_step -= 1
                   progress -= 100 / (wizard_layout_list.length + 3)
@@ -715,6 +717,7 @@ export default {
 }
 
 .wizard-dialog {
+  overflow-y: scroll;
   overflow-x: hidden;
 }
 

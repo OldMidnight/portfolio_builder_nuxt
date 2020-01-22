@@ -1,5 +1,9 @@
 <script>
+import { mapMutations } from 'vuex'
+import { EditorContent } from 'tiptap'
+import SocialBar1 from '@/components/user/social_media_bar/bar_1'
 export default {
+  components: { EditorContent, SocialBar1 },
   props: {
     name: {
       type: String,
@@ -22,7 +26,7 @@ export default {
     },
     editor: {
       type: Object,
-      default: () => ({})
+      default: null
     }
   },
   data() {
@@ -40,12 +44,6 @@ export default {
     site_props() {
       return this.$store.state.creator.site_props
     },
-    imgStyle() {
-      return {
-        height: this.options.height + 'px',
-        width: this.options.width + 'px'
-      }
-    },
     check_color_style() {
       if (
         this.site_props.text_border_color &&
@@ -58,40 +56,53 @@ export default {
       } else {
         return {}
       }
+    },
+    html() {
+      return this.site_props[this.options.input_dict_name].html
+    },
+    img_props() {
+      return this.site_props[this.options.input_dict_name].img_props
+    },
+    avatar_size() {
+      if (this.$vuetify.breakpoint.xs) {
+        return '60'
+      } else if (this.$vuetify.breakpoint.sm) {
+        return '90'
+      } else if (this.$vuetify.breakpoint.md) {
+        return '130'
+      } else if (this.$vuetify.breakpoint.lg) {
+        return '160'
+      } else if (this.$vuetify.breakpoint.xl) {
+        return '220'
+      } else {
+        return '0'
+      }
     }
   },
   watch: {
     img_dialog(value) {
       if (value === false) {
-        if (!this.site_props[this.options.input_dict_name].img_props.url) {
+        if (!this.img_props.url) {
           this.img_url = ''
         } else {
-          // eslint-disable-next-line prettier/prettier
-          this.img_url = this.site_props[this.options.input_dict_name].img_props.url
+          this.img_url = this.img_props.url
         }
-        // eslint-disable-next-line prettier/prettier
-        this.img_contain = this.site_props[this.options.input_dict_name].img_props.contain
+        this.img_contain = this.img_props.contain
       }
     }
   },
   mounted() {
-    this.name_model =
-      !this.options.preview &&
-      this.site_props[this.options.input_dict_name].name
-        ? this.site_props[this.options.input_dict_name].name
-        : this.name
-    this.tagline_model =
-      !this.options.preview &&
-      this.site_props[this.options.input_dict_name].tagline
-        ? this.site_props[this.options.input_dict_name].tagline
-        : this.tagline
-    this.img_url = this.site_props[this.options.input_dict_name].img_props.url
-    // eslint-disable-next-line prettier/prettier
-    this.validated_img_url = this.site_props[this.options.input_dict_name].img_props.url
-    // eslint-disable-next-line prettier/prettier
-    this.img_contain = this.site_props[this.options.input_dict_name].img_props.contain
+    if (this.editor) {
+      this.editor.setContent(this.html)
+    }
+    this.img_url = this.img_props.url
+    this.validated_img_url = this.img_props.url
+    this.img_contain = this.img_props.contain
   },
   methods: {
+    ...mapMutations({
+      updatePageImg: 'creator/updatePageImg'
+    }),
     validateURL() {
       this.getValidatedURL().then((result) => {
         this.validated_img_url = result
@@ -113,24 +124,14 @@ export default {
       return validation
     },
     updateImgURL() {
-      this.$emit('update', {
-        type: 'img_props',
-        value: {
+      this.updatePageImg({
+        page_label: this.options.input_dict_name,
+        img_props: 'img_props',
+        data: {
           url: this.validated_img_url,
           contain: this.img_contain
         }
       })
-    },
-    updateInput(ev, type, maxLength) {
-      if (ev.target.textContent.length <= maxLength) {
-        this.$emit('update', {
-          type,
-          value: ev.target.textContent
-        })
-      } else {
-        // eslint-disable-next-line prettier/prettier
-        ev.target.textContent = this.site_props[this.options.input_dict_name][type]
-      }
     }
   }
 }
@@ -140,48 +141,74 @@ export default {
   <v-layout
     column
     :class="{ slate: site_props.selected_theme === 1 && options.show_theme }"
-    class="template-container"
+    class="template-container d-flex flex-column align-center justify-start"
   >
-    <v-flex
-      class="user-landing-text d-flex flex-column pa-0 pb-2 align-center justify-end"
+    <!-- <v-flex
+      class="user-landing-text d-flex flex-column pa-0 pb-2 px-4 align-center justify-end"
     >
-      <span
-        v-if="!options.preview && !options.live"
-        class="display-1"
-        contenteditable="true"
-        @input="updateInput($event, 'name', 30)"
+      <client-only>
+        <editor-content :editor="editor" />
+      </client-only>
+    </v-flex> -->
+    <div class="home--content-container d-flex flex-column align-center">
+      <div
+        :style="check_color_style"
+        class="user-landing-text d-flex flex-column pa-0 px-4 align-center"
       >
-        {{ name_model }}
-      </span>
-      <span v-else :class="{ 'display-2': options.live, title: !options.live }">
-        {{ name_model }}
-      </span>
-      <span
-        v-if="!options.preview && !options.live"
-        class="caption"
-        contenteditable="true"
-        @input="updateInput($event, 'tagline', 100)"
-      >
-        {{ tagline_model }}
-      </span>
-      <span
-        v-else
-        :class="{ caption: options.live, 'smaller-caption': !options.live }"
-      >
-        {{ tagline_model }}
-      </span>
-    </v-flex>
-    <div class="user-img-container">
-      <div :style="[imgStyle, check_color_style]">
-        <v-tooltip v-model="edit_img_tooltip" right>
-          <template v-slot:activator>
+        <editor-content :editor="editor" />
+      </div>
+      <SocialBar1 :live="options.live" />
+    </div>
+    <!-- <div
+      :class="{
+        'smaller-user-img-container': !options.live && !options.preview,
+        'user-img-container': options.live || options.preview
+      }"
+      :style="[check_color_style]"
+    >
+      <v-tooltip v-model="edit_img_tooltip" right>
+        <template v-slot:activator="{ on }">
+          <v-img
+            alt="User Profile Picture"
+            :src="
+              !options.preview
+                ? img_props.url
+                : 'https://images.unsplash.com/photo-1549068106-b024baf5062d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1234&q=80'
+            "
+            :class="{
+              'user-hero-image-border':
+                site_props.selected_theme === 3 && !options.preview,
+              'has-border':
+                site_props.text_border_color &&
+                site_props.selected_theme === null,
+              editable: !options.preview && !options.live
+            }"
+            class="user-hero-image elevation-2"
+            :contain="img_props.contain ? img_props.contain : false"
+            @click.stop="
+              !options.preview && !options.live
+                ? (img_dialog = true)
+                : (img_dialog = false)
+            "
+            @mouseover="edit_img_tooltip = !options.preview && !options.live"
+            @mouseout="edit_img_tooltip = false"
+            v-on="on"
+          >
+          </v-img>
+        </template>
+        <span v-if="!options.preview && !options.live">Insert Image</span>
+      </v-tooltip>
+    </div> -->
+    <div class="home--img-container d-flex flex-column align-center mt-8">
+      <v-tooltip v-model="edit_img_tooltip" right>
+        <template v-slot:activator="{ on }">
+          <v-avatar :size="avatar_size">
             <v-img
-              :style="imgStyle"
               alt="User Profile Picture"
               :src="
                 !options.preview
-                  ? site_props[options.input_dict_name].img_props.url
-                  : 'https://images.unsplash.com/photo-1549068106-b024baf5062d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1234&q=80'
+                  ? img_props.url
+                  : 'https://images.unsplash.com/photo-1542103749-8ef59b94f47e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80   '
               "
               :class="{
                 'user-hero-image-border':
@@ -192,24 +219,22 @@ export default {
                 editable: !options.preview && !options.live
               }"
               class="user-hero-image elevation-2"
-              :contain="
-                site_props[options.input_dict_name]
-                  ? site_props[options.input_dict_name].img_props.contain
-                  : false
-              "
+              :contain="img_props.contain"
               @click.stop="
                 !options.preview && !options.live
                   ? (img_dialog = true)
                   : (img_dialog = false)
               "
+              v-on="on"
               @mouseover="edit_img_tooltip = !options.preview && !options.live"
               @mouseout="edit_img_tooltip = false"
             >
             </v-img>
-          </template>
-          <span v-if="!options.preview && !options.live">Insert Image</span>
-        </v-tooltip>
-      </div>
+          </v-avatar>
+        </template>
+        <span v-if="!options.preview && !options.live">Insert Image</span>
+      </v-tooltip>
+      <!-- </v-flex> -->
     </div>
     <v-dialog v-model="img_dialog" width="500">
       <v-card>
@@ -285,6 +310,7 @@ export default {
   // background-color: white !important;
   position: relative;
   z-index: 5;
+  overflow: auto;
 }
 
 .img-preview-container {
@@ -300,18 +326,11 @@ export default {
   width: 250px;
 }
 
-.user-img-container {
-  margin-left: auto;
-  margin-right: auto;
-  height: 50%;
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 15%;
-}
-
 .user-hero-image {
   // border: 1px solid #b6b6b6;
   border-radius: 50%;
+  height: 100%;
+  width: 100%;
 }
 
 .user-hero-image-border {
@@ -320,12 +339,12 @@ export default {
 
 .user-landing-text {
   width: 100%;
-  height: 0%;
+  height: auto;
   span {
     width: 80%;
     max-width: 80%;
     text-align: center;
-    overflow: auto;
+    // overflow: auto;
   }
 }
 
@@ -334,5 +353,15 @@ export default {
   opacity: 0.2;
   transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
+}
+
+.home--img-container {
+  height: 40%;
+  width: 100%;
+}
+
+.home--content-container {
+  // height: 60%;
+  width: 100%;
 }
 </style>

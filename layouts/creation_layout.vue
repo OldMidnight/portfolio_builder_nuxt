@@ -36,10 +36,12 @@ export default {
   <v-app>
     <v-container grid-list-md text-xs-center fluid justify-center fill-height>
       <v-layout column align-center class="creation-page-layout">
-        <v-flex class="top-nav mb-3">
-          <div class="mini-logo font-weight-bold">Kreoh.com</div>
+        <v-flex class="top-nav">
+          <div class="mini-logo font-weight-bold">
+            <nuxt-link to="/dashboard" class="info--text">Kreoh.com</nuxt-link>
+          </div>
         </v-flex>
-        <nuxt />
+        <nuxt class="creation-step" />
         <v-flex class="next-creation-step">
           <v-btn
             color="error"
@@ -89,16 +91,18 @@ export default {
 
 <style lang="scss" scoped>
 .top-nav {
-  min-height: 5%;
   max-height: 5%;
   align-self: baseline;
+  position: absolute;
+  top: 0;
   // background-color: #e6e6e6;
 }
 
 .mini-logo {
   // height: 40px;
   // width: 40px;
-  font-size: 32px;
+  height: 100%;
+  font-size: 24px;
   color: #0066ff;
   // display: flex;
   // border: 1px solid #b6b6b6;
@@ -115,28 +119,32 @@ export default {
 }
 
 .creation-step {
-  min-height: 77%;
-  max-height: 77%;
+  max-height: 82%;
+  overflow: auto;
+  position: absolute;
+  top: 6%;
   // background-color: #cccccc;
 }
 
 .creation-progress {
-  min-height: 2%;
-  max-height: 2%;
+  max-height: 3%;
   padding-right: 25% !important;
   padding-left: 25% !important;
   width: 90%;
+  position: absolute;
+  top: 97%;
   // background-color: #b3b3b3;
 }
 .next-creation-step {
-  margin-bottom: 2%;
-  margin-top: 2%;
-  min-height: 5%;
-  max-height: 5%;
+  // margin-bottom: 2%;
+  // margin-top: 2%;
+  max-height: 10%;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  position: absolute;
+  top: 89%;
   button {
     margin-right: 5%;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -166,7 +174,6 @@ export default {
 
 .creation-page-layout {
   position: relative;
-  min-height: 100%;
-  max-height: 100%;
+  height: 100%;
 }
 </style>

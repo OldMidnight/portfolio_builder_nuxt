@@ -1,5 +1,5 @@
 <script>
-import _ from 'lodash'
+// import _ from 'lodash'
 import { mapMutations, mapActions } from 'vuex'
 import { Editor, EditorMenuBar } from 'tiptap'
 import {
@@ -18,8 +18,12 @@ import {
   Heading,
   TrailingNode
 } from 'tiptap-extensions'
-import Align from '@/components/tiptap-custom-nodes/UnifiedAlign'
+// import Align from '@/components/tiptap-custom-nodes/UnifiedAlign'
+import CenterAlign from '@/components/tiptap-custom-nodes/Align/CenterAlign'
+import LeftAlign from '@/components/tiptap-custom-nodes/Align/LeftAlign'
+import RightAlign from '@/components/tiptap-custom-nodes/Align/RightAlign'
 import FontSize from '@/components/tiptap-custom-nodes/FontSize'
+import Span from '@/components/tiptap-custom-nodes/Span'
 import LoadableComponent from '@/components/helpers/loadable_component'
 export default {
   layout: 'creation_layout',
@@ -39,33 +43,21 @@ export default {
           component_name: 'Layout_Type_1',
           name: 'ORIGINAL',
           img_path: 'Layout_1_img.png',
-          preview_images: [
-            { id: 0, src: '/layout_images/kreoh_layout_1_fresh.png' },
-            { id: 1, src: '/layout_images/kreoh_layout_1_slate.png' },
-            { id: 2, src: '/layout_images/kreoh_layout_1_matrix.png' }
-          ]
+          preview_image: '/layout_images/kreoh_layout_1_fresh.png'
         },
         {
           id: 2,
           component_name: 'Layout_Type_2',
           name: 'STARK',
           img_path: '#',
-          preview_images: [
-            { id: 0, src: '/layout_images/kreoh_layout_1_fresh.png' },
-            { id: 1, src: '/layout_images/kreoh_layout_1_slate.png' },
-            { id: 2, src: '/layout_images/kreoh_layout_1_matrix.png' }
-          ]
+          preview_image: '/layout_images/kreoh_layout_1_fresh.png'
         },
         {
           id: 3,
           component_name: 'Layout_Type_3',
           name: 'CLEAR',
           img_path: '#',
-          preview_images: [
-            { id: 0, src: '/layout_images/kreoh_layout_1_fresh.png' },
-            { id: 1, src: '/layout_images/kreoh_layout_1_slate.png' },
-            { id: 2, src: '/layout_images/kreoh_layout_1_matrix.png' }
-          ]
+          preview_image: '/layout_images/kreoh_layout_1_fresh.png'
         }
       ],
       site_nav: 0,
@@ -78,22 +70,48 @@ export default {
       activeNav: 'home',
       activeNav_index: 1,
       page_templates: [
-        // {id: NUM, type: PAGE NUMBER, component: COMPONENT}
-        { id: 1, tab: 'home', type: 1, component: 'home_sections/home_type_1' },
-        { id: 2, tab: 'home', type: 1, component: 'home_sections/home_type_2' },
-        { id: 3, tab: 'home', type: 2, component: 'home_sections/home_type_3' },
-        { id: 4, tab: 'home', type: 2, component: 'home_sections/home_type_4' },
+        // {id: NUM, type: PAGE NUMBER, component: COMPONENT, preview_img: path}
         {
-          id: 5,
-          tab: 'projects',
-          type: 2,
-          component: 'projects_sections/projects_type_1'
+          id: 1,
+          tab: 'home',
+          type: 1,
+          component: 'home_sections/home_type_1',
+          preview_img: '/preview_images/home_pg_1.png'
         },
         {
-          id: 6,
+          id: 2,
+          tab: 'home',
+          type: 1,
+          component: 'home_sections/home_type_2',
+          preview_img: '/preview_images/home_pg_2.png'
+        },
+        // {
+        //   id: 3,
+        //   tab: 'home',
+        //   type: 2,
+        //   component: 'home_sections/home_type_3',
+        //   preview_img: '/preview_images/home_pg_1.png'
+        // },
+        // {
+        //   id: 4,
+        //   tab: 'home',
+        //   type: 2,
+        //   component: 'home_sections/home_type_4',
+        //   preview_img: '/preview_images/home_pg_1.png'
+        // },
+        {
+          id: 3,
           tab: 'projects',
           type: 2,
-          component: 'projects_sections/projects_type_2'
+          component: 'projects_sections/projects_type_1',
+          preview_img: '/preview_images/home_pg_1.png'
+        },
+        {
+          id: 4,
+          tab: 'projects',
+          type: 2,
+          component: 'projects_sections/projects_type_2',
+          preview_img: '/preview_images/home_pg_1.png'
         }
       ],
       page_customise_select: [
@@ -141,7 +159,7 @@ export default {
         resume: '#FFFFFF'
       },
       show_nav_color_customiser: false,
-      page_template_model: null,
+      page_template_model: 1,
       show_page_add_error: false,
       show_page_delete_error: false,
       show_page_add_success: false,
@@ -387,12 +405,16 @@ export default {
       const pages = []
 
       if (this.customise_page_option === 1) {
-        for (let i = 0; i < this.site_props.homePages.length; i++) {
-          pages.push({ text: 'Page ' + (i + 1), value: i + 1 })
+        pages.push({ text: 'Home Landing Page', value: 1 })
+        if (this.site_props.homePages.length === 2) {
+          pages.push({ text: 'Call-To-Action Page', value: 2 })
         }
       } else if (this.customise_page_option === 2) {
-        for (let i = 0; i < this.site_props.projectsPages.length; i++) {
-          pages.push({ text: 'Page ' + (i + 1), value: i + 1 })
+        pages.push({ text: 'Projects Landing Page', value: 1 })
+        if (this.site_props.projectsPages.length > 1) {
+          for (let i = 1; i < this.site_props.projectsPages.length; i++) {
+            pages.push({ text: 'Projects Page ' + i, value: i + 1 })
+          }
         }
       }
 
@@ -553,7 +575,10 @@ export default {
     this.editor = new Editor({
       editable: this.preview || this.live,
       extensions: [
-        new Align(),
+        // new Align(),
+        new CenterAlign(),
+        new LeftAlign(),
+        new RightAlign(),
         new FontSize(),
         new Heading(),
         new Bold(),
@@ -568,23 +593,25 @@ export default {
         new History(),
         new CodeBlock(),
         new Code(),
+        new Span(),
         new TrailingNode({
           node: 'paragraph',
-          notAfter: ['paragraph']
+          notAfter: ['paragraph', 'align']
         })
       ],
       onFocus: () => {
         this.is_editing = true
       },
-      onUpdate: _.debounce((e) => {
-        console.log('sdfasdfasda', e.getHTML())
-        this.updatePage(e.getHTML())
-      }, 3000)
-      // onBlur: () => {
-      //   this.editor_timeout = setTimeout(() => {
-      //     this.is_editing = false
-      //   }, 1200)
-      // }
+      // onUpdate: _.debounce((e) => {
+      //   this.updatePage(e.getHTML())
+      // }, 3000)
+      onUpdate: (e) => {
+        this.updatePageHTML({
+          page_label:
+            this.activeNav + '_page_' + this.activeNav_index + '_data',
+          html: e.getHTML()
+        })
+      }
     })
     this.preview_images_interval = setInterval(() => {
       if (this.current_preview_img === 2) {
@@ -596,26 +623,39 @@ export default {
     this.setHomePages([
       // { id: #, component: () => import(COMPONENT_PATH) }
       { id: 1, page_num: 1, component: 'home_sections/home_type_1' },
-      { id: 2, page_num: 2, component: 'home_sections/home_type_3' },
-      { id: 3, page_num: 3, component: 'home_sections/home_type_4' }
+      { id: 2, page_num: 2, component: 'home_sections/home_type_4' }
     ])
     let inputDict = 'home_page_1_data'
     this.updatePageData({
       page_label: inputDict,
       data: {
         html: `
-<p>
-  <span class="d-flex justify-center">
-    <span class="display-1">Your Name Here</span>
-  </span>
-</p>
-<p>
-  <span class="d-flex justify-center">
-    <span class="caption">
-      Insert Your Epic Tagline Here!
-    </span>
-  </span>
-</p>
+          <p>
+            <span style="text-align: center; display: block">
+              <span class="display-1">Your Name Here</span>
+            </span>
+          </p>
+          <p>
+            <span style="text-align: center; display: block">
+              <span class="caption">
+                your@email.com - 08xxxxxxxx
+              </span>
+            </span>
+          </p>
+          <p>
+            <span style="text-align: center; display: block">
+              <span class="caption">
+                Lorem ipsum dolor sit amet consectetur adipiscing elit.
+              </span>
+            </span>
+          </p>
+          <p>
+            <span style="text-align: center; display: block">
+              <span class="caption">
+                Mollis montes nam hendrerit sollicitudin iaculis.
+              </span>
+            </span>
+          </p>
         `,
         img_props: {
           url:
@@ -624,25 +664,28 @@ export default {
         }
       }
     })
+    // inputDict = 'home_page_2_data'
+    // this.updatePageData({
+    //   page_label: inputDict,
+    //   data: {
+    //     html: `
+    //       <p>
+    //         Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis
+    //       </p>
+    //     `,
+    //     img_props_1: {
+    //       url:
+    //         'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1682&q=80',
+    //       contain: false
+    //     },
+    //     img_props_2: {
+    //       url:
+    //         'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1682&q=80',
+    //       contain: false
+    //     }
+    //   }
+    // })
     inputDict = 'home_page_2_data'
-    this.setInputDictValues({
-      inputDict,
-      input_dict_values: {
-        para_1:
-          'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis',
-        para_2:
-          'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis',
-        img_props_1: {
-          url: '',
-          contain: false
-        },
-        img_props_2: {
-          url: '',
-          contain: false
-        }
-      }
-    })
-    inputDict = 'home_page_3_data'
     this.updatePageData({
       page_label: inputDict,
       data: `
@@ -656,60 +699,143 @@ export default {
     this.setProjectsPages([
       // { id: #, component: () => import(COMPONENT_PATH) }
       { id: 1, page_num: 1, component: 'projects_sections/projects_type_1' },
-      { id: 2, page_num: 2, component: 'projects_sections/projects_type_2' },
-      { id: 3, page_num: 3, component: 'home_sections/home_type_4' }
+      { id: 2, page_num: 2, component: 'projects_sections/projects_type_2' }
     ])
-    inputDict = 'projects_page_1_inputs'
+    inputDict = 'projects_page_1_data'
 
-    this.setInputDictValues({
-      inputDict,
-      input_dict_values: {
+    this.updatePageData({
+      page_label: inputDict,
+      data: {
+        // projects: [
+        //   {
+        //     id: Date.now().toString(),
+        //     html: `
+        //       <p>
+        //         <span class="title">Project Title Here</span>
+        //       </p>
+        //       <p>
+        //         <span class="body-1">
+        //           Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.
+        //         </span>
+        //       </p>
+        //     `,
+        //     img_props: {
+        //       url:
+        //         'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1682&q=80',
+        //       contain: false
+        //     }
+        //   },
+        //   {
+        //     id: Date.now().toString() + 1,
+        //     html: `
+        //       <p>
+        //         <span class="title">Project Title Here</span>
+        //       </p>
+        //       <p>
+        //         <span class="body-1">
+        //           Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.
+        //         </span>
+        //       </p>
+        //     `,
+        //     img_props: {
+        //       url:
+        //         'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1682&q=80',
+        //       contain: false
+        //     }
+        //   }
+        // ]
+        html: `
+          <p>
+            <span style="text-align: center; display: block">
+              <span class="headline">My Projects</span>
+            </span>
+          </p>
+          <p>
+            <span style="text-align: center; display: block">
+              <span class="caption">
+                Below you will find a few of my featured projects I've worked on during my free time. The next page has a more comprehensive list of things I have worked on when I have the time to do so!
+              </span>
+            </span>
+          </p>
+        `,
         projects: [
           {
-            id: Date.now().toString(),
+            id: '0',
             title: 'Project Title Here',
             description:
               'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
             img: {
+              use: true,
               url:
                 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1682&q=80',
               contain: false
             },
-            link: null
+            link: {
+              use: true,
+              url: 'https://www.kreoh.com/',
+              link_text: 'Learn More...'
+            }
+          },
+          {
+            id: '1',
+            title: 'Project Title Here',
+            description:
+              'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
+            img: {
+              use: true,
+              url:
+                'https://images.unsplash.com/photo-1494959764136-6be9eb3c261e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80',
+              contain: false
+            },
+            link: {
+              use: false,
+              url: null,
+              link_text: null
+            }
           }
         ]
       }
     })
 
-    inputDict = 'projects_page_2_inputs'
+    inputDict = 'projects_page_2_data'
 
     this.setInputDictValues({
       inputDict,
       input_dict_values: {
         projects: [
           {
-            id: Date.now().toString(),
+            id: '0',
             title: 'Project Title Here',
             description:
               'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
             img: {
+              use: true,
               url:
-                'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1682&q=80',
+                'https://images.unsplash.com/photo-1494959764136-6be9eb3c261e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80',
               contain: false
             },
-            link: null
+            link: {
+              use: false,
+              url: null,
+              link_text: null
+            }
           },
           {
-            id: Date.now().toString() + '_2',
+            id: '1',
             title: 'Project Title Here',
             description:
               'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
             img: {
+              use: true,
               url:
-                'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1682&q=80',
+                'https://images.unsplash.com/photo-1494959764136-6be9eb3c261e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80',
               contain: false
             },
-            link: null
+            link: {
+              use: false,
+              url: null,
+              link_text: null
+            }
           }
         ]
       }
@@ -741,7 +867,7 @@ export default {
   },
   head() {
     return {
-      title: 'Creator - Kreoh.com'
+      title: 'Creator - Kreoh'
     }
   },
   methods: {
@@ -781,7 +907,8 @@ export default {
       restoreSiteProps: 'creator/restoreSiteProps',
       setResumeSection: 'creator/setResumeSection',
       updatePageData: 'creator/updatePageData',
-      updatePageDataObject: 'creator/updatePageDataObject'
+      updatePageDataObject: 'creator/updatePageDataObject',
+      updatePageHTML: 'creator/updatePageHTML'
     }),
     ...mapActions({
       registerWebsite: 'creator/registerWebsite'
@@ -1066,6 +1193,39 @@ export default {
     setLinkUrl(command, url) {
       command({ href: url })
       this.hideLinkMenu()
+    },
+    toggleAlign(isActive, commands, align) {
+      switch (align) {
+        case 'left':
+          if (isActive.right_align()) {
+            commands.right_align()
+          } else if (isActive.center_align()) {
+            commands.center_align()
+          }
+          commands.left_align()
+          break
+
+        case 'right':
+          if (isActive.left_align()) {
+            commands.left_align()
+          } else if (isActive.center_align()) {
+            commands.center_align()
+          }
+          commands.right_align()
+          break
+
+        case 'center':
+          if (isActive.right_align()) {
+            commands.right_align()
+          } else if (isActive.left_align()) {
+            commands.left_align()
+          }
+          commands.center_align()
+          break
+
+        default:
+          break
+      }
     }
   }
 }
@@ -1073,7 +1233,7 @@ export default {
 
 <template>
   <div
-    class="creation-step-layout"
+    class="creation-step-layout d-flex justify-start align-center"
     :class="{ 'extra-padding-site-name': checkStepCount(2) }"
   >
     <transition
@@ -1081,8 +1241,8 @@ export default {
       leave-active-class="animated fadeOut faster"
       mode="out-in"
     >
-      <v-flex v-if="checkStepCount(0)" key="0" class="creation-step">
-        <v-flex xs12 class="creation-step-header">
+      <v-flex v-if="checkStepCount(0)" key="0" class="creation-step px-9">
+        <v-flex class="creation-step-header">
           <div>Select a layout!</div>
         </v-flex>
 
@@ -1107,37 +1267,12 @@ export default {
                 'layout-selected-2': site_props.layout === layout.component_name
               }"
             >
-              <!-- <img
-                :alt="'Layout Image: ' + layout.name"
-                :src="'/layout_images/' + layout.img_path"
-              /> -->
-              <transition
-                enter-active-class="animated fadeIn"
-                leave-active-class="animated fadeOut"
-                mode="out-in"
-              >
-                <v-img
-                  v-if="current_preview_img === 0"
-                  key="0"
-                  class="website-img"
-                  contain
-                  :src="layout.preview_images[current_preview_img].src"
-                ></v-img>
-                <v-img
-                  v-if="current_preview_img === 1"
-                  key="1"
-                  class="website-img"
-                  contain
-                  :src="layout.preview_images[current_preview_img].src"
-                ></v-img>
-                <v-img
-                  v-if="current_preview_img === 2"
-                  key="2"
-                  class="website-img"
-                  contain
-                  :src="layout.preview_images[current_preview_img].src"
-                ></v-img>
-              </transition>
+              <v-img
+                :key="index"
+                class="website-img"
+                contain
+                :src="layout.preview_image"
+              ></v-img>
             </div>
             <p class="text-center font-weight-light">{{ layout.name }}</p>
           </v-flex>
@@ -1147,17 +1282,22 @@ export default {
       <v-layout
         v-else-if="checkStepCount(1)"
         key="1"
-        class="creation-step preview-edit"
+        class="creation-step preview-edit d-flex justify-center align-center ma-0"
       >
-        <v-flex class="preview-edit-window creation-step-edit-options">
+        <div class="preview-edit-window pa-0 px-3 creation-step-edit-options">
           <div class="title">Customize Your Website</div>
 
-          <v-row align="center" class="edit_options_panels">
+          <v-row align="center" class="edit-options-panels">
             <v-expansion-panels focusable>
               <!-- NAVIGATION TAB -->
 
               <v-expansion-panel>
-                <v-expansion-panel-header>Navigation</v-expansion-panel-header>
+                <v-expansion-panel-header>
+                  <span>Navigation</span>
+                  <span class="caption">
+                    Customize webiste navigation styles
+                  </span>
+                </v-expansion-panel-header>
                 <v-expansion-panel-content>
                   <v-flex>
                     <v-radio-group v-model="site_nav" @change="hideNextStep()">
@@ -1295,7 +1435,10 @@ export default {
               <!-- TABS CUSTOMISATIONS -->
 
               <v-expansion-panel>
-                <v-expansion-panel-header>Tabs</v-expansion-panel-header>
+                <v-expansion-panel-header>
+                  <span>Tabs</span>
+                  <span class="caption">Customize tab titles and colors</span>
+                </v-expansion-panel-header>
                 <v-expansion-panel-content class="nav_titles_container">
                   <v-flex pt-3>
                     <p
@@ -1317,7 +1460,7 @@ export default {
                             (!!nav_title_home && nav_title_home.length <= 12) ||
                             'Max 12 characters'
                         ]"
-                        label="Change Text"
+                        label="Tab Title"
                         outlined
                         @change="hideNextStep()"
                       >
@@ -1328,7 +1471,7 @@ export default {
                         :disabled="site_props.selected_theme !== null"
                         mode="hex"
                         hide-inputs
-                        class="preview-color-pick"
+                        class="preview-color-pick align-self-center"
                         @input="hideNextStep()"
                       >
                       </v-color-picker>
@@ -1359,7 +1502,7 @@ export default {
                               nav_title_projects.length <= 12) ||
                             'Max 12 characters'
                         ]"
-                        label="Change Text"
+                        label="Tab Title"
                         outlined
                         @change="hideNextStep()"
                       >
@@ -1370,7 +1513,7 @@ export default {
                         :disabled="site_props.selected_theme !== null"
                         mode="hex"
                         hide-inputs
-                        class="preview-color-pick"
+                        class="preview-color-pick align-self-center"
                         @input="hideNextStep()"
                       >
                       </v-color-picker>
@@ -1401,7 +1544,7 @@ export default {
                               nav_title_resume.length <= 12) ||
                             'Max 12 characters'
                         ]"
-                        label="Change Text"
+                        label="Tab Title"
                         outlined
                         @change="hideNextStep()"
                       >
@@ -1412,7 +1555,7 @@ export default {
                         :disabled="site_props.selected_theme !== null"
                         mode="hex"
                         hide-inputs
-                        class="preview-color-pick"
+                        class="preview-color-pick align-self-center"
                         @input="hideNextStep()"
                       >
                       </v-color-picker>
@@ -1435,9 +1578,16 @@ export default {
               <!-- PAGES TAB -->
 
               <v-expansion-panel>
-                <v-expansion-panel-header>Pages</v-expansion-panel-header>
+                <v-expansion-panel-header>
+                  <span>Pages</span>
+                  <span class="caption">Modify your pages</span>
+                </v-expansion-panel-header>
                 <v-expansion-panel-content>
                   <v-flex class="pt-3">
+                    <p>Page Theme & Colors</p>
+                    <span class="caption">
+                      Customize the theme and colors of your pages
+                    </span>
                     <v-select
                       v-model="page_option"
                       :items="page_customise_select"
@@ -1576,6 +1726,9 @@ export default {
                   </v-flex>
                   <v-flex class="mt-3">
                     <p>Pages</p>
+                    <span class="caption">
+                      Modify your page templates here
+                    </span>
                     <v-select
                       v-model="customise_page_option"
                       :items="currentTabs"
@@ -1614,57 +1767,66 @@ export default {
                             class="ma-4 d-flex flex-column"
                             width="270"
                             height="300"
+                            color="#F5F5F5"
                             @click.stop="toggle"
                           >
-                            <v-btn
-                              style="height: 10%;"
-                              icon
-                              :color="active ? 'info' : ''"
-                              class="align-self-end"
-                            >
-                              <v-icon size="26">{{
-                                active ? 'mdi-check' : 'mdi-plus'
-                              }}</v-icon>
-                            </v-btn>
-                            <client-only placeholder="loading">
-                              <LoadableComponent
-                                :component-name="template.component"
-                                :options="{
-                                  input_dict_name:
-                                    activeNav +
-                                    '_page_' +
-                                    activeNav_index +
-                                    '_inputs',
-                                  show_theme: false,
-                                  preview: true,
-                                  height: 100,
-                                  width: 100
-                                }"
-                              ></LoadableComponent>
-                            </client-only>
+                            <v-card-title>
+                              <v-btn
+                                style="height: 10%;"
+                                icon
+                                :color="active ? 'info' : ''"
+                                class="align-self-end"
+                              >
+                                <v-icon size="26">{{
+                                  active ? 'mdi-check' : 'mdi-plus'
+                                }}</v-icon>
+                              </v-btn>
+                            </v-card-title>
+                            <v-divider></v-divider>
+                            <v-card-text>
+                              <v-img
+                                contain
+                                :src="template.preview_img"
+                                class="preview-img"
+                              ></v-img>
+                            </v-card-text>
                           </v-card>
                         </v-slide-item>
                       </v-slide-group>
-
-                      <v-flex class="d-flex justify-center align-center">
-                        <v-btn
-                          color="error"
-                          class="mr-2"
-                          :disabled="activeNav === 'resume'"
-                          @click.stop="deletePage()"
-                        >
-                          <v-icon>mdi-delete</v-icon>
-                        </v-btn>
-                        <v-btn
-                          color="success"
-                          class="ml-2"
-                          :disabled="activeNav === 'resume'"
-                          @click.stop="addPage()"
-                        >
-                          <v-icon>mdi-plus</v-icon>
-                        </v-btn>
-                      </v-flex>
                     </v-sheet>
+                    <v-flex class="d-flex justify-center align-center">
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            color="error"
+                            class="mr-2"
+                            :disabled="activeNav === 'resume'"
+                            @click.stop="deletePage()"
+                            v-on="on"
+                          >
+                            <v-icon>mdi-delete</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Delete current page</span>
+                      </v-tooltip>
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            color="success"
+                            class="ml-2"
+                            :disabled="
+                              activeNav === 'resume' ||
+                                site_props.homePages.length === 2
+                            "
+                            @click.stop="addPage()"
+                            v-on="on"
+                          >
+                            <v-icon>mdi-plus</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Add a new {{ new_page_name }} page</span>
+                      </v-tooltip>
+                    </v-flex>
                   </v-flex>
                 </v-expansion-panel-content>
               </v-expansion-panel>
@@ -1704,12 +1866,12 @@ export default {
               <span>Delete All Changes</span>
             </v-tooltip>
           </v-flex>
-        </v-flex>
+        </div>
 
         <v-layout
           id="creation-step-preview"
           align-center
-          class="preview-edit-window creation-step-preview"
+          class="preview-edit-window creation-step-preview ma-0"
           :class="{
             'slate-light': site_props.selected_theme === 1,
             matrix: site_props.selected_theme === 3
@@ -1912,13 +2074,12 @@ export default {
                         :component-name="preview_page.component"
                         :options="{
                           input_dict_name:
-                            activeNav + '_page_' + activeNav_index + '_inputs',
+                            activeNav + '_page_' + activeNav_index + '_data',
                           preview: false,
                           height: '150',
                           width: '150'
                         }"
                         :editor="editor"
-                        @update="updateInput($event)"
                       ></LoadableComponent>
                     </v-flex>
                   </transition>
@@ -2215,81 +2376,129 @@ export default {
             <v-divider vertical></v-divider>
             <v-btn-toggle dense group multiple color="primary">
               <v-btn
-                :class="{ 'is-active': isActive.bold() }"
+                :class="{
+                  'not-active': !isActive.bold(),
+                  'is-active v-btn--active v-item--active': isActive.bold()
+                }"
                 @click="commands.bold"
               >
                 <v-icon>mdi-format-bold</v-icon>
               </v-btn>
               <v-btn
-                :class="{ 'is-active': isActive.italic() }"
+                :class="{
+                  'not-active': !isActive.italic(),
+                  'is-active v-btn--active v-item--active': isActive.italic()
+                }"
                 @click="commands.italic"
               >
                 <v-icon>mdi-format-italic</v-icon>
               </v-btn>
               <v-btn
-                :class="{ 'is-active': isActive.underline() }"
+                :class="{
+                  'not-active': !isActive.underline(),
+                  'is-active v-btn--active v-item--active': isActive.underline()
+                }"
                 @click="commands.underline"
               >
                 <v-icon>mdi-format-underline</v-icon>
               </v-btn>
               <v-btn
-                :class="{ 'is-active': isActive.strike() }"
+                :class="{
+                  'not-active': !isActive.strike(),
+                  'is-active v-btn--active v-item--active': isActive.strike()
+                }"
                 @click="commands.strike"
               >
                 <v-icon>mdi-format-strikethrough</v-icon>
               </v-btn>
               <v-divider vertical></v-divider>
               <v-btn
-                :class="{ 'is-active': isActive.blockquote() }"
+                :class="{
+                  'not-active': !isActive.blockquote(),
+                  'is-active v-btn--active v-item--active': isActive.blockquote()
+                }"
                 @click="commands.blockquote"
               >
                 <v-icon>mdi-format-quote-close</v-icon>
               </v-btn>
               <v-btn
-                :class="{ 'is-active': isActive.link() }"
+                :class="{
+                  'not-active': !isActive.link(),
+                  'is-active v-btn--active v-item--active': isActive.link()
+                }"
                 @click="showLinkMenu(getMarkAttrs('link'))"
               >
                 <v-icon>mdi-link</v-icon>
               </v-btn>
               <v-btn
-                :class="{ 'is-active': isActive.ordered_list() }"
+                :class="{
+                  'not-active': !isActive.ordered_list(),
+                  'is-active v-btn--active v-item--active': isActive.ordered_list()
+                }"
                 @click="commands.ordered_list"
               >
                 <v-icon>mdi-format-list-numbered</v-icon>
               </v-btn>
               <v-btn
-                :class="{ 'is-active': isActive.bullet_list() }"
+                :class="{
+                  'not-active': !isActive.bullet_list(),
+                  'is-active v-btn--active v-item--active': isActive.bullet_list()
+                }"
                 @click="commands.bullet_list"
               >
                 <v-icon>mdi-format-list-bulleted</v-icon>
               </v-btn>
               <v-btn
-                :class="{ 'is-active': isActive.code_block() }"
+                :class="{
+                  'not-active': !isActive.code_block(),
+                  'is-active v-btn--active v-item--active': isActive.code_block()
+                }"
                 @click="commands.code_block"
               >
                 <v-icon>mdi-code-tags</v-icon>
               </v-btn>
-              <v-btn @click="commands.undo">
+              <v-btn class="not-active" @click="commands.undo">
                 <v-icon>mdi-arrow-left</v-icon>
               </v-btn>
-              <v-btn @click="commands.redo">
+              <v-btn class="not-active" @click="commands.redo">
                 <v-icon>mdi-arrow-right</v-icon>
               </v-btn>
               <v-divider vertical></v-divider>
               <v-btn-toggle
                 v-model="editor_align_btn"
-                mandatory
                 dense
                 group
+                mandatory
                 color="primary"
               >
-                <v-btn @click="commands.align({ class: 'text-left' })">
+                <v-btn
+                  key="0"
+                  :class="{
+                    'not-active': !isActive.left_align(),
+                    'is-active v-btn--active v-item--active': isActive.left_align()
+                  }"
+                  @click="toggleAlign(isActive, commands, 'left')"
+                >
                   <v-icon>mdi-format-align-left</v-icon>
                 </v-btn>
-                <v-btn @click="commands.align({ class: 'text-center' })">
+                <v-btn
+                  key="1"
+                  :class="{
+                    'not-active': !isActive.center_align(),
+                    'is-active v-btn--active v-item--active': isActive.center_align()
+                  }"
+                  @click="toggleAlign(isActive, commands, 'center')"
+                >
                   <v-icon>mdi-format-align-center</v-icon>
                 </v-btn>
-                <v-btn @click="commands.align({ class: 'text-right' })">
+                <v-btn
+                  key="2"
+                  :class="{
+                    'not-active': !isActive.right_align(),
+                    'is-active v-btn--active v-item--active': isActive.right_align()
+                  }"
+                  @click="toggleAlign(isActive, commands, 'right')"
+                >
                   <v-icon>mdi-format-align-right</v-icon>
                 </v-btn>
               </v-btn-toggle>
@@ -2335,427 +2544,4 @@ export default {
 
 <style lang="scss" scoped>
 // @import '~animate.css/animate.min.css';
-
-.creation-name {
-  border-radius: 20px;
-  text-align: center;
-}
-
-.creation-step-header {
-  height: 20%;
-  border-bottom: 3px solid #b3b3b3;
-  margin-left: 20% !important;
-  margin-right: 20% !important;
-  div {
-    font-size: 40px;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-}
-
-.creation-step-content {
-  height: 70%;
-  flex-direction: row;
-  align-items: center;
-}
-
-.creation-step-layout {
-  min-height: 80%;
-  max-height: 80%;
-  width: 80%;
-}
-
-.creation-step {
-  min-height: 100%;
-  max-height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.layout-item-container {
-  height: 80%;
-  padding: 30px 20px 30px 20px !important;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  p {
-    height: 10%;
-    margin: 0;
-    margin-top: 5px;
-  }
-}
-
-.layout-item-container:hover {
-  padding: initial !important;
-}
-
-.layout-item {
-  height: 100%;
-  border: 1px solid #e3f2fd;
-  background-color: #e3f2fd;
-  border-radius: 10px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  img {
-    width: 100%;
-  }
-}
-
-.layout-item-disabled {
-  height: 100%;
-  border: 1px solid #777;
-  background-color: #777;
-  border-radius: 10px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-}
-
-.layout-disabled {
-  height: 80%;
-  padding: 30px 20px 30px 20px !important;
-  cursor: not-allowed;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  p {
-    height: 10%;
-    margin: 0;
-    margin-top: 5px;
-  }
-}
-
-.layout-selected {
-  padding: initial !important;
-}
-
-.layout-selected-2 {
-  border: 2px solid #0066ff;
-  box-shadow: 0 3px 6px rgba(0, 0, 255, 0.16), 0 3px 6px rgba(0, 0, 255, 0.23);
-}
-
-.preview-edit {
-  flex-direction: row;
-  width: 100%;
-  position: relative;
-}
-
-.preview-edit-window {
-  width: 50%;
-  height: 100%;
-  position: absolute;
-  // padding-left: 10px !important;
-}
-
-.creation-step-edit-options {
-  width: 40%;
-  // margin-right: 4px;
-  overflow-y: scroll;
-}
-
-.creation-step-preview {
-  width: 60%;
-  left: 45%;
-  border-left: 1px solid #b6b6b6;
-  border-right: 1px solid #b6b6b6;
-  border-bottom: 1px solid #b6b6b6;
-  border-radius: 5px;
-}
-
-.preview-page-wrapper {
-  height: 80%;
-  width: 90%;
-  margin-bottom: 5%;
-  margin-top: 0px !important;
-  // background-color: #fafafa;
-}
-
-.preview-1-page-container {
-  margin: 0px !important;
-  margin-top: 5% !important;
-  width: 90%;
-  height: 90%;
-  margin-bottom: 5% !important;
-  // border: 1px solid;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-}
-
-.preview-username-container {
-  height: 10%;
-  width: 80%;
-  // margin-top: 5%;
-  font-size: 20px;
-  border-bottom: 1px solid #e6e6e6;
-}
-
-.preview-bottom-nav-arrows {
-  height: 10%;
-  margin: 0 !important;
-  // border: 1px solid;
-}
-
-.preview-1-top-nav {
-  display: flex;
-  padding: 0 !important;
-  width: 100%;
-  height: 15%;
-  background-color: white;
-  // border-bottom: 1px solid #b6b6b6;
-}
-
-.preview-1-content-body {
-  width: 100%;
-  height: 85%;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
-  background-color: white;
-}
-
-.preview-1-top-nav-item {
-  border-bottom-color: green;
-  height: 100%;
-  margin: 0;
-  // border-left: 1px solid;
-}
-
-.preview-1-top-nav-item.active {
-  border-bottom-width: 3px;
-  border-bottom-style: solid;
-}
-
-.preview-1-top-nav-item.customActive {
-  border-bottom-width: 3px;
-  border-bottom-style: solid;
-}
-
-.preview-1-top-nav-item:hover {
-  transition: 0.2s;
-  // box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-  border-bottom-width: 3px;
-  border-bottom-style: solid;
-}
-
-.preview-2-page-container {
-  margin-top: 5% !important;
-  width: 70%;
-  height: 90%;
-  margin-bottom: 5% !important;
-  // border: 1px solid;
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-}
-
-.preview-2-sidenav {
-  width: 15%;
-  height: 100%;
-  margin: 0 !important;
-  border-right: 1px solid;
-}
-
-.preview-2-content-body {
-  width: 85%;
-  height: 100%;
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
-}
-
-.preview-3-page-container {
-  width: 75%;
-  height: 100%;
-  margin: 0 !important;
-  margin-top: 3% !important;
-  margin-bottom: 5% !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-}
-
-.preview-3-page-container-sidenav {
-  width: 75%;
-  height: 90%;
-  margin: 0 !important;
-  margin-top: 5% !important;
-  // margin-bottom: 15% !important;
-}
-
-.preview-3-content-body {
-  width: 100%;
-  height: 90%;
-  border: 1px solid;
-  border-radius: 20px;
-  margin: 0 !important;
-}
-
-.preview-3-bottom-nav {
-  width: 60%;
-  height: 10%;
-  border: 1px solid;
-  border-bottom-left-radius: 15px;
-  border-bottom-right-radius: 15px;
-  margin: 0 !important;
-}
-
-.round-corner-left {
-  border-top-left-radius: 20px;
-}
-
-.round-corner-right {
-  border-top-right-radius: 20px;
-}
-
-.round-corner-bottom-left {
-  border-bottom-left-radius: 15px;
-}
-
-.round-corner-bottom-right {
-  border-bottom-right-radius: 15px;
-}
-
-.preview-sidenav-btn-left {
-  margin-right: 5%;
-}
-
-.preview-sidenav-btn-right {
-  margin-left: 5%;
-}
-
-.title {
-  font-size: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 3%;
-}
-
-.subtitle {
-  font-size: 20px;
-}
-
-.preview-customize-option-group {
-  border-top-left-radius: 20px;
-  border-bottom-right-radius: 20px;
-  width: 80%;
-  margin-top: 5%;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-}
-
-.title-2 {
-  font-size: 30px;
-  margin: 10px;
-  margin-bottom: 0;
-}
-
-.subtitle-2 {
-  font-size: 12px;
-  margin-bottom: 10px;
-}
-
-.extra-info {
-  color: #b3d9ff;
-}
-
-.extra-info:hover {
-  cursor: pointer;
-  color: #0066ff;
-}
-
-.preview-1-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-  border-radius: 10px;
-}
-
-.preview-1-page {
-  width: 100%;
-  height: 100%;
-  // background-color: red;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 30px;
-  // color: white;
-  // border: 1px solid;
-}
-
-.preview-extra-width {
-  width: 100%;
-}
-
-.edit_options_panels {
-  margin: 0px !important;
-  padding-bottom: 5px;
-}
-
-.nav-1-item-slate {
-  color: white !important;
-  background-color: #8c8c8c !important;
-  // border-bottom: 3px solid blue !important;
-}
-
-.nav-1-item-matrix {
-  color: #00e676 !important;
-  background-color: black !important;
-}
-
-.nav-1-item-slate.active {
-  border-bottom: 3px solid #66a3ff !important;
-}
-
-.nav-1-item-slate:hover {
-  border-bottom: 3px solid #66a3ff !important;
-}
-
-.nav-1-item-matrix.active {
-  border-bottom: 3px solid green !important;
-}
-
-.nav-1-item-matrix:hover {
-  border-bottom: 3px solid green !important;
-}
-
-.matrix-card {
-  background-color: black !important;
-  color: #00e676;
-  border-bottom: 1px solid;
-  border-left: 1px solid;
-  border-right: 1px solid;
-}
-
-.matrix-card-opp {
-  background-color: black !important;
-  color: #00e676;
-  border-top: 1px solid;
-  border-left: 1px solid;
-  border-right: 1px solid;
-}
-
-.x2 {
-  font-size: 48px !important;
-}
-
-.preview-window-bar {
-  width: 100%;
-}
-
-.preview-color-pick {
-  align-self: center;
-}
-
-.dark-nav-text {
-  color: black;
-}
-
-.white-nav-text {
-  color: white;
-}
-
-.save-btn-container {
-  width: 100%;
-}
-
-.font-size-btn {
-  width: 150px;
-}
 </style>

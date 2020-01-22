@@ -1,5 +1,7 @@
 <script>
+import { EditorContent } from 'tiptap'
 export default {
+  components: { EditorContent },
   props: {
     para1: {
       type: String,
@@ -50,11 +52,11 @@ export default {
     html() {
       return this.site_props[this.options.input_dict_name].html
     },
-    img_1_props() {
-      return this.site_props[this.options.input_dict_name].img_1_props
+    img_props_1() {
+      return this.site_props[this.options.input_dict_name].img_props_1
     },
-    img_2_props() {
-      return this.site_props[this.options.input_dict_name].img_2_props
+    img_props_2() {
+      return this.site_props[this.options.input_dict_name].img_props_2
     }
   },
   mounted() {
@@ -73,32 +75,20 @@ export default {
         ? this.site_props[this.options.input_dict_name].para_2
         : this.para_2
 
-    this.img_url_1 = this.site_props[this.options.input_dict_name].img_props_1
-      ? this.site_props[this.options.input_dict_name].img_props_1.url
-      : ''
+    this.img_url_1 = this.img_props_1 ? this.img_props_1.url : ''
 
-    this.validated_img_url_1 = this.site_props[this.options.input_dict_name]
-      .img_props_1
-      ? this.site_props[this.options.input_dict_name].img_props_1.url
-      : ''
+    this.validated_img_url_1 = this.img_props_1 ? this.img_props_1.url : ''
 
-    this.img_contain_1 = this.site_props[this.options.input_dict_name]
-      .img_props_1
-      ? this.site_props[this.options.input_dict_name].img_props_1
+    this.img_contain_1 = this.img_props_1
+      ? this.img_props_1.contain
       : this.img_contain_1
 
-    this.img_url_2 = this.site_props[this.options.input_dict_name].img_props_2
-      ? this.site_props[this.options.input_dict_name].img_props_2.url
-      : ''
+    this.img_url_2 = this.img_props_2 ? this.img_props_2.url : ''
 
-    this.validated_img_url_2 = this.site_props[this.options.input_dict_name]
-      .img_props_2
-      ? this.site_props[this.options.input_dict_name].img_props_2.url
-      : ''
+    this.validated_img_url_2 = this.img_props_2 ? this.img_props_2.url : ''
 
-    this.img_contain_2 = this.site_props[this.options.input_dict_name]
-      .img_props_2
-      ? this.site_props[this.options.input_dict_name].img_props_2
+    this.img_contain_2 = this.img_props_2
+      ? this.img_props_2.contain
       : this.img_contain_2
   },
   methods: {
@@ -157,113 +147,11 @@ export default {
   >
     <div
       :class="{
-        'preview-content-container': options.preview,
-        'content-container': !options.preview || options.live,
-        'my-2': !options.preview || options.live,
-        'mx-3': !options.preview || options.live,
-        'my-1': options.preview,
-        'mx-1': options.preview
+        'preview-content-container my-1 px-1': options.preview,
+        'content-container px-3': !options.preview || options.live
       }"
       class="d-flex"
     >
-      <div
-        :class="{
-          'preview-image-container': options.preview,
-          'image-container': !options.preview
-        }"
-      >
-        <v-tooltip v-model="edit_img_tooltip_1" right>
-          <template v-slot:activator>
-            <v-img
-              :class="{
-                'slate-border':
-                  site_props.selected_theme === 1 &&
-                  (!options.preview || options.live),
-                'matrix-border':
-                  site_props.selected_theme === 3 &&
-                  (!options.preview || options.live),
-                'preview-main-img': options.preview,
-                'main-img': !options.preview || options.live,
-                'has-border': site_props.text_border_color,
-                editable: !options.preview && !options.live
-              }"
-              class="elevation-2"
-              :src="
-                !options.preview &&
-                site_props[options.input_dict_name].img_props_1
-                  ? site_props[options.input_dict_name].img_props_1.url
-                  : 'https://images.unsplash.com/photo-1549692520-acc6669e2f0c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1233&q=80'
-              "
-              :contain="
-                site_props[options.input_dict_name].img_props_1
-                  ? site_props[options.input_dict_name].img_props_1.contain
-                  : false
-              "
-              @click.stop="
-                !options.preview && !options.live
-                  ? (img_dialog_1 = true)
-                  : (img_dialog_1 = false)
-              "
-              @mouseover="
-                edit_img_tooltip_1 = !options.preview && !options.live
-              "
-              @mouseout="edit_img_tooltip_1 = false"
-            >
-            </v-img>
-          </template>
-          <span v-if="!options.preview && !options.live">Insert Image</span>
-        </v-tooltip>
-      </div>
-      <div
-        :class="{
-          'preview-text-container': options.preview,
-          'text-container': !options.preview || options.live
-        }"
-        class="px-6"
-      >
-        <p
-          v-if="!options.preview && !options.live"
-          class="pre-model"
-          contenteditable="true"
-          @input="updateInput($event, 'para_1', 300)"
-        >
-          {{ para_1_model }}
-        </p>
-        <p v-else class="pre-model">
-          {{ para_1_model }}
-        </p>
-      </div>
-    </div>
-    <div
-      :class="{
-        'preview-content-container': options.preview,
-        'content-container': !options.preview || options.live,
-        'my-2': !options.preview || options.live,
-        'mx-3': !options.preview || options.live,
-        'my-1': options.preview,
-        'mx-1': options.preview
-      }"
-      class="d-flex"
-    >
-      <div
-        :class="{
-          'preview-text-container': options.preview,
-          'text-container': !options.preview || options.live
-        }"
-        class="px-6"
-      >
-        <p
-          v-if="!options.preview && !options.live"
-          class="pre-model"
-          contenteditable="true"
-          @input="updateInput($event, 'para_2', 300)"
-        >
-          {{ para_2_model }}
-        </p>
-        <p v-else class="pre-model">
-          {{ para_2_model }}
-        </p>
-      </div>
       <div
         :class="{
           'preview-image-container': options.preview,
@@ -312,6 +200,170 @@ export default {
           <span v-if="!options.preview && !options.live">Insert Image</span>
         </v-tooltip>
       </div>
+      <div
+        :class="{
+          'preview-image-container': options.preview,
+          'image-container': !options.preview
+        }"
+      >
+        <v-tooltip v-model="edit_img_tooltip_1" right>
+          <template v-slot:activator>
+            <v-img
+              :class="{
+                'slate-border':
+                  site_props.selected_theme === 1 &&
+                  (!options.preview || options.live),
+                'matrix-border':
+                  site_props.selected_theme === 3 &&
+                  (!options.preview || options.live),
+                'preview-main-img': options.preview,
+                'main-img': !options.preview || options.live,
+                'has-border': site_props.text_border_color,
+                editable: !options.preview && !options.live
+              }"
+              class="elevation-2"
+              :src="
+                !options.preview &&
+                site_props[options.input_dict_name].img_props_1
+                  ? site_props[options.input_dict_name].img_props_1.url
+                  : 'https://images.unsplash.com/photo-1549692520-acc6669e2f0c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1233&q=80'
+              "
+              :contain="
+                site_props[options.input_dict_name].img_props_1
+                  ? site_props[options.input_dict_name].img_props_1.contain
+                  : false
+              "
+              @click.stop="
+                !options.preview && !options.live
+                  ? (img_dialog_1 = true)
+                  : (img_dialog_1 = false)
+              "
+              @mouseover="
+                edit_img_tooltip_1 = !options.preview && !options.live
+              "
+              @mouseout="edit_img_tooltip_1 = false"
+            >
+            </v-img>
+          </template>
+          <span v-if="!options.preview && !options.live">Insert Image</span>
+        </v-tooltip>
+      </div>
+      <!-- <div
+        :class="{
+          'preview-text-container': options.preview,
+          'text-container': !options.preview || options.live
+        }"
+        class="px-6"
+      >
+        <p
+          v-if="!options.preview && !options.live"
+          class="pre-model"
+          contenteditable="true"
+          @input="updateInput($event, 'para_1', 300)"
+        >
+          {{ para_1_model }}
+        </p>
+        <p v-else class="pre-model">
+          {{ para_1_model }}
+        </p>
+      </div> -->
+    </div>
+    <div
+      :class="{
+        'preview-content-container mx-1 my-1': options.preview,
+        'content-container px-5': !options.preview || options.live
+      }"
+      class="d-flex"
+    >
+      <!-- <div
+        :class="{
+          'preview-text-container': options.preview,
+          'text-container': !options.preview || options.live
+        }"
+        class="px-6"
+      >
+        <p
+          v-if="!options.preview && !options.live"
+          class="pre-model"
+          contenteditable="true"
+          @input="updateInput($event, 'para_2', 300)"
+        >
+          {{ para_2_model }}
+        </p>
+        <p v-else class="pre-model">
+          {{ para_2_model }}
+        </p>
+      </div>
+      <div
+        :class="{
+          'preview-text-container': options.preview,
+          'text-container': !options.preview || options.live
+        }"
+        class="px-6"
+      >
+        <p
+          v-if="!options.preview && !options.live"
+          class="pre-model"
+          contenteditable="true"
+          @input="updateInput($event, 'para_1', 300)"
+        >
+          {{ para_1_model }}
+        </p>
+        <p v-else class="pre-model">
+          {{ para_1_model }}
+        </p>
+      </div> -->
+      <client-only>
+        <editor-content :editor="editor" />
+      </client-only>
+      <!-- <div
+        :class="{
+          'preview-image-container': options.preview,
+          'image-container': !options.preview || options.live
+        }"
+      >
+        <v-tooltip v-model="edit_img_tooltip_2" right>
+          <template v-slot:activator>
+            <v-img
+              :class="{
+                'slate-border':
+                  site_props.selected_theme === 1 &&
+                  (!options.preview || options.live),
+                'matrix-border':
+                  site_props.selected_theme === 3 &&
+                  (!options.preview || options.live),
+                'preview-main-img': options.preview,
+                'main-img': !options.preview || options.live,
+                'has-border': site_props.text_border_color,
+                editable: !options.preview && !options.live
+              }"
+              class="elevation-2"
+              :src="
+                !options.preview &&
+                site_props[options.input_dict_name].img_props_2
+                  ? site_props[options.input_dict_name].img_props_2.url
+                  : 'https://images.unsplash.com/photo-1517148815978-75f6acaaf32c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80'
+              "
+              :contain="
+                site_props[options.input_dict_name].img_props_2
+                  ? site_props[options.input_dict_name].img_props_2.contain
+                  : false
+              "
+              @click.stop="
+                !options.preview && !options.live
+                  ? (img_dialog_2 = true)
+                  : (img_dialog_2 = false)
+              "
+              @mouseover="
+                edit_img_tooltip_2 = !options.preview && !options.live
+              "
+              @mouseout="edit_img_tooltip_2 = false"
+            >
+            </v-img>
+          </template>
+          <span v-if="!options.preview && !options.live">Insert Image</span>
+        </v-tooltip>
+      </div> -->
     </div>
     <v-dialog v-model="img_dialog_1" width="500">
       <v-card>
@@ -462,6 +514,7 @@ export default {
 .template-container {
   // border: 1px solid;
   height: 100%;
+  overflow: auto;
 }
 
 .preview-template-container {

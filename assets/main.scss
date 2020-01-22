@@ -16,6 +16,7 @@
   word-wrap: break-word;
   font-variant-ligatures: none;
   word-break: break-word;
+  line-height: 15px;
 }
 
 .ProseMirror blockquote {
@@ -71,6 +72,34 @@ pre {
   overflow-y: hidden;
 }
 
-.is-active {
-  background-color: #E3F2FD;
+.v-btn--active.not-active {
+  transition-duration: 0.28s;
+  transition-property: box-shadow, transform, opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1 !important;
+  color: rgba(0,0,0,.87) !important;
+}
+
+.v-btn--active.not-active::before {
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.6, 1) !important;
+  border-radius: inherit;
+  bottom: 0;
+  color: inherit !important;
+  content: "";
+  left: 0;
+  opacity: 0 !important;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: currentColor !important;
+}
+
+.v-btn--active.not-active:hover::before {
+  // color: rgba(0,0,0,.87) !important;
+  opacity: 0.08 !important;
+}
+
+.font-size-btn {
+  width: 150px;
 }

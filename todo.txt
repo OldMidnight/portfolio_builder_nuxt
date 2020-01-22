@@ -1,0 +1,36 @@
+//TODO Add social media btns to home pages (17/01/2020) (Completed 18/01/2020)
+
+//FIXME Fix preview images in creator an editor pages - Preview images require a placeholder to prevent the div from collapsing and expaning on open (17/01/2020)
+
+//FIXME Fix login refresh token working (18/01/2020)
+
+//FIXME Fix auto selection of page templates when editing website. page_template_model defaults to 1 (added 19/01/2020)
+
+      19/01/2020 - END - Divided Kreoh into 2 apps, one for main app w/ dashboard etc, second hosting user apps. IO think this is the way to go.
+
+      Implemented the first Social media bar with working links etc, looks nice.
+
+      Ive turned to page 2 of the home page templates, looks dreadful, needs redesign. I believe Home pages are finished for the MVP, moving onto secondary and tertiary pages.
+
+
+      20/01/2020 - START - Im trying to change how the user sites are structured.
+      Home Tab:
+        Main page: Pic, Contact info, about text, social media bar
+        Call to action page - WIP
+      Projects Tab:
+        Main Page: Intro up top, List of FEATURED projects below
+        Secondary Page: All other projects
+      Resume Tab
+
+//TODO Add option for expandable pictures to full screen in projects (added 19/01/2020)
+//TODO Add option to add border to projects (added 19/01/2020)
+
+//TODO Separate User site pages into separate routes ((Completed 21/01/2020))
+
+//FIXME Fix Dashboard screenshots
+
+      21/01/2020 - START - Gonna Continue where I left off yesterday
+
+//TODO Add image loaders throughout site (vuetify has this)
+
+TODO Make each site tab have its own page index tracking (Completed 21/01/2020)
