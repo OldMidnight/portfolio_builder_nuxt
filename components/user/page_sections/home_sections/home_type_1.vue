@@ -154,7 +154,9 @@ export default {
     :class="{ slate: site_props.selected_theme === 1 && options.show_theme }"
     class="template-container d-flex flex-column align-center justify-start"
   >
-    <div class="home--img-container mt-2 d-flex flex-column align-center">
+    <div
+      class="home--img-container d-flex flex-column align-center justify-end"
+    >
       <v-tooltip v-model="edit_img_tooltip" right>
         <template v-slot:activator="{ on }">
           <v-avatar :size="avatar_size">
@@ -180,6 +182,7 @@ export default {
                   ? (img_dialog = true)
                   : (img_dialog = false)
               "
+              lazy-src="/img_lazy.jpeg"
               v-on="on"
               @mouseover="edit_img_tooltip = !options.preview && !options.live"
               @mouseout="edit_img_tooltip = false"
@@ -191,7 +194,7 @@ export default {
       </v-tooltip>
       <!-- </v-flex> -->
     </div>
-    <div class="home--content-container d-flex flex-column align-center">
+    <div class="home--content-container d-flex flex-column align-center pt-4">
       <div
         :style="check_color_style"
         class="user-landing-text d-flex flex-column pa-0 px-4 align-center"

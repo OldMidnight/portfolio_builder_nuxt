@@ -159,46 +159,6 @@ export default {
       </div>
       <SocialBar1 :live="options.live" />
     </div>
-    <!-- <div
-      :class="{
-        'smaller-user-img-container': !options.live && !options.preview,
-        'user-img-container': options.live || options.preview
-      }"
-      :style="[check_color_style]"
-    >
-      <v-tooltip v-model="edit_img_tooltip" right>
-        <template v-slot:activator="{ on }">
-          <v-img
-            alt="User Profile Picture"
-            :src="
-              !options.preview
-                ? img_props.url
-                : 'https://images.unsplash.com/photo-1549068106-b024baf5062d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1234&q=80'
-            "
-            :class="{
-              'user-hero-image-border':
-                site_props.selected_theme === 3 && !options.preview,
-              'has-border':
-                site_props.text_border_color &&
-                site_props.selected_theme === null,
-              editable: !options.preview && !options.live
-            }"
-            class="user-hero-image elevation-2"
-            :contain="img_props.contain ? img_props.contain : false"
-            @click.stop="
-              !options.preview && !options.live
-                ? (img_dialog = true)
-                : (img_dialog = false)
-            "
-            @mouseover="edit_img_tooltip = !options.preview && !options.live"
-            @mouseout="edit_img_tooltip = false"
-            v-on="on"
-          >
-          </v-img>
-        </template>
-        <span v-if="!options.preview && !options.live">Insert Image</span>
-      </v-tooltip>
-    </div> -->
     <div class="home--img-container d-flex flex-column align-center mt-8">
       <v-tooltip v-model="edit_img_tooltip" right>
         <template v-slot:activator="{ on }">
@@ -220,6 +180,7 @@ export default {
               }"
               class="user-hero-image elevation-2"
               :contain="img_props.contain"
+              lazy-src="/img_lazy.jpeg"
               @click.stop="
                 !options.preview && !options.live
                   ? (img_dialog = true)

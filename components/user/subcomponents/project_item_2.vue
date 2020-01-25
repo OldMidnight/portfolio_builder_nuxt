@@ -92,6 +92,7 @@ export default {
             class="project-img"
             :src="img.url"
             :contain="img.contain"
+            lazy-src="/img_lazy.jpeg"
           ></v-img>
         </v-flex>
         <v-flex

@@ -34,14 +34,14 @@ export default {
 
 <template>
   <v-app>
-    <v-container grid-list-md text-xs-center fluid justify-center fill-height>
+    <v-container fill-height class="creator-container">
       <v-layout column align-center class="creation-page-layout">
         <v-flex class="top-nav">
           <div class="mini-logo font-weight-bold">
             <nuxt-link to="/dashboard" class="info--text">Kreoh.com</nuxt-link>
           </div>
         </v-flex>
-        <nuxt class="creation-step" />
+        <nuxt class="creation-wrapper" />
         <v-flex class="next-creation-step">
           <v-btn
             color="error"
@@ -90,6 +90,12 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+.creator-container {
+  width: 100%;
+  max-width: 100%;
+  min-width: 100%;
+}
+
 .top-nav {
   max-height: 5%;
   align-self: baseline;
@@ -118,11 +124,12 @@ export default {
   cursor: pointer;
 }
 
-.creation-step {
+.creation-wrapper {
   max-height: 82%;
   overflow: auto;
   position: absolute;
   top: 6%;
+  width: 90%;
   // background-color: #cccccc;
 }
 

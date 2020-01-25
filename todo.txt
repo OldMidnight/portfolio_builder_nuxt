@@ -1,6 +1,6 @@
 //TODO Add social media btns to home pages (17/01/2020) (Completed 18/01/2020)
 
-//FIXME Fix preview images in creator an editor pages - Preview images require a placeholder to prevent the div from collapsing and expaning on open (17/01/2020)
+//FIXME Fix preview images in creator an editor pages - Preview images require a placeholder to prevent the div from collapsing and expaning on open (17/01/2020) (Completed 22/01/2020)
 
 //FIXME Fix login refresh token working (18/01/2020)
 
@@ -27,10 +27,14 @@
 
 //TODO Separate User site pages into separate routes ((Completed 21/01/2020))
 
-//FIXME Fix Dashboard screenshots
+//FIXME Fix Dashboard screenshots (Completed 22/01/2020)
 
       21/01/2020 - START - Gonna Continue where I left off yesterday
 
 //TODO Add image loaders throughout site (vuetify has this)
 
 TODO Make each site tab have its own page index tracking (Completed 21/01/2020)
+
+      22/01/2020 - START
+
+TODO Split common creator and editor methods and data into mixins

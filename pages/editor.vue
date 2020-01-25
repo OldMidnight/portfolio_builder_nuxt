@@ -193,7 +193,17 @@ export default {
       editing_font_size: false,
       editor_font_size: 'overline',
       editor_align_btn: 0,
-      new_page_name: 'Call-To-Action'
+      new_page_name: 'Call-To-Action',
+      api_waiting_lines: [
+        'Summoning Cthulu...',
+        'Enriching Uranium...',
+        'Playing Windows Boot Up Noises...',
+        'Taking My Time...',
+        `Deleting '/'...`,
+        `Switching The Internet Off And On...`
+      ],
+      current_waiting_line: null,
+      api_waiting_lines_interval: null
     }
   },
   computed: {
@@ -589,6 +599,12 @@ export default {
     })
   },
   mounted() {
+    this.api_waiting_lines_interval = setInterval(() => {
+      const newLineIndex = Math.floor(
+        Math.random() * this.api_waiting_lines.length
+      )
+      this.current_waiting_line = this.api_waiting_lines[newLineIndex]
+    }, 3500)
     this.editor = new Editor({
       editable: this.preview || this.live,
       extensions: [
@@ -1060,6 +1076,7 @@ export default {
                 class="website-img"
                 contain
                 :src="layout.preview_image"
+                lazy-src="/img_lazy.jpeg"
               ></v-img>
             </div>
             <p class="text-center font-weight-light">{{ layout.name }}</p>
@@ -1650,7 +1667,7 @@ export default {
         <v-layout
           id="creation-step-preview"
           align-center
-          class="preview-edit-window creation-step-preview ma-0"
+          class="preview-edit-window creation-step-preview ma-0 align-self-start"
           :class="{
             'slate-light': site_props.selected_theme === 1,
             matrix: site_props.selected_theme === 3
@@ -2054,39 +2071,110 @@ export default {
         class="creation-step justify-center creation-site-name-wrapper"
         align-center
       >
-        <div class="creation-name pa-5 elevation-2">
-          <v-flex class="">
-            <div class="title-2">Your Site Name</div>
-            <div class="subtitle-2">Your site in your browser tabs</div>
+        <v-flex class="creation-name d-flex flex-column">
+          <v-flex
+            class="creation-name-form-container pa-3 elevation-1 d-flex  justify-center align-center"
+          >
+            <transition
+              enter-active-class="animated fadeIn faster"
+              leave-active-class="animated fadeOut faster"
+              mode="out-in"
+            >
+              <v-form
+                v-if="!validating"
+                ref="editor_site_name_form"
+                class="creation-name--form elevation-2 pa-5 px-9"
+              >
+                <span class="headline">Enter Your site name</span>
+                <v-text-field
+                  ref="site_name"
+                  v-model="site_name"
+                  label="Name"
+                  outlined
+                  placeholder="John Doe: My Site"
+                  :rules="[
+                    rules.required,
+                    () =>
+                      (!!site_props.site_name &&
+                        site_props.site_name.length <= 40) ||
+                      'Max 40 characters'
+                  ]"
+                  outline
+                >
+                </v-text-field>
+                <v-btn
+                  :loading="validating"
+                  :disabled="validating"
+                  color="info"
+                  @click="updateSite()"
+                >
+                  Submit
+                </v-btn>
+              </v-form>
+              <v-flex v-else class="creation-name--form">
+                <v-flex>
+                  <p class="title font-weight-light">
+                    Your Kreoh Site is being generated
+                  </p>
+                </v-flex>
+                <div class="lds-ellipsis">
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                </div>
+                <v-flex>
+                  <transition
+                    enter-active-class="animated fadeIn faster"
+                    leave-active-class="animated fadeOut faster"
+                    mode="out-in"
+                  >
+                    <p class="font-italic">{{ current_waiting_line }}</p>
+                  </transition>
+                </v-flex>
+              </v-flex>
+            </transition>
           </v-flex>
-
-          <v-form ref="editor_site_name_form">
-            <v-text-field
-              ref="site_name"
-              v-model="site_name"
-              label="Name"
-              outlined
-              placeholder="John Doe: My Site"
-              :rules="[
-                rules.required,
-                () =>
-                  (!!site_props.site_name &&
-                    site_props.site_name.length <= 40) ||
-                  'Max 40 characters'
-              ]"
-              outline
+          <v-flex
+            class="creation-name-preview-container elevation-1 pa-3 d-flex flex-column justify-center align-center"
+          >
+            <p class="subtitle-1">Info</p>
+            <p class="">
+              Your site name is what appears in a tab when it is opened.
+            </p>
+            <p class="">
+              The structure of your kreoh site name will be the text you entered
+              above followed by the name of the current tab. These are separated
+              by a hyphen.
+            </p>
+            <p>
+              See below for a preview
+            </p>
+            <v-flex
+              class="creation-name--preview elevation-1 mt-5 d-flex flex-column"
             >
-            </v-text-field>
-            <v-btn
-              :loading="validating"
-              :disabled="validating"
-              color="info"
-              @click="updateSite()"
-            >
-              Submit
-            </v-btn>
-          </v-form>
-        </div>
+              <v-flex class="creation-name--preview-tabs d-flex align-end px-1">
+                <div
+                  class="creation-name--preview-tab-item d-flex align-center justify-center px-4"
+                >
+                  <v-icon class="pr-1">mdi-account</v-icon>
+                  <span>{{ site_name }} - Home</span>
+                </div>
+              </v-flex>
+              <v-flex
+                class="creation-name--preview-search px-3 d-flex align-center justify-center"
+              >
+                <v-icon class="creation-name--preview-search-icon pa-1 mx-1">
+                  mdi-chevron-left
+                </v-icon>
+                <v-icon class="creation-name--preview-search-icon pa-1 mx-1">
+                  mdi-chevron-right
+                </v-icon>
+                <v-flex class="ml-2 creation-name--preview-search-bar"></v-flex>
+              </v-flex>
+            </v-flex>
+          </v-flex>
+        </v-flex>
       </v-layout>
     </transition>
     <v-snackbar v-model="show_page_add_error" left color="error">

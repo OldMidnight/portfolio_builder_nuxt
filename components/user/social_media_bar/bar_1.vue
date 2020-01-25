@@ -236,6 +236,10 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+.home--social-bar {
+  width: 50%;
+}
+
 .social-bar--btn {
   // border: 1px solid;
   height: 100%;

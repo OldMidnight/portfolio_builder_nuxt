@@ -209,7 +209,7 @@ export default {
 <template>
   <v-container fill-height class="projects-container">
     <v-layout class="d-flex flex-column">
-      <v-flex>
+      <v-flex class="align-self-center projects--html-content">
         <editor-content :editor="editor" />
       </v-flex>
       <v-flex>
@@ -396,6 +396,10 @@ export default {
   // border: 1px solid;
   // padding: 20px;
   overflow: auto;
+}
+
+.projects--html-content {
+  width: 80%;
 }
 
 .project-item-add {

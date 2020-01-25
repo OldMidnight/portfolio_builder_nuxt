@@ -1,7 +1,7 @@
 <script>
 import HomeSection from '@/components/home_section'
 export default {
-  name: 'home',
+  name: 'Home',
   components: { HomeSection },
   auth: false,
   transitions: {
@@ -25,7 +25,7 @@ export default {
 <template>
   <v-layout class="app-container d-flex flex-column align-center">
     <HomeSection />
-    <v-footer
+    <!-- <v-footer
       padless
       height="30"
       class="user-footer caption font-weight-light d-flex flex-column align-center justify-center"
@@ -36,7 +36,7 @@ export default {
           <a href="www.kreoh.com">Kreoh.com</a>
         </strong>
       </span>
-    </v-footer>
+    </v-footer> -->
   </v-layout>
 </template>
 

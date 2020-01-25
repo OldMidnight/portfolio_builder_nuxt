@@ -78,7 +78,12 @@ export default {
     class="item-container mb-2 mx-auto"
   >
     <v-flex v-if="img.use" class="project-img-container pa-2">
-      <v-img class="project-img" :src="img.url" :contain="img.contain"></v-img>
+      <v-img
+        class="project-img"
+        :src="img.url"
+        :contain="img.contain"
+        lazy-src="/img_lazy.jpeg"
+      ></v-img>
     </v-flex>
     <v-flex class="d-flex flex-column project-content-container my-3 pa-2">
       <v-flex class="d-flex flex-column project-content">

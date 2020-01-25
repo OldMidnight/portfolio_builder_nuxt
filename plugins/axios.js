@@ -23,7 +23,7 @@ export default function(context) {
           return response.access_token
         })
       console.log('newtoken: ', newToken)
-      if (newToken) {
+      if (typeof newToken === 'string' || newToken instanceof String) {
         context.$auth.setUserToken(newToken)
         originalRequest.headers.Authorization = 'Bearer ' + newToken
         context.$axios.setHeader('Authorization', 'Bearer ' + newToken)

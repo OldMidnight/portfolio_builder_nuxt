@@ -33,6 +33,18 @@ export default {
       } else {
         return 'http://' + this.user.domain + '.localhost:3001/'
       }
+    },
+    website_images() {
+      const images = []
+      const url =
+        this.$axios.defaults.baseURL === 'http://127.0.0.1:5000/'
+          ? 'http://127.0.0.1:5000/uploads/screenshot/'
+          : 'https://api.kreoh.com/uploads/screenshot'
+
+      for (const page of ['home', 'projects', 'resume']) {
+        images.push(url + page + '.' + this.user.domain + '.kreoh.com.png')
+      }
+      return images
     }
     // weekly_stats() {
     //   return this.$store.state.dashboard.stats.weekly
@@ -174,40 +186,17 @@ export default {
             class="website-preview-container d-flex align-center justify-center pt-2"
           >
             <v-img
-              v-for="(img, index) in preview_images"
+              v-for="(img, index) in website_images"
               :key="index"
               class="website-img website-img--border mx-1"
               contain
-              :src="img.src"
+              :src="img"
             ></v-img>
           </div>
           <div
             v-else
             class="website-preview-container d-flex align-center justify-center pt-2"
           >
-            <!-- <transition
-              enter-active-class="animated fadeIn"
-              leave-active-class="animated fadeOut"
-              mode="out-in"
-            > -->
-            <!-- <v-img
-              key="0"
-              class="website-img website-img--border mx-1"
-              contain
-              :src="preview_images[current_preview_img].src"
-            ></v-img>
-            <v-img
-              key="1"
-              class="website-img website-img--border mx-1"
-              contain
-              :src="preview_images[current_preview_img].src"
-            ></v-img>
-            <v-img
-              key="2"
-              class="website-img website-img--border mx-1"
-              contain
-              :src="preview_images[current_preview_img].src"
-            ></v-img> -->
             <v-img
               v-for="(img, index) in preview_images"
               :key="index"
