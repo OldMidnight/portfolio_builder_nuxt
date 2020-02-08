@@ -1,5 +1,6 @@
 export const state = () => ({
   creation_step: 0,
+  saving: false,
   site_props: {
     favicon: {
       use: false,
@@ -189,7 +190,8 @@ export const state = () => ({
       1: null,
       2: null,
       3: null
-    }
+    },
+    callToActionURL: 'call-to-action'
   },
   is_subdomain: false,
   domain: {
@@ -295,8 +297,14 @@ export const mutations = {
     Payload contains:
       page_label: String - dictionary for page data
       html: Html content from tiptap editor for the page
+
+    Also changes saving state from true to false
     */
     state.site_props[payload.page_label].html = payload.html
+    state.saving = false
+  },
+  startSaving(state) {
+    state.saving = true
   },
   updatePageImg(state, payload) {
     state.site_props[payload.page_label][payload.img_props] = payload.data
@@ -364,8 +372,8 @@ export const mutations = {
   setResumePages(state, value) {
     state.site_props.resumePages = value
   },
-  addPage(state, tab, page) {
-    state.site_props[tab].push(page)
+  addPage(state, payload) {
+    state.site_props[payload.tab].push(payload.page)
   },
   deleteNavPage(state, payload) {
     state.site_props[payload.list].splice(payload.index, 1)
@@ -530,6 +538,14 @@ export const mutations = {
   saveSocialBar(state, payload) {
     state.site_props.social_media_bar = payload.btns
     state.site_props.social_media_bar_urls = payload.urls
+  },
+  setCallToActionURL(state, payload) {
+    /*
+    Saves the user input as the call to action page url
+    @params:
+      value - String - New URL
+    */
+    state.callToActionURL = payload.value
   }
 }
 

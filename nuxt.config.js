@@ -10,7 +10,10 @@ module.exports = {
     title: process.env.npm_package_name || '',
     meta: [
       { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      {
+        name: 'viewport',
+        content: 'width=device-width, initial-scale=1, maximum-scale=1.0'
+      },
       {
         hid: 'description',
         name: 'description',
@@ -23,6 +26,25 @@ module.exports = {
         rel: 'stylesheet',
         href:
           'https://fonts.googleapis.com/css?family=Comfortaa:300,400,700&display=swap'
+      }
+    ],
+    script: [
+      {
+        type: 'text/javascript',
+        innerHTML: `
+          var _paq = window._paq || [];
+          /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+          _paq.push(['trackPageView']);
+          _paq.push(['enableLinkTracking']);
+          (function() {
+            var u="https://kreoh.matomo.cloud/";
+            _paq.push(['setTrackerUrl', u+'matomo.php']);
+            _paq.push(['setSiteId', '1']);
+            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+            g.type='text/javascript'; g.async=true; g.defer=true; g.src='//cdn.matomo.cloud/kreoh.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
+          })();
+
+        `
       }
     ]
   },
@@ -94,7 +116,7 @@ module.exports = {
     },
     rewriteRedirects: true,
     refresh_token: {
-      prefix: '_refesh_token'
+      prefix: '_refesh_token.'
     }
   },
   /*

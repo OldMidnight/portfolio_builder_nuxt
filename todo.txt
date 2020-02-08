@@ -2,7 +2,7 @@
 
 //FIXME Fix preview images in creator an editor pages - Preview images require a placeholder to prevent the div from collapsing and expaning on open (17/01/2020) (Completed 22/01/2020)
 
-//FIXME Fix login refresh token working (18/01/2020)
+//FIXME Fix login refresh token working (18/01/2020) (Completed 31/01/2020)
 
 //FIXME Fix auto selection of page templates when editing website. page_template_model defaults to 1 (added 19/01/2020)
 
@@ -37,4 +37,4 @@ TODO Make each site tab have its own page index tracking (Completed 21/01/2020)
 
       22/01/2020 - START
 
-TODO Split common creator and editor methods and data into mixins
+TODO Split common creator and editor methods and data into mixins (Completed 31/01/2020)

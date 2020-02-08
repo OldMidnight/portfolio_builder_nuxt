@@ -5,6 +5,7 @@ export default {
       price_plans: [
         {
           name: 'Basic',
+          subtitle: 'Simple, Easy, Fast',
           price: '3.50',
           special: false,
           features: [
@@ -17,6 +18,7 @@ export default {
         },
         {
           name: 'Plus',
+          subtitle: 'All round package',
           price: '5',
           special: true,
           features: [
@@ -33,6 +35,7 @@ export default {
         },
         {
           name: 'Pro',
+          subtitle: 'Priority Support',
           price: '8.50',
           special: false,
           features: [
@@ -56,8 +59,12 @@ export default {
 </script>
 
 <template>
-  <v-col cols="12" class="pricing--content">
-    <v-row class="pricing--wrapper">
+  <v-col
+    cols="12"
+    class="pricing--content"
+    :class="{ 'm-pricing--content': $vuetify.breakpoint.xs }"
+  >
+    <v-row v-if="!$vuetify.breakpoint.xs" class="pricing--wrapper">
       <v-col
         v-for="(plan, index) in price_plans"
         :key="index"
@@ -74,13 +81,13 @@ export default {
         <v-row align-content="start" class="pricing--item elevation-3 mx-1 ">
           <v-col
             cols="12"
-            class="pricing--item-header d-flex flex-column align-center justify-center"
+            class="pricing--item-header d-flex flex-column align-center justify-center pa-0"
           >
             <p style="font-size: 20px" class="font-weight-bold info--text">
               {{ plan.name }}
             </p>
             <p style="font-size: 52px" class="font-weight-bold">
-              {{ plan.price }} <sup>&euro;</sup>
+              &euro;{{ plan.price }}
             </p>
             <p class="caption">per month</p>
           </v-col>
@@ -98,6 +105,58 @@ export default {
             </div>
           </v-col>
         </v-row>
+      </v-col>
+    </v-row>
+    <v-row v-else class="m-pricing--wrapper">
+      <v-col
+        v-for="(plan, index) in price_plans"
+        :key="index"
+        cols="12"
+        class="m-pricing--container"
+      >
+        <v-card scrollable>
+          <v-card-title class="d-flex flex-column align-start">
+            <p
+              v-if="plan.special"
+              :style="{ fontSize: '16px' }"
+              class="font-weight-bold special--tag text-center mb-3"
+            >
+              Most Popular
+            </p>
+            <p :style="{ fontSize: '18px' }" class="font-weight-bold">
+              {{ plan.name }}
+            </p>
+            <p class="caption font-weight-light">{{ plan.subtitle }}</p>
+          </v-card-title>
+          <v-card-subtitle class="d-flex pt-3">
+            <p
+              :style="{ fontSize: '24px' }"
+              class="black--text font-weight-bold"
+            >
+              &euro;{{ plan.price }}
+            </p>
+            <span class="font-weight-light caption">/month</span>
+          </v-card-subtitle>
+          <v-divider></v-divider>
+          <v-card-text class="pa-1">
+            <v-expansion-panels focusable flat>
+              <v-expansion-panel>
+                <v-expansion-panel-header expand-icon="mdi-menu-down">
+                  View Features
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <p
+                    v-for="(feature, f_index) in plan.features"
+                    :key="f_index"
+                    class="my-3 font-weight-bold"
+                  >
+                    {{ feature }}
+                  </p>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </v-card-text>
+        </v-card>
       </v-col>
     </v-row>
   </v-col>
@@ -120,8 +179,13 @@ export default {
 }
 
 .pricing--content {
-  height: 80%;
+  height: 65%;
   padding: 0 15%;
+}
+
+.m-pricing--content {
+  height: auto;
+  padding: 0 5%;
 }
 
 .pricing--item-header {
@@ -144,5 +208,12 @@ export default {
 
 .feature {
   height: 10%;
+}
+
+.special--tag {
+  width: 100%;
+  background-color: #bbdefb;
+  color: #0d47a1;
+  border-radius: 3px;
 }
 </style>

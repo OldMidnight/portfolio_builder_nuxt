@@ -24,7 +24,8 @@ export default {
           return pattern.test(value) || 'Invalid e-mail.'
         }
       },
-      domainInvalid: false
+      domainInvalid: false,
+      show_confirm: false
     }
   },
   computed: {
@@ -49,11 +50,6 @@ export default {
       }
     }
   },
-  head() {
-    return {
-      title: 'Registration - Kreoh.com'
-    }
-  },
   methods: {
     ...mapActions({
       register: 'user_auth/register'
@@ -72,13 +68,22 @@ export default {
           })
       }
     }
+  },
+  head() {
+    return {
+      title: 'Registration - Kreoh.com'
+    }
   }
 }
 </script>
 
 <template>
-  <v-layout column align-center>
-    <v-form ref="reg_form" class="pa-2 d-flex flex-column align-center">
+  <v-row column align-center class="d-flex flex-column">
+    <v-form
+      v-if="!show_confirm"
+      ref="reg_form"
+      class="pa-2 d-flex flex-column align-center"
+    >
       <span class="headline mb-4">Create Your Account</span>
       <v-text-field
         ref="f_name"
@@ -138,9 +143,14 @@ export default {
       >
       </v-text-field>
       <!-- <v-btn color="success" @click.stop="validateInfo()">Submit</v-btn> -->
-      <v-btn color="success" @click="validateForm()">Submit</v-btn>
+      <v-btn color="success" @click="validateForm()">
+        Next<v-icon>mdi-chevron-right</v-icon>
+      </v-btn>
     </v-form>
-    <v-flex class="d-flex flex-column align-center auth-link">
+    <v-flex
+      v-if="!show_confirm"
+      class="d-flex flex-column align-center auth-link"
+    >
       <span class="caption">Already have an account?</span>
       <nuxt-link to="/auth/login" class="caption auth-link">Login</nuxt-link>
     </v-flex>
@@ -150,7 +160,7 @@ export default {
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-snackbar>
-  </v-layout>
+  </v-row>
 </template>
 
 <style lang="scss" scoped>

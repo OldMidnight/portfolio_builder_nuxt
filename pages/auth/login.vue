@@ -1,13 +1,15 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 export default {
-  name: 'login',
+  name: 'Login',
   transitions: {
     enterActiveClass: 'animated fadeInLeft',
     leaveActiveClass: 'animated fadeOutRight'
   },
-  // middleware: 'available_route_check',
   layout: 'auth_layout',
+  asyncData({ $auth }) {
+    return { from_path: $auth.$storage.getUniversal('redirect-path') }
+  },
   data() {
     return {
       email: null,
@@ -35,19 +37,6 @@ export default {
     },
     ...mapState('user_auth', ['status'])
   },
-  head() {
-    return {
-      title: 'Login - Kreoh.com'
-    }
-  },
-  // beforeRouteEnter(to, from, next) {
-  //   console.log('asdfsd')
-  //   console.log(from)
-  //   next()
-  // },
-  asyncData({ $auth }) {
-    return { from_path: $auth.$storage.getUniversal('redirect-path') }
-  },
   methods: {
     ...mapActions('user_auth', ['login']),
     validateInfo() {
@@ -59,14 +48,19 @@ export default {
         })
       }
     }
+  },
+  head() {
+    return {
+      title: 'Login - Kreoh.com'
+    }
   }
 }
 </script>
 
 <template>
   <v-form
-    v-model="loginFormValid"
     ref="loginForm"
+    v-model="loginFormValid"
     class="pa-2 d-flex flex-column align-center"
   >
     <span class="headline mb-4">Login</span>

@@ -38,7 +38,7 @@ export default {
       <v-layout column align-center class="creation-page-layout">
         <v-flex class="top-nav">
           <div class="mini-logo font-weight-bold">
-            <nuxt-link to="/dashboard" class="info--text">Kreoh.com</nuxt-link>
+            <v-img class="logo" src="/Logo_beta_text.png"></v-img>
           </div>
         </v-flex>
         <nuxt class="creation-wrapper" />
@@ -101,15 +101,17 @@ export default {
   align-self: baseline;
   position: absolute;
   top: 0;
+  width: 100%;
   // background-color: #e6e6e6;
 }
 
 .mini-logo {
   // height: 40px;
-  // width: 40px;
+  width: 8%;
   height: 100%;
   font-size: 24px;
   color: #0066ff;
+  position: relative;
   // display: flex;
   // border: 1px solid #b6b6b6;
   // border-radius: 50%;
@@ -118,6 +120,10 @@ export default {
   //     height: 100%;
   //     width: 100%;
   // }
+}
+
+.logo {
+  position: absolute;
 }
 
 .mini-logo:hover {

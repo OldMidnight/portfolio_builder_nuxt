@@ -3,9 +3,16 @@ import { mapState, mapActions } from 'vuex'
 // import SiteSettings from '@/components/dashboard/site_settings'
 // import UserSettings from '@/components/dashboard/user_settings'
 export default {
-  name: 'dashboard',
+  name: 'Dashboard',
   layout: 'dashboard_layout',
   // components: { SiteSettings, UserSettings },
+  fetch({ store, $axios }) {
+    return $axios.$get('/helper/auth_site_config').then((response) => {
+      if (!response.site_not_created) {
+        store.commit('creator/setSiteProps', response.site_config)
+      }
+    })
+  },
   data() {
     return {
       delete_error: false,
@@ -17,12 +24,24 @@ export default {
         { src: '/layout_images/kreoh_layout_1_slate.png' },
         { src: '/layout_images/kreoh_layout_1_matrix.png' }
       ],
-      website_delete_dialog: false
+      accout_types: {
+        0: { title: 'Free Trial', price: 'Free' },
+        1: { title: 'Basic', price: '3.50' },
+        2: { title: 'Plus', price: '5' },
+        3: { title: 'Pro', price: '8.50' },
+        4: { title: 'Beta Tester', price: 'Free' }
+      },
+      website_delete_dialog: false,
+      emailNotConfirmed: false,
+      messages: [],
+      prev_messages: [],
+      activation_resent: false
     }
   },
   computed: {
     ...mapState({
-      weekly_stats: (state) => state.dashboard.stats.weekly
+      weekly_stats: (state) => state.dashboard.stats.weekly,
+      cta_inter_stats: (state) => state.dashboard.stats.cta_inter
     }),
     user() {
       return this.$store.state.auth.user
@@ -38,11 +57,11 @@ export default {
       const images = []
       const url =
         this.$axios.defaults.baseURL === 'http://127.0.0.1:5000/'
-          ? 'http://127.0.0.1:5000/uploads/screenshot/'
-          : 'https://api.kreoh.com/uploads/screenshot'
+          ? 'http://127.0.0.1:5000/uploads/images/'
+          : 'https://api.kreoh.com/uploads/images/'
 
       for (const page of ['home', 'projects', 'resume']) {
-        images.push(url + page + '.' + this.user.domain + '.kreoh.com.png')
+        images.push(url + this.user.domain + '/' + page + '.kreoh.com.png')
       }
       return images
     }
@@ -50,24 +69,29 @@ export default {
     //   return this.$store.state.dashboard.stats.weekly
     // }
   },
-  fetch({ store, $axios }) {
-    return $axios.$get('/helper/auth_site_config').then((response) => {
-      if (!response.site_not_created) {
-        store.commit('creator/setSiteProps', response.site_config)
+  created() {
+    this.emailNotConfirmed = !this.user.email_confirmed
+    this.$axios.$get('/u/status').then((response) => {
+      if (!response.email_confirmed) {
+        this.emailNotConfirmed = true
       }
+      this.messages = response.messages
     })
+    if (this.messages.length <= 3) {
+      this.prev_messages = this.messages
+    } else {
+      this.prev_messages = this.messages.slice(
+        this.messages.length - 3,
+        this.messages.length
+      )
+    }
   },
   mounted() {
-    this.updateWeeklyStats()
-  },
-  head() {
-    return {
-      title: 'Dashboard - Kreoh'
-    }
+    this.updateStats()
   },
   methods: {
     ...mapActions({
-      updateWeeklyStats: 'dashboard/updateWeeklyStats'
+      updateStats: 'dashboard/updateStats'
     }),
     deleteSite() {
       this.$axios
@@ -85,6 +109,16 @@ export default {
           this.website_delete_dialog = false
           this.$auth.fetchUser()
         })
+    },
+    resendVerification() {
+      this.$axios.$post('/u/email_verify').then(() => {
+        this.activation_resent = true
+      })
+    }
+  },
+  head() {
+    return {
+      title: 'Dashboard - Kreoh'
     }
   }
 }
@@ -94,18 +128,22 @@ export default {
   <v-layout>
     <div class="general-settings-container">
       <div
-        class="general-setting-wrapper d-flex flex-column align-center justify-center pl-3 pr-2 pt-3"
+        class="general-settings-wrapper d-flex flex-column align-center justify-center pl-3 pr-2 pt-3"
       >
         <div
-          class="gen-setting-item ma-2 pa-4 d-flex flex-column align-center justify-center elevation-2 gen-setting--border"
+          class="gen-setting-item gen-setting-settings ma-2 pa-4 d-flex flex-column align-center justify-center elevation-2 gen-setting--border"
         >
-          <v-icon size="50" class="gen-setting--icon" color="success">
-            mdi-settings
-          </v-icon>
-          <div class="d-flex flex-column justify-center align-center my-2">
+          <div>
+            <v-icon class="gen-setting--icon" color="success">
+              mdi-settings
+            </v-icon>
+            <span class="font-weight-bold">Settings</span>
+          </div>
+          <div class="d-flex flex-column justify-center align-center my-1">
             <v-btn
-              class="ma-1 gen-setting-btn--border"
+              class="my-1 gen-setting-btn--border"
               color="info"
+              small
               nuxt
               to="/dashboard/site-settings"
               outlined
@@ -113,9 +151,10 @@ export default {
               Site Setings
             </v-btn>
             <v-btn
-              class="ma-1 gen-setting-btn--border"
+              class="my-1 gen-setting-btn--border"
               color="info"
               outlined
+              small
               nuxt
               to="/dashboard/user-settings"
             >
@@ -124,12 +163,49 @@ export default {
           </div>
         </div>
         <div
-          class="gen-setting-item messages ma-2 pa-4 d-flex flex-column align-center elevation-2 gen-setting--border"
+          class="gen-setting-item gen-setting-messages messages ma-2 py-4 px-2 d-flex flex-column align-center elevation-2 gen-setting--border"
         >
-          <v-icon size="50" class="gen-setting--icon" color="info">
-            mdi-message
-          </v-icon>
-          <div v-if="temp_messages" class="messages-preview my-3"></div>
+          <div>
+            <v-icon class="gen-setting--icon" color="info">
+              mdi-message
+            </v-icon>
+            <span class="font-weight-bold">Messages</span>
+          </div>
+          <div
+            v-if="messages"
+            class="messages-preview my-3 py-2 d-flex flex-column align-center"
+          >
+            <div
+              v-for="(message, index) in messages"
+              :key="index"
+              class="messages-container my-1"
+            >
+              <v-hover v-slot:default="{ hover }">
+                <div
+                  class="message pa-2 d-flex"
+                  :class="{ 'elevation-1': !hover, 'elevation-3': hover }"
+                >
+                  <div
+                    class="message-details d-flex flex-column justify-center"
+                  >
+                    <span :style="{ fontSize: '16px' }">
+                      {{ message.subject }}
+                    </span>
+                    <span :style="{ fontSize: '12px' }">
+                      {{ message.sender }}
+                    </span>
+                  </div>
+                  <div
+                    class="message-icon d-flex flex-column justify-center align-center"
+                  >
+                    <v-icon large color="info">
+                      mdi-{{ message.read ? 'email-open' : 'email' }}
+                    </v-icon>
+                  </div>
+                </div>
+              </v-hover>
+            </div>
+          </div>
           <div
             v-else
             class=" d-flex flex-column align-center justify-center my-3"
@@ -139,6 +215,7 @@ export default {
           <v-btn
             class="align-self-center gen-setting-btn--border"
             color="info"
+            small
             outlined
             @click="flipTo('messages')"
           >
@@ -146,16 +223,25 @@ export default {
           </v-btn>
         </div>
         <div
-          class="gen-setting-item ma-2 pa-4 d-flex flex-column align-center justify-space-around elevation-2 gen-setting--border"
+          class="gen-setting-item gen-setting-plan ma-2 pa-4 d-flex flex-column align-center justify-space-around elevation-2 gen-setting--border"
         >
-          <v-icon size="50" class="gen-setting--icon" color="#FDD835">
-            mdi-star
-          </v-icon>
-          <span class="font-weight-light my-3">
-            Account Type: {{ user.account_type }}
+          <div>
+            <v-icon class="gen-setting--icon" color="#FDD835">
+              mdi-star
+            </v-icon>
+            <span class="font-weight-bold">Your Plan</span>
+          </div>
+          <span class="font-weight-light text-center">
+            Account Type:
           </span>
-          <span class="font-weight-light mb-3">
-            Monthly Cost: &euro; 4.99
+          <span class="font-weight-bold mb-3">
+            {{ accout_types[user.account_type].title }}
+          </span>
+          <span class="font-weight-light">
+            Monthly Cost:
+          </span>
+          <span class="mb-3 font-weight-bold">
+            &euro; {{ accout_types[user.account_type].price }}
           </span>
           <v-btn
             color="info"
@@ -164,7 +250,7 @@ export default {
             class="gen-setting-btn--border"
             @click="flipTo('subscriptions')"
           >
-            {{ user.account_type === 'Free' ? 'Upgrade' : 'Subscription' }}
+            {{ user.account_type === 0 ? 'Upgrade' : 'Manage' }}
           </v-btn>
         </div>
       </div>
@@ -197,14 +283,31 @@ export default {
             v-else
             class="website-preview-container d-flex align-center justify-center pt-2"
           >
-            <v-img
+            <!-- <v-img
               v-for="(img, index) in preview_images"
               :key="index"
               class="website-img website-img--border mx-1"
               contain
               :src="img.src"
-            ></v-img>
-            <!-- </transition> -->
+            ></v-img> -->
+            <div
+              class="img-preview-text d-flex justify-center align-center mx-1"
+            >
+              <v-icon>mdi-image</v-icon>
+              <p class="font-weight-bold ml-3">Home</p>
+            </div>
+            <div
+              class="img-preview-text d-flex justify-center align-center mx-1"
+            >
+              <v-icon>mdi-image</v-icon>
+              <p class="font-weight-bold ml-3">Projects</p>
+            </div>
+            <div
+              class="img-preview-text d-flex justify-center align-center mx-1"
+            >
+              <v-icon>mdi-image</v-icon>
+              <p class="font-weight-bold ml-3">Resume</p>
+            </div>
           </div>
           <div
             class="website-actions-container d-flex justify-space-around align-center"
@@ -213,12 +316,12 @@ export default {
               v-if="user.site_created"
               outlined
               color="info"
-              href="/editor"
+              href="/creator"
             >
               <v-icon>mdi-pencil</v-icon> Edit
             </v-btn>
             <v-btn
-              :disabled="!user.site_active"
+              :disabled="!user.site_active || !user.email_confirmed"
               color="info"
               outlined
               :href="user_domain"
@@ -238,6 +341,16 @@ export default {
               <v-icon>mdi-delete-forever</v-icon>
             </v-btn>
           </div>
+          <p
+            v-if="!user.site_active || !user.email_confirmed"
+            class="caption grey--text mt-4"
+          >
+            Your website is currently parked. To actiavte it, go to the site
+            settings page
+            <nuxt-link to="/dashboard/site-settings#functionality_section">
+              here
+            </nuxt-link>
+          </p>
         </div>
       </div>
       <div
@@ -275,7 +388,7 @@ export default {
               mdi-clock
             </v-icon>
             <span class="caption grey--text font-weight-light">
-              last visitor {{ weekly_stats.last_visitor_time }}
+              last visitor: {{ weekly_stats.last_visitor_time }}
             </span>
           </v-card-text>
         </v-card>
@@ -286,10 +399,10 @@ export default {
             max-width="calc(100% - 32px)"
           >
             <v-sparkline
-              v-if="weekly_stats.autodraw"
-              :labels="weekly_stats.labels"
-              :value="weekly_stats.data"
-              :auto-draw="weekly_stats.autodraw"
+              v-if="cta_inter_stats.autodraw"
+              :labels="cta_inter_stats.labels"
+              :value="cta_inter_stats.data"
+              :auto-draw="cta_inter_stats.autodraw"
               gradient-direction="top"
               :gradient="['#f72047', '#ffd200', '#1feaea']"
               line-width="2"
@@ -300,17 +413,18 @@ export default {
           </v-sheet>
           <v-card-text class="pt-0">
             <div class="title font-weight-light mb-2">
-              User Registrations
+              Call-To-Action Analytics
             </div>
             <div class="subheading font-weight-light grey--text">
-              Last Campaign Performance
+              Weekly Interactions - {{ cta_inter_stats.avg }}
+              / interactions per week
             </div>
             <v-divider class="my-2"></v-divider>
             <v-icon class="mr-2" small>
               mdi-clock
             </v-icon>
             <span class="caption grey--text font-weight-light">
-              last registration 26 minutes ago
+              last registration: {{ cta_inter_stats.last_visitor_time }}
             </span>
           </v-card-text>
         </v-card>
@@ -369,26 +483,53 @@ export default {
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-snackbar>
+    <v-snackbar v-model="emailNotConfirmed" color="info">
+      Check Your email to activate your account.
+      <v-btn color="success" @click="resendVerification()">Resend Link</v-btn>
+      <v-btn icon @click="emailNotConfirmed = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
+    <v-snackbar v-model="activation_resent" color="success">
+      Account verification link has been resent!
+      <v-btn icon @click="activation_resent = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
   </v-layout>
 </template>
 
 <style lang="scss" scoped>
 .general-settings-container {
-  width: 20%;
+  width: 22%;
   height: 100%;
   // border-right: 1px solid #e6e6e6;
   overflow: auto;
 }
 
 .general-settings-wrapper {
-  position: absolute;
+  // position: absolute;
   background-color: #eceff1;
+  height: 100%;
+  // overflow: auto;
 }
 
 .gen-setting-item {
   width: 100%;
   background-color: #fafafa;
   border-radius: 0.5em;
+}
+
+.gen-setting-settings {
+  height: 20%;
+}
+
+.gen-setting-messages {
+  height: 50%;
+}
+
+.gen-setting-plan {
+  height: 30%;
 }
 
 .messages {
@@ -399,10 +540,12 @@ export default {
 
 .messages-preview {
   overflow: auto;
+  height: 100%;
+  width: 100%;
 }
 
 .site-settings-container {
-  width: 80%;
+  width: 78%;
 }
 
 .site-setting-website-container {
@@ -458,6 +601,37 @@ export default {
 .v-sheet--offset {
   top: -24px;
   position: relative;
+}
+
+.img-preview-text {
+  font-size: 30px;
+  border: 1px solid #e6e6e6;
+  height: 90%;
+  width: 33%;
+  border-radius: 10px;
+}
+
+.messages-container {
+  width: 97%;
+  height: 33%;
+}
+
+.message {
+  height: 100%;
+  width: 100%;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.message-details {
+  width: 80%;
+  height: 100%;
+}
+
+.message-icon {
+  width: 20%;
+  height: 100%;
 }
 
 // .dashboard--border {

@@ -25,18 +25,6 @@ export default {
 <template>
   <v-layout class="app-container d-flex flex-column align-center">
     <HomeSection />
-    <!-- <v-footer
-      padless
-      height="30"
-      class="user-footer caption font-weight-light d-flex flex-column align-center justify-center"
-    >
-      <span>
-        &#169; {{ new Date().getFullYear() }} —
-        <strong>
-          <a href="www.kreoh.com">Kreoh.com</a>
-        </strong>
-      </span>
-    </v-footer> -->
   </v-layout>
 </template>
 
@@ -45,6 +33,7 @@ export default {
   height: 100%;
   padding: 0 !important;
   width: 100%;
+  overflow-x: hidden;
 }
 
 .user-footer {

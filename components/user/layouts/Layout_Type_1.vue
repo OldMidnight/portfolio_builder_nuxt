@@ -114,7 +114,9 @@ export default {
         case 'left':
           if (this.activeNav_index === 1) {
             // eslint-disable-next-line prettier/prettier
-            this.activeNav_index = this.site_props[this.activeNav + 'Pages'].length
+            this.activeNav_index = this.site_props[
+              this.activeNav + 'Pages'
+            ].length
           } else {
             this.activeNav_index -= 1
           }

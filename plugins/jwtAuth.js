@@ -86,6 +86,7 @@ export default class LocalScheme {
     }
 
     if (result.refresh_token) {
+      // console.log('dfasdfasdfasdfasd')
       const token = this.options.tokenType + ' ' + result.refresh_token
       this.$auth.setRefreshToken(this.name, token)
     }

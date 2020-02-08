@@ -1,21 +1,15 @@
 <script>
-export default {
-  methods: {
-    goHome() {
-      this.$router.push({ path: '/' })
-    }
-  }
-}
+export default {}
 </script>
 
 <template>
   <v-app>
     <v-container fluid fill-height>
       <v-layout column justify-center align-center class="form-layout">
-        <span class="logo mb-7 font-weight-light" @click="goHome()">
+        <span class="logo mb-7 font-weight-bold">
           Kreoh.com
         </span>
-        <v-flex pa-7 xs1 class="form elevation-2">
+        <v-flex pa-7 xs1 class="form elevation-1">
           <transition
             name="auth-transition"
             enter-active-class="animated fadeIn fast"
@@ -41,7 +35,6 @@ export default {
 .logo {
   font-size: 48px;
   color: #0066ff;
-  cursor: pointer;
 }
 
 .form {

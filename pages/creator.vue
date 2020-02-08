@@ -1,5 +1,5 @@
 <script>
-// import _ from 'lodash'
+import _ from 'lodash'
 import { mapMutations, mapActions } from 'vuex'
 import { Editor, EditorMenuBar } from 'tiptap'
 import {
@@ -31,6 +31,13 @@ export default {
   transitions: {
     enterActiveClass: 'animated fadeInLeft',
     leaveActiveClass: 'animated fadeOutRight'
+  },
+  fetch({ store, $axios }) {
+    if (store.state.auth.user.site_created) {
+      return $axios.get('/helper/auth_site_config').then((response) => {
+        store.commit('creator/setSiteProps', response.data.site_config)
+      })
+    }
   },
   data() {
     return {
@@ -85,20 +92,6 @@ export default {
           component: 'home_sections/home_type_2',
           preview_img: '/preview_images/home_pg_2.png'
         },
-        // {
-        //   id: 3,
-        //   tab: 'home',
-        //   type: 2,
-        //   component: 'home_sections/home_type_3',
-        //   preview_img: '/preview_images/home_pg_1.png'
-        // },
-        // {
-        //   id: 4,
-        //   tab: 'home',
-        //   type: 2,
-        //   component: 'home_sections/home_type_4',
-        //   preview_img: '/preview_images/home_pg_1.png'
-        // },
         {
           id: 3,
           tab: 'projects',
@@ -197,10 +190,14 @@ export default {
         `Switching The Internet Off And On...`
       ],
       current_waiting_line: null,
-      api_waiting_lines_interval: null
+      api_waiting_lines_interval: null,
+      show_help_dialog: false
     }
   },
   computed: {
+    saving() {
+      return this.$store.state.creator.saving
+    },
     creation_step() {
       return this.$store.state.creator.creation_step
     },
@@ -242,6 +239,9 @@ export default {
         }
       }
       return options
+    },
+    user() {
+      return this.$store.state.auth.user
     },
     nav_title_home: {
       set(title) {
@@ -585,6 +585,11 @@ export default {
       }
     }
   },
+  created() {
+    if (!this.user.site_created) {
+      this.show_help_dialog = true
+    }
+  },
   mounted() {
     this.api_waiting_lines_interval = setInterval(() => {
       const newLineIndex = Math.floor(
@@ -622,273 +627,245 @@ export default {
       onFocus: () => {
         this.is_editing = true
       },
-      // onUpdate: _.debounce((e) => {
-      //   this.updatePage(e.getHTML())
-      // }, 3000)
       onUpdate: (e) => {
-        this.updatePageHTML({
-          page_label:
-            this.activeNav + '_page_' + this.activeNav_index + '_data',
-          html: e.getHTML()
-        })
+        // console.log(e)
+        this.startSaving()
+        const func = _.debounce(() => {
+          this.updatePageHTML({
+            page_label:
+              this.activeNav + '_page_' + this.activeNav_index + '_data',
+            html: e.getHTML()
+          })
+          // this.test()
+          // console.log(e)
+          // console.log(this)
+        }, 4000)
+        func()
       }
     })
-    this.preview_images_interval = setInterval(() => {
-      if (this.current_preview_img === 2) {
-        this.current_preview_img = 0
-      } else {
-        this.current_preview_img += 1
-      }
-    }, 5000)
-    this.setHomePages([
-      // { id: #, component: () => import(COMPONENT_PATH) }
-      { id: 1, page_num: 1, component: 'home_sections/home_type_1' },
-      { id: 2, page_num: 2, component: 'home_sections/home_type_4' }
-    ])
-    let inputDict = 'home_page_1_data'
-    this.updatePageData({
-      page_label: inputDict,
-      data: {
-        html: `
-          <p>
-            <span style="text-align: center; display: block">
-              <span class="display-1">Your Name Here</span>
-            </span>
-          </p>
-          <p>
-            <span style="text-align: center; display: block">
-              <span class="caption">
-                your@email.com - 08xxxxxxxx
+    if (this.user.site_created) {
+      this.customise_background_color = this.site_props.background.color
+      this.customise_foreground_color = this.site_props.foreground.color
+      this.site_nav = this.site_props.navigation
+      this.tab_colors.home = this.site_props.tab_colors.home
+      this.tab_colors.projects = this.site_props.tab_colors.projects
+      this.tab_colors.resume = this.site_props.tab_colors.resume
+      this.showNextStep()
+      this.temp_site_props = JSON.stringify(this.site_props)
+    } else {
+      this.setHomePages([
+        // { id: #, component: () => import(COMPONENT_PATH) }
+        { id: 1, page_num: 1, component: 'home_sections/home_type_1' },
+        { id: 2, page_num: 2, component: 'home_sections/home_type_4' }
+      ])
+      let inputDict = 'home_page_1_data'
+      this.updatePageData({
+        page_label: inputDict,
+        data: {
+          html: `
+            <p>
+              <span style="text-align: center; display: block">
+                <span class="display-1">Your Name Here</span>
               </span>
-            </span>
-          </p>
-          <p>
-            <span style="text-align: center; display: block">
-              <span class="caption">
-                Lorem ipsum dolor sit amet consectetur adipiscing elit.
+            </p>
+            <p>
+              <span style="text-align: center; display: block">
+                <span class="body-2">
+                  your@email.com - 08xxxxxxxx
+                </span>
               </span>
-            </span>
-          </p>
-          <p>
-            <span style="text-align: center; display: block">
-              <span class="caption">
-                Mollis montes nam hendrerit sollicitudin iaculis.
+            </p>
+            <p>
+              <span style="text-align: center; display: block">
+                <span class="body-1">
+                  Lorem ipsum dolor sit amet consectetur adipiscing elit.
+                </span>
               </span>
-            </span>
-          </p>
-        `,
-        img_props: {
-          url:
-            'https://images.unsplash.com/photo-1502791451862-7bd8c1df43a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=900&q=60',
-          contain: false
+            </p>
+            <p>
+              <span style="text-align: center; display: block">
+                <span class="body-1">
+                  Mollis montes nam hendrerit sollicitudin iaculis.
+                </span>
+              </span>
+            </p>
+          `,
+          img_props: {
+            url:
+              'https://images.unsplash.com/photo-1502791451862-7bd8c1df43a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=900&q=60',
+            contain: false,
+            link: true,
+            upload: false
+          }
         }
-      }
-    })
-    // inputDict = 'home_page_2_data'
-    // this.updatePageData({
-    //   page_label: inputDict,
-    //   data: {
-    //     html: `
-    //       <p>
-    //         Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis
-    //       </p>
-    //     `,
-    //     img_props_1: {
-    //       url:
-    //         'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1682&q=80',
-    //       contain: false
-    //     },
-    //     img_props_2: {
-    //       url:
-    //         'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1682&q=80',
-    //       contain: false
-    //     }
-    //   }
-    // })
-    inputDict = 'home_page_2_data'
-    this.updatePageData({
-      page_label: inputDict,
-      data: `
-        <p>
-          <span class="display-1">An Awesome Title</span>
-        </p>
-        <p>C'mon! Get Writing!</p>
-      `
-    })
-
-    this.setProjectsPages([
-      // { id: #, component: () => import(COMPONENT_PATH) }
-      { id: 1, page_num: 1, component: 'projects_sections/projects_type_1' },
-      { id: 2, page_num: 2, component: 'projects_sections/projects_type_2' }
-    ])
-    inputDict = 'projects_page_1_data'
-
-    this.updatePageData({
-      page_label: inputDict,
-      data: {
-        // projects: [
-        //   {
-        //     id: Date.now().toString(),
-        //     html: `
-        //       <p>
-        //         <span class="title">Project Title Here</span>
-        //       </p>
-        //       <p>
-        //         <span class="body-1">
-        //           Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.
-        //         </span>
-        //       </p>
-        //     `,
-        //     img_props: {
-        //       url:
-        //         'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1682&q=80',
-        //       contain: false
-        //     }
-        //   },
-        //   {
-        //     id: Date.now().toString() + 1,
-        //     html: `
-        //       <p>
-        //         <span class="title">Project Title Here</span>
-        //       </p>
-        //       <p>
-        //         <span class="body-1">
-        //           Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.
-        //         </span>
-        //       </p>
-        //     `,
-        //     img_props: {
-        //       url:
-        //         'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1682&q=80',
-        //       contain: false
-        //     }
-        //   }
-        // ]
-        html: `
-          <p>
-            <span style="text-align: center; display: block">
-              <span class="headline">My Projects</span>
-            </span>
-          </p>
-          <p>
-            <span style="text-align: center; display: block">
-              <span class="caption">
-                Below you will find a few of my featured projects I've worked on during my free time. The next page has a more comprehensive list of things I have worked on when I have the time to do so!
+      })
+      inputDict = 'home_page_2_data'
+      this.updatePageData({
+        page_label: inputDict,
+        data: {
+          html: `
+            <p>
+              <span style="text-align: center; display: block">
+                <span class="display-1">Your Call-To-Action</span>
               </span>
-            </span>
-          </p>
-        `,
-        projects: [
-          {
-            id: '0',
-            title: 'Project Title Here',
-            description:
-              'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
-            img: {
-              use: true,
-              url:
-                'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1682&q=80',
-              contain: false
-            },
-            link: {
-              use: true,
-              url: 'https://www.kreoh.com/',
-              link_text: 'Learn More...'
-            }
+            </p>
+            <p></p>
+            <p>
+              <span style="text-align: center; display: block">
+                <span class="body-1">Got an idea you believe in? Or maybe a cause you vouch for? Use this space to bring attention to it! Maybe its a website that lets users create their own websites... ;-)</span>
+              </span>
+            </p>
+          `,
+          img_props: {
+            url:
+              'https://images.unsplash.com/photo-1421790500381-fc9b5996f343?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=934&q=80',
+            contain: false,
+            link: true,
+            upload: false
           },
-          {
-            id: '1',
-            title: 'Project Title Here',
-            description:
-              'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
-            img: {
-              use: true,
-              url:
-                'https://images.unsplash.com/photo-1494959764136-6be9eb3c261e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80',
-              contain: false
-            },
-            link: {
-              use: false,
-              url: null,
-              link_text: null
-            }
+          button_props: {
+            text: 'Learn More',
+            color: '#2196F3',
+            text_color: 'white',
+            url: 'https://www.kreoh.com'
           }
-        ]
-      }
-    })
+        }
+      })
 
-    inputDict = 'projects_page_2_data'
+      this.setProjectsPages([
+        // { id: #, component: () => import(COMPONENT_PATH) }
+        { id: 1, page_num: 1, component: 'projects_sections/projects_type_1' },
+        { id: 2, page_num: 2, component: 'projects_sections/projects_type_2' }
+      ])
+      inputDict = 'projects_page_1_data'
 
-    this.setInputDictValues({
-      inputDict,
-      input_dict_values: {
-        projects: [
-          {
-            id: '0',
-            title: 'Project Title Here',
-            description:
-              'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
-            img: {
-              use: true,
-              url:
-                'https://images.unsplash.com/photo-1494959764136-6be9eb3c261e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80',
-              contain: false
+      this.updatePageData({
+        page_label: inputDict,
+        data: {
+          html: `
+            <p>
+              <span style="text-align: center; display: block">
+                <span class="body-2">
+                  Below you will find a few of my featured projects I've worked on during my free time. The next page has a more comprehensive list of things I have worked on when I have the time to do so!
+                </span>
+              </span>
+            </p>
+          `,
+          projects: [
+            {
+              id: '0',
+              title: 'Project Title Here',
+              description:
+                'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
+              img: {
+                use: true,
+                url:
+                  'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1682&q=80',
+                contain: false,
+                link: true,
+                upload: false
+              },
+              link: {
+                use: true,
+                url: 'https://www.kreoh.com/',
+                link_text: 'Learn More...'
+              }
             },
-            link: {
-              use: false,
-              url: null,
-              link_text: null
+            {
+              id: '1',
+              title: 'Project Title Here',
+              description:
+                'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
+              img: {
+                use: true,
+                url:
+                  'https://images.unsplash.com/photo-1494959764136-6be9eb3c261e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80',
+                contain: false,
+                link: true,
+                upload: false
+              },
+              link: {
+                use: false,
+                url: null,
+                link_text: null
+              }
             }
-          },
-          {
-            id: '1',
-            title: 'Project Title Here',
-            description:
-              'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
-            img: {
-              use: true,
-              url:
-                'https://images.unsplash.com/photo-1494959764136-6be9eb3c261e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80',
-              contain: false
+          ]
+        }
+      })
+
+      inputDict = 'projects_page_2_data'
+
+      this.setInputDictValues({
+        inputDict,
+        input_dict_values: {
+          projects: [
+            {
+              id: '0',
+              title: 'Project Title Here',
+              description:
+                'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
+              img: {
+                use: true,
+                url:
+                  'https://images.unsplash.com/photo-1494959764136-6be9eb3c261e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80',
+                contain: false,
+                link: true,
+                upload: false
+              },
+              link: {
+                use: false,
+                url: null,
+                link_text: null
+              }
             },
-            link: {
-              use: false,
-              url: null,
-              link_text: null
+            {
+              id: '1',
+              title: 'Project Title Here',
+              description:
+                'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.',
+              img: {
+                use: true,
+                url:
+                  'https://images.unsplash.com/photo-1494959764136-6be9eb3c261e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80',
+                contain: false,
+                link: true,
+                upload: false
+              },
+              link: {
+                use: false,
+                url: null,
+                link_text: null
+              }
             }
-          }
-        ]
-      }
-    })
+          ]
+        }
+      })
 
-    this.setResumePages([
-      // { id: #, component: () => import(COMPONENT_PATH) }
-      { id: 1, page_num: 1, component: 'resume_sections/resume_index' }
-    ])
+      this.setResumePages([
+        // { id: #, component: () => import(COMPONENT_PATH) }
+        { id: 1, page_num: 1, component: 'resume_sections/resume_index' }
+      ])
 
-    // SET RESUME NAME AND EMAIL INPUTS
-    this.setResumeSection({
-      section_type: 'info',
-      prop: 'name',
-      value:
-        this.$store.state.auth.user.f_name +
-        ' ' +
-        this.$store.state.auth.user.s_name
-    })
+      // SET RESUME NAME AND EMAIL INPUTS
+      this.setResumeSection({
+        section_type: 'info',
+        prop: 'name',
+        value:
+          this.$store.state.auth.user.f_name +
+          ' ' +
+          this.$store.state.auth.user.s_name
+      })
 
-    this.setResumeSection({
-      section_type: 'info',
-      prop: 'email',
-      value: this.$store.state.auth.user.email
-    })
+      this.setResumeSection({
+        section_type: 'info',
+        prop: 'email',
+        value: this.$store.state.auth.user.email
+      })
+    }
   },
   beforeDestroy() {
     this.editor.destroy()
-  },
-  head() {
-    return {
-      title: 'Creator - Kreoh'
-    }
   },
   methods: {
     ...mapMutations({
@@ -928,11 +905,16 @@ export default {
       setResumeSection: 'creator/setResumeSection',
       updatePageData: 'creator/updatePageData',
       updatePageDataObject: 'creator/updatePageDataObject',
-      updatePageHTML: 'creator/updatePageHTML'
+      updatePageHTML: 'creator/updatePageHTML',
+      startSaving: 'creator/startSaving'
     }),
     ...mapActions({
-      registerWebsite: 'creator/registerWebsite'
+      registerWebsite: 'creator/registerWebsite',
+      updateWebsite: 'creator/updateWebsite'
     }),
+    // test() {
+    //   console.log('testfdgafdasging')
+    // },
     selectLayout(e, index) {
       if (index === 0) {
         const layoutItemContainer = document.querySelector('.layout-selected')
@@ -1036,53 +1018,6 @@ export default {
         this.setNavColor('success')
       }
     },
-    updatePage(html) {
-      // Function to update the html state of a page of a website
-      // Takes a html string as an argument
-
-      // const inputDict =
-      //   this.activeNav + '_page_' + this.activeNav_index + '_inputs'
-      // if (e.data_struct && e.data_struct === 'Array') {
-      //   if (e.id) {
-      //     this.updateInputArrayValue({
-      //       inputDict,
-      //       input_type: e.type,
-      //       input_value: e.value,
-      //       update_type: e.update_type,
-      //       id: e.id
-      //     })
-      //   } else {
-      //     this.addInputArrayValue({
-      //       inputDict,
-      //       input_type: e.type,
-      //       input_value: e.value
-      //     })
-      //   }
-      // } else {
-      //   this.updateInputDictValue({
-      //     inputDict,
-      //     input_type: e.type,
-      //     input_value: e.value
-      //   })
-      // }
-      // eslint-disable-next-line prettier/prettier
-      const data = this.site_props[this.activeNav + '_page_' + this.activeNav_index + '_data']
-      if (typeof data === 'object' && data !== null) {
-        this.updatePageDataObject({
-          page_label:
-            this.activeNav + '_page_' + this.activeNav_index + '_data',
-          type: 'html',
-          data: html
-        })
-      } else {
-        this.updatePageData({
-          page_label:
-            this.activeNav + '_page_' + this.activeNav_index + '_data',
-          data: html
-        })
-      }
-      this.hideNextStep()
-    },
     gotoPage() {
       switch (this.customise_page_option) {
         case 1:
@@ -1124,21 +1059,23 @@ export default {
       this.tab_colors.projects = '#FFFFFF'
       this.tab_colors.resume = '#FFFFFF'
     },
-    addPage() {
+    addNewPage() {
       switch (this.customise_page_option) {
         case 1:
-          if (this.site_props.homePages.length === 3) {
+          if (this.site_props.homePages.length === 2) {
             this.show_page_add_error = true
           } else {
-            this.addPage('homePages', {
-              id: this.site_props.homePages.length + 1,
-              layout: Number(
-                this.site_props.layout[this.site_props.layout.length - 1]
-              ),
-              component: 'home_sections/home_type_3'
+            this.addPage({
+              tab: 'homePages',
+              page: {
+                id: 2,
+                layout: Number(
+                  this.site_props.layout[this.site_props.layout.length - 1]
+                ),
+                component: 'home_sections/home_type_4'
+              }
             })
-            this.activeNav_index = 3
-            this.customise_page_option_number = 3
+            this.activeNav_index = 2
             this.show_page_add_success = true
           }
           break
@@ -1147,32 +1084,17 @@ export default {
           if (this.site_props.projectsPages.length === 3) {
             this.show_page_add_error = true
           } else {
-            this.addPage('projectsPages', {
-              id: this.site_props.projectsPages.length + 1,
-              layout: Number(
-                this.site_props.layout[this.site_props.layout.length - 1]
-              ),
-              component: 'home_sections/home_type_3'
+            this.addPage({
+              tab: 'projectsPages',
+              page: {
+                id: this.site_props.projectsPages.length + 1,
+                layout: Number(
+                  this.site_props.layout[this.site_props.layout.length - 1]
+                ),
+                component: 'home_sections/projects_type_2'
+              }
             })
-            this.activeNav_index = 3
-            this.customise_page_option_number = 3
-            this.show_page_add_success = true
-          }
-          break
-
-        case 3:
-          if (this.site_props.resumePages.length === 3) {
-            this.show_page_add_error = true
-          } else {
-            this.addPage('resumePages', {
-              id: this.site_props.resumePages.length + 1,
-              layout: Number(
-                this.site_props.layout[this.site_props.layout.length - 1]
-              ),
-              component: 'home_sections/home_type_4'
-            })
-            this.activeNav_index = 3
-            this.customise_page_option_number = 3
+            this.activeNav_index = this.site_props.projectsPages.length + 1
             this.show_page_add_success = true
           }
           break
@@ -1194,9 +1116,13 @@ export default {
       }
     },
     registerSite() {
-      if (this.$refs.creator_site_name_form.validate()) {
+      if (this.$refs.editor_site_name_form.validate()) {
         this.validating = true
-        this.registerWebsite(this.site_props)
+        if (!this.user.site_created) {
+          this.registerWebsite(this.site_props)
+        } else {
+          this.updateWebsite(this.site_props)
+        }
       }
     },
     showLinkMenu(attrs) {
@@ -1246,6 +1172,11 @@ export default {
         default:
           break
       }
+    }
+  },
+  head() {
+    return {
+      title: this.user.site_created ? 'Editor - Kreoh' : 'Creator - Kreoh'
     }
   }
 }
@@ -1432,7 +1363,6 @@ export default {
                     <p class="align-self-center">Colors</p>
                     <v-color-picker
                       v-model="navigation_color"
-                      mode="hex"
                       hide-inputs
                       class="preview-color-pick"
                       @input="hideNextStep()"
@@ -1490,7 +1420,6 @@ export default {
                       <v-color-picker
                         v-model="tab_colors.home"
                         :disabled="site_props.selected_theme !== null"
-                        mode="hex"
                         hide-inputs
                         class="preview-color-pick align-self-center"
                         @input="hideNextStep()"
@@ -1532,7 +1461,6 @@ export default {
                       <v-color-picker
                         v-model="tab_colors.projects"
                         :disabled="site_props.selected_theme !== null"
-                        mode="hex"
                         hide-inputs
                         class="preview-color-pick align-self-center"
                         @input="hideNextStep()"
@@ -1574,7 +1502,6 @@ export default {
                       <v-color-picker
                         v-model="tab_colors.resume"
                         :disabled="site_props.selected_theme !== null"
-                        mode="hex"
                         hide-inputs
                         class="preview-color-pick align-self-center"
                         @input="hideNextStep()"
@@ -1691,7 +1618,6 @@ export default {
                       <v-color-picker
                         v-model="customise_background_color"
                         hide-inputs
-                        mode="hex"
                         show-swatches
                         class="preview-color-pick"
                         @change="hideNextStep()"
@@ -1714,7 +1640,6 @@ export default {
                       <v-color-picker
                         v-model="customise_foreground_color"
                         hide-inputs
-                        mode="hex"
                         show-swatches
                         class="preview-color-pick"
                         @change="hideNextStep()"
@@ -1737,7 +1662,6 @@ export default {
                         <v-color-picker
                           v-model="text_border_color_value"
                           hide-inputs
-                          mode="hex"
                           show-swatches
                           class="preview-color-pick"
                           @change="hideNextStep()"
@@ -1815,7 +1739,7 @@ export default {
                         </v-slide-item>
                       </v-slide-group>
                     </v-sheet>
-                    <v-flex class="d-flex justify-center align-center">
+                    <v-flex class="d-flex justify-center align-center mt-3">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
                           <v-btn
@@ -1839,7 +1763,7 @@ export default {
                               activeNav === 'resume' ||
                                 site_props.homePages.length === 2
                             "
-                            @click.stop="addPage()"
+                            @click.stop="addNewPage()"
                             v-on="on"
                           >
                             <v-icon>mdi-plus</v-icon>
@@ -1854,7 +1778,7 @@ export default {
             </v-expansion-panels>
           </v-row>
           <v-flex
-            class="save-btn-container d-flex justify-center align-center mt-3"
+            class="save-btn-container d-flex justify-center align-center my-2"
           >
             <v-tooltip bottom>
               <template v-slot:activator="{ on }">
@@ -2335,7 +2259,7 @@ export default {
                   :loading="validating"
                   :disabled="validating"
                   color="info"
-                  @click="updateSite()"
+                  @click="registerSite()"
                 >
                   Submit
                 </v-btn>
@@ -2439,6 +2363,9 @@ export default {
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-snackbar>
+    <v-snackbar v-model="saving" color="info" :timeout="0" top>
+      Saving text...
+    </v-snackbar>
     <transition
       enter-active-class="animated fadeIn faster"
       leave-active-class="animated fadeOut faster"
@@ -2446,8 +2373,8 @@ export default {
     >
       <v-toolbar v-show="is_editing" class="editor-toolbar">
         <editor-menu-bar
-          :editor="editor"
           v-slot="{ commands, isActive, getMarkAttrs }"
+          :editor="editor"
         >
           <div
             class="d-flex justify-space-between align-center edit-items-container"
@@ -2457,11 +2384,11 @@ export default {
             </v-btn>
             <v-divider vertical></v-divider>
             <v-overflow-btn
+              v-model="editor_font_size"
               :items="font_size_classes"
               label="Select size"
               class="font-size-btn"
               hide-details
-              v-model="editor_font_size"
               overflow
               @change="commands.font_size({ class: $event })"
             ></v-overflow-btn>
@@ -2602,14 +2529,14 @@ export default {
                   <v-container>
                     <v-sheet>
                       <v-text-field
+                        ref="linkInput"
                         v-model="linkUrl"
                         dense
                         placeholder="https://"
-                        ref="linkInput"
+                        clearable
                         prepend-inner-icon="mdi-link"
                         @keydown.esc="hideLinkMenu"
                         @keydown.enter="setLinkUrl(commands.link, linkUrl)"
-                        clearable
                       ></v-text-field>
                     </v-sheet>
                   </v-container>

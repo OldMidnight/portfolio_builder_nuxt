@@ -1,11 +1,11 @@
 {
   "name": "kreoh_client",
   "version": "1.0.0",
-  "description": "Nuxtjs client for kreoh.com",
+  "description": "Kreoh.com is an online website and resume hosting platform, allowing users to customise and deploy a website from a selection of kreoh templates. Display your work, host your resume and give yourself an advantage in a competitive job market. Kreoh websites give you everything you will need for a simple, easy and ready-to-go website in minutes.",
   "author": "Fareed Idris",
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_ENV=development nodemon server/index.js --watch server",
+    "dev": "cross-env NUXT_HOST=0.0.0.0 NODE_ENV=development nodemon server/index.js --watch server",
     "build": "nuxt build",
     "start": "cross-env NODE_ENV=production node server/index.js",
     "generate": "nuxt generate",

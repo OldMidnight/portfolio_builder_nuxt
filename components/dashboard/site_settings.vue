@@ -6,11 +6,11 @@ export default {
     BarChart: () => import('@/components/dashboard/charts/bar_chart')
   },
   props: {
-    site_available: {
+    siteAvailable: {
       type: Boolean,
       default: false
     },
-    site_parked: {
+    siteParked: {
       type: Boolean,
       default: false
     }
@@ -109,6 +109,7 @@ export default {
         ]
       }
     })
+    console.log(this.hourly_stats_labels)
     this.$axios.$get('/stats/fetch_monthly').then((response) => {
       this.monthly_stats_data = response.values
       this.monthly_stats_labels = response.labels
@@ -157,7 +158,6 @@ export default {
       const validation = await this.$axios
         .get(this.favicon_url)
         .then((response) => {
-          console.log(response.config)
           if (
             response.headers['content-type'] === 'image/vnd.microsoft.icon' ||
             response.headers['content-type'] === 'image/x-icon'
@@ -460,10 +460,10 @@ export default {
             </p>
             <div class="function-parking-actions">
               <v-switch
-                v-model="site_parked"
-                :label="site_parked ? 'Parked' : 'Not Parked'"
+                v-model="siteParked"
+                :label="siteParked ? 'Parked' : 'Not Parked'"
                 inset
-                :disabled="!site_available"
+                :disabled="!siteAvailable"
                 @change="activateSite()"
               ></v-switch>
             </div>

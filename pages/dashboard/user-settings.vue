@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: 'user_settings',
+  name: 'UserSettings',
   layout: 'dashboard_layout',
   data() {
     return {

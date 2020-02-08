@@ -2,6 +2,7 @@ export const state = () => ({
   status: {
     loggedIn: false
   },
+  refresh_token: null,
   user: null
 })
 
@@ -15,6 +16,9 @@ export const actions = {
           email,
           password
         }
+      })
+      .then(() => {
+        this.$router.push({ path: '/dashboard' })
       })
       .catch((error) => {
         commit('loginFailure', error)
@@ -38,7 +42,7 @@ export const actions = {
             }
           })
           .then(() => {
-            this.$router.push({ path: '/dashboard' })
+            this.$router.push({ path: '/creator' })
           })
           .catch((error) => {
             commit('loginFailure', error)
@@ -51,6 +55,9 @@ export const actions = {
 }
 
 export const mutations = {
+  setRefreshToken(state, payload) {
+    state.refresh_token = payload.refresh_token
+  },
   loginRequest(state, user) {
     state.status = { loggingIn: true }
     state.user = user

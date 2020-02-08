@@ -1,7 +1,7 @@
 <script>
-import { mapMutations, mapState, mapActions } from 'vuex'
+import { mapMutations, mapActions } from 'vuex'
 export default {
-  name: 'siteSettings',
+  name: 'SiteSettings',
   layout: 'dashboard_layout',
   components: {
     LineChart: () => import('@/components/dashboard/charts/line_chart'),
@@ -9,27 +9,58 @@ export default {
   },
   data() {
     return {
-      weekly_data_collection: null,
       weekly_chart: 'line',
-      hourly_data_collection: null,
       hourly_chart: 'line',
-      monthly_data_collection: null,
       monthly_chart: 'line',
       favicon_dialog_link: false,
       favicon_url: null,
       validated_favicon_url: null,
       favicon_url_error: false,
       favicon_dialog_upload: false,
-      favicon_file: null
+      favicon_file: null,
+      show_email_dialog: false
     }
   },
   computed: {
-    ...mapState({
-      hourly_stats: (state) => state.dashboard.stats.hourly,
-      weekly_stats: (state) => state.dashboard.stats.weekly,
-      monthly_stats: (state) => state.dashboard.stats.monthly,
-      site_props: (state) => state.creator.site_props
-    }),
+    hourly_stats() {
+      return {
+        labels: this.$store.state.dashboard.stats.hourly.labels,
+        datasets: [
+          {
+            label: 'Visitors By Hour',
+            backgroundColor: '#BBDEFB',
+            data: this.$store.state.dashboard.stats.hourly.data
+          }
+        ]
+      }
+    },
+    weekly_stats() {
+      return {
+        labels: this.$store.state.dashboard.stats.weekly.labels,
+        datasets: [
+          {
+            label: 'Visitors By Day',
+            backgroundColor: '#BBDEFB',
+            data: this.$store.state.dashboard.stats.weekly.data
+          }
+        ]
+      }
+    },
+    monthly_stats() {
+      return {
+        labels: this.$store.state.dashboard.stats.monthly.labels,
+        datasets: [
+          {
+            label: 'Visitors By Month',
+            backgroundColor: '#BBDEFB',
+            data: this.$store.state.dashboard.stats.monthly.data
+          }
+        ]
+      }
+    },
+    site_props() {
+      return this.$store.state.creator.site_props
+    },
     user() {
       return this.$store.state.auth.user
     },
@@ -43,57 +74,15 @@ export default {
       }
     }
   },
-  mounted() {
-    this.updateWeeklyStats().then(() => {
-      this.weekly_data_collection = {
-        labels: this.weekly_stats_labels,
-        datasets: [
-          {
-            label: 'Visitors By Day',
-            backgroundColor: '#BBDEFB',
-            data: this.weekly_stats.data
-          }
-        ]
-      }
-    })
-    this.updateHourlyStats().then(() => {
-      this.hourly_data_collection = {
-        labels: this.hourly_stats_labels,
-        datasets: [
-          {
-            label: 'Visitors By Hour',
-            backgroundColor: '#BBDEFB',
-            data: this.hourly_stats.data
-          }
-        ]
-      }
-    })
-    this.updateMonthlyStats().then(() => {
-      this.monthly_data_collection = {
-        labels: this.monthly_stats_labels,
-        datasets: [
-          {
-            label: 'Visitors By Month',
-            backgroundColor: '#BBDEFB',
-            data: this.monthly_stats.data
-          }
-        ]
-      }
-    })
-  },
-  head() {
-    return {
-      title: 'Site Settings - Kreoh'
-    }
+  created() {
+    this.updateStats()
   },
   methods: {
     ...mapMutations({
       setFavicon: 'creator/setFavicon'
     }),
     ...mapActions({
-      updateHourlyStats: 'dashboard/updateHourlyStats',
-      updateWeeklyStats: 'dashboard/updateWeeklyStats',
-      updateMonthlyStats: 'dashboard/updateMonthlyStats'
+      updateStats: 'dashboard/updateStats'
     }),
     validateFavicon() {
       this.getValidatedFavicon().then((result) => {
@@ -121,7 +110,6 @@ export default {
       const validation = await this.$axios
         .get(this.favicon_url)
         .then((response) => {
-          console.log(response.config)
           if (
             response.headers['content-type'] === 'image/vnd.microsoft.icon' ||
             response.headers['content-type'] === 'image/x-icon'
@@ -139,11 +127,16 @@ export default {
         })
       return validation
     },
-    activateSite() {
-      this.$axios.$post('/helper/site_config/site_activation')
-    },
-    flip(section) {
-      this.$emit('flip', section)
+    async activateSite() {
+      if (this.user.email_confirmed) {
+        await this.$axios
+          .$post('/helper/site_config/site_activation')
+          .then(() => {
+            window.location.reload()
+          })
+      } else {
+        this.show_email_dialog = true
+      }
     },
     scrollTo(id) {
       const el = document.getElementById(id)
@@ -152,7 +145,7 @@ export default {
     async uploadFavicon() {
       const formData = new FormData()
       formData.append('favicon', this.favicon_file)
-      const url = 'uploads/favicon/set'
+      const url = 'uploads/images/' + this.user.domain + '/favicon.ico'
       const config = {
         headers: {
           'content-type': 'multipart/form-data'
@@ -169,16 +162,23 @@ export default {
           use: true,
           link:
             this.$axios.defaults.baseURL +
-            'uploads/favicon/' +
-            this.user.id +
-            '_' +
+            'uploads/images/' +
             this.user.domain +
-            '_' +
-            this.favicon_file.name
+            '/favicon.ico'
         })
         this.updateWebsite(this.site_props)
         this.favicon_file = null
       })
+    },
+    resendVerification() {
+      this.$axios.$post('/u/email_verify').then(() => {
+        this.activation_resent = true
+      })
+    }
+  },
+  head() {
+    return {
+      title: 'Site Settings - Kreoh'
     }
   }
 }
@@ -241,12 +241,12 @@ export default {
               <v-sheet>
                 <LineChart
                   v-if="hourly_chart === 'line'"
-                  :chartData="hourly_data_collection"
+                  :chart-data="hourly_stats"
                   height="100"
                 ></LineChart>
                 <BarChart
                   v-if="hourly_chart === 'bar'"
-                  :chartData="hourly_data_collection"
+                  :chart-data="hourly_stats"
                   height="100"
                 ></BarChart>
               </v-sheet>
@@ -282,12 +282,12 @@ export default {
               <v-sheet>
                 <LineChart
                   v-if="weekly_chart === 'line'"
-                  :chartData="weekly_data_collection"
+                  :chart-data="weekly_stats"
                   height="100"
                 ></LineChart>
                 <BarChart
                   v-if="weekly_chart === 'bar'"
-                  :chartData="weekly_data_collection"
+                  :chart-data="weekly_stats"
                   height="100"
                 ></BarChart>
               </v-sheet>
@@ -323,12 +323,12 @@ export default {
               <v-sheet>
                 <LineChart
                   v-if="monthly_chart === 'line'"
-                  :chartData="monthly_data_collection"
+                  :chart-data="monthly_stats"
                   height="100"
                 ></LineChart>
                 <BarChart
                   v-if="monthly_chart === 'bar'"
-                  :chartData="monthly_data_collection"
+                  :chart-data="monthly_stats"
                   height="100"
                 ></BarChart>
               </v-sheet>
@@ -374,7 +374,7 @@ export default {
             >
               <div class="icon-btns mr-5">
                 <v-btn
-                  :disabled="user.account_type === 'test'"
+                  :disabled="!user.email_confirmed"
                   color="info"
                   rounded
                   @click="favicon_dialog_upload = true"
@@ -424,8 +424,8 @@ export default {
             </p>
             <div class="function-parking-actions">
               <v-switch
-                v-model="user.site_active"
-                :label="user.site_active ? 'Not Parked' : 'Parked'"
+                :label="user.site_active ? 'Active' : 'Parked'"
+                :input-value="user.site_active"
                 inset
                 :disabled="!user.site_created"
                 @change="activateSite()"
@@ -527,6 +527,13 @@ export default {
     <v-snackbar v-model="favicon_url_error" color="error">
       Error: Inavlid URL!
       <v-btn icon @click="favicon_url_error = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
+    <v-snackbar v-model="show_email_dialog" color="warning" :timeout="10000">
+      Verify your email to activate your website.
+      <v-btn color="success" @click="resendVerification()">Resend Link</v-btn>
+      <v-btn icon @click="show_email_dialog = false">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-snackbar>

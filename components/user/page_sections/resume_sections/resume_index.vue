@@ -618,8 +618,8 @@ export default {
               class="d-flex wizard-btns px-7"
             >
               <v-btn
-                :disabled="transitioning"
                 v-if="resume_wizard_step <= wizard_layout_list.length + 2"
+                :disabled="transitioning"
                 color="info"
                 class="mx-1"
                 @click="

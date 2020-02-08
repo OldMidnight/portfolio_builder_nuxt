@@ -1,12 +1,6 @@
 <script>
 import { mapMutations } from 'vuex'
 export default {
-  props: {
-    live: {
-      required: true,
-      default: false
-    }
-  },
   data() {
     return {
       edit_social_bar_dialog: false,
@@ -146,7 +140,7 @@ export default {
         <v-card-text>
           <v-container>
             <span>Edit the buttons available</span>
-            <v-item-group multiple mandatory v-model="selected_social_btns">
+            <v-item-group v-model="selected_social_btns" multiple mandatory>
               <v-form
                 ref="social_btns_form"
                 class="social-bar-dialog--btn-options d-flex flex-wrap"

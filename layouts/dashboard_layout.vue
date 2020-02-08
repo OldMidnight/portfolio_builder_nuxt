@@ -1,18 +1,18 @@
 <script>
 export default {
-  name: 'dashboardLayout',
-  data() {
-    return {
-      links: ['Home', 'About Us', 'Team', 'Services', 'Blog', 'Contact Us'],
-      site_screenshot: ''
-    }
-  },
+  name: 'DashboardLayout',
   fetch({ store, $axios }) {
     return $axios.$get('/helper/auth_site_config').then((response) => {
       if (!response.site_not_created) {
         store.commit('creator/setSiteProps', response.site_config)
       }
     })
+  },
+  data() {
+    return {
+      links: ['Home', 'About Us', 'Team', 'Services', 'Blog', 'Contact Us'],
+      site_screenshot: ''
+    }
   },
   created() {
     this.$auth.fetchUser()
@@ -37,9 +37,7 @@ export default {
           class="dashboard-topnav elevation-3 px-5 d-flex topnav--neumorph"
         >
           <div class="logo-container d-flex align-center">
-            <nuxt-link to="/" class="logo font-weight-bold info--text">
-              Kreoh
-            </nuxt-link>
+            <v-img class="logo" src="/Logo_beta_text.png"></v-img>
           </div>
           <div class="links-container d-flex align-center justify-end">
             <v-text-field
@@ -66,17 +64,10 @@ export default {
         <v-layout
           class="dashboard-content-wrapper d-flex flex-column align-center justify-center"
         >
-          <!-- <transition
-            name="dashboard"
-            enter-active-class="animated fadeInUp"
-            leave-active-class="animated fadeOutDown"
-            mode="out-in"
-          > -->
           <nuxt
             id="dashboard"
             class="elevation-15 dashboard--border mt-0 mb-9"
           />
-          <!-- </transition> -->
           <div
             class="dashboard--footer-container d-flex flex-column justify-end"
           >
@@ -157,13 +148,20 @@ export default {
 }
 
 .logo-container {
+  position: relative;
   width: 60%;
   height: 100%;
-  span {
-    color: #0066ff;
-    text-align: center;
-    font-size: 32px;
-  }
+  padding-left: 2%;
+  // span {
+  //   color: #0066ff;
+  //   text-align: center;
+  //   font-size: 32px;
+  // }
+}
+
+.logo {
+  position: absolute;
+  width: 13%;
 }
 
 .links-container {

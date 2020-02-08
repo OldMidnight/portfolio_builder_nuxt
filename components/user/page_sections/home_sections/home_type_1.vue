@@ -44,13 +44,23 @@ export default {
       img_contain: false,
       edit_img_tooltip: false,
       validated_img_url: '',
-      name_model: this.name,
-      tagline_model: this.tagline
+      link_image: false,
+      upload_image: false,
+      upload_rules: [
+        (value) =>
+          !value ||
+          value.size < 2000000 ||
+          'Avatar size should be less than 2 MB!'
+      ],
+      upload_file: null
     }
   },
   computed: {
     site_props() {
       return this.$store.state.creator.site_props
+    },
+    user() {
+      return this.$store.state.auth.user
     },
     check_color_style() {
       if (
@@ -99,6 +109,24 @@ export default {
         // eslint-disable-next-line prettier/prettier
         this.img_contain = this.img_props.contain
       }
+    },
+    link_image(value) {
+      if (value && this.upload_image) {
+        this.upload_image = false
+        this.validated_img_url = this.img_props.url
+      } else if (!value && !this.upload_image) {
+        this.upload_image = true
+        // this.validated_img_url = this.img_props.url
+      }
+    },
+    upload_image(value) {
+      if (value && this.link_image) {
+        this.link_image = false
+        this.validated_img_url = ''
+      } else if (!value && !this.link_image) {
+        this.link_image = true
+        this.validated_img_url = this.img_props.url
+      }
     }
   },
   mounted() {
@@ -108,6 +136,8 @@ export default {
     this.img_url = this.img_props.url
     this.validated_img_url = this.img_props.url
     this.img_contain = this.img_props.contain
+    this.link_image = this.img_props.link
+    this.upload_image = this.img_props.upload
   },
   methods: {
     ...mapMutations({
@@ -133,15 +163,74 @@ export default {
         })
       return validation
     },
-    updateImgURL() {
-      this.updatePageImg({
-        page_label: this.options.input_dict_name,
-        img_props: 'img_props',
-        data: {
-          url: this.validated_img_url,
-          contain: this.img_contain
+    async updateImgURL() {
+      if (
+        !this.img_props.link &&
+        this.img_props.url !== this.validated_img_url
+      ) {
+        this.$axios.$post(
+          '/uploads/images/' + this.options.input_dict_name + '/delete'
+        )
+      }
+      if (this.upload_image) {
+        const formData = new FormData()
+        formData.append('image', this.upload_file)
+        const url =
+          'uploads/images/' +
+          this.user.domain +
+          '/' +
+          this.options.input_dict_name
+        const config = {
+          headers: {
+            'content-type': 'multipart/form-data'
+          }
         }
-      })
+        await this.$axios({
+          method: 'post',
+          url,
+          data: formData,
+          config
+        }).then(() => {
+          this.img_dialog = false
+          this.validated_img_url =
+            this.$axios.defaults.baseURL +
+            'uploads/images/' +
+            this.user.domain +
+            '/' +
+            this.options.input_dict_name
+          this.updatePageImg({
+            page_label: this.options.input_dict_name,
+            img_props: 'img_props',
+            data: {
+              url: this.validated_img_url,
+              contain: this.img_contain,
+              link: this.link_image,
+              upload: this.upload_image
+            }
+          })
+          this.upload_file = null
+        })
+      } else {
+        this.updatePageImg({
+          page_label: this.options.input_dict_name,
+          img_props: 'img_props',
+          data: {
+            url: this.validated_img_url,
+            contain: this.img_contain,
+            link: this.link_image,
+            upload: this.upload_image
+          }
+        })
+        this.upload_file = null
+        this.img_dialog = false
+      }
+    },
+    previewUpload(e) {
+      const reader = new FileReader()
+      reader.onload = () => {
+        this.validated_img_url = reader.result
+      }
+      reader.readAsDataURL(e)
     }
   }
 }
@@ -162,11 +251,7 @@ export default {
           <v-avatar :size="avatar_size">
             <v-img
               alt="User Profile Picture"
-              :src="
-                !options.preview
-                  ? img_props.url
-                  : 'https://images.unsplash.com/photo-1542103749-8ef59b94f47e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80   '
-              "
+              :src="img_props.url"
               :class="{
                 'user-hero-image-border':
                   site_props.selected_theme === 3 && !options.preview,
@@ -177,13 +262,13 @@ export default {
               }"
               class="user-hero-image elevation-2"
               :contain="img_props.contain"
+              lazy-src="/img_lazy.jpeg"
+              v-on="on"
               @click.stop="
                 !options.preview && !options.live
                   ? (img_dialog = true)
                   : (img_dialog = false)
               "
-              lazy-src="/img_lazy.jpeg"
-              v-on="on"
               @mouseover="edit_img_tooltip = !options.preview && !options.live"
               @mouseout="edit_img_tooltip = false"
             >
@@ -208,18 +293,54 @@ export default {
         <v-card-title>Edit Image</v-card-title>
         <v-card-text>
           <v-container>
-            <span class="caption">Insert the url to your image</span>
-            <v-text-field
-              v-model="img_url"
-              label="Image URL..."
-              outlined
-              @input="validateURL()"
-            >
-            </v-text-field>
+            <v-switch v-model="link_image" inset label="Link Image"></v-switch>
+            <div v-if="link_image">
+              <span class="caption">Insert the url to your image</span>
+              <v-text-field
+                v-model="img_url"
+                label="Image URL..."
+                outlined
+                @input="validateURL()"
+              >
+              </v-text-field>
+            </div>
+            <v-switch
+              v-model="upload_image"
+              inset
+              label="Upload Image"
+            ></v-switch>
+            <div v-if="upload_image">
+              <!-- <span class="caption">Insert the url to your image</span> -->
+              <v-file-input
+                v-model="upload_file"
+                :rules="upload_rules"
+                :show-size="1000"
+                color="info"
+                counter
+                chips
+                accept="image/*"
+                label="Click to upload an image"
+                prepend-icon="mdi-image"
+                outlined
+                @change="previewUpload($event)"
+              >
+                <template v-slot:selection="{ index, text }">
+                  <v-chip
+                    v-if="index < 2"
+                    color="deep-purple accent-4"
+                    dark
+                    label
+                  >
+                    {{ text }}
+                  </v-chip>
+                </template>
+              </v-file-input>
+            </div>
             <v-layout column justify-center align-center>
               <span>Preview</span>
               <v-flex class="img-preview-container">
                 <v-img
+                  id="img-preview"
                   :src="validated_img_url"
                   class="img-preview elevation-2"
                   :contain="img_contain"
@@ -249,20 +370,15 @@ export default {
             </v-switch>
           </v-container>
         </v-card-text>
+        <v-divider></v-divider>
         <v-card-actions>
           <v-flex>
-            <v-btn color="blue darken-1" text @click="img_dialog = false"
+            <v-btn color="blue darken-1" @click="img_dialog = false"
               >Close</v-btn
             >
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="
-                img_dialog = false
-                updateImgURL()
-              "
-              >Save</v-btn
-            >
+            <v-btn color="success" @click="updateImgURL()">
+              Save
+            </v-btn>
           </v-flex>
         </v-card-actions>
       </v-card>
