@@ -87,10 +87,10 @@ export default {
     </v-flex>
     <v-flex class="d-flex flex-column project-content-container my-3 pa-2">
       <v-flex class="d-flex flex-column project-content">
-        <p class="project-title headline">
+        <p class="project-title title">
           {{ title }}
         </p>
-        <p class="body-2 project-desc pt-3 mb-2">
+        <p class="body-1 project-desc pt-3 mb-2 text-center">
           {{ description }}
         </p>
         <v-divider v-if="link.use"></v-divider>
@@ -99,19 +99,12 @@ export default {
         </a>
       </v-flex>
     </v-flex>
-    <v-tooltip bottom>
-      <template v-slot:activator="{ on }">
-        <v-icon
-          class="edit-icon mt-4 ml-3 pa-1"
-          :color="site_props.selected_theme === 3 ? '#00E676' : 'warning'"
-          @click.stop="editProject()"
-          v-on="on"
-        >
-          mdi-pencil
-        </v-icon>
-      </template>
-      <span>Edit</span>
-    </v-tooltip>
+    <v-btn class="px-3" color="info" @click.stop="editProject()">
+      <v-icon class="pr-3">
+        mdi-pencil
+      </v-icon>
+      Edit
+    </v-btn>
   </v-layout>
 </template>
 
@@ -120,7 +113,7 @@ export default {
   position: absolute;
   right: 2%;
   border: 1px solid;
-  opacity: 0.4;
+  // opacity: 0.4;
   border-radius: 50%;
   cursor: pointer;
 }
@@ -189,12 +182,5 @@ export default {
   height: 200px;
   width: 200px;
   background-color: rgba(0, 0, 0, 0.465);
-}
-
-.editable:hover {
-  background-color: #bdbdbd;
-  opacity: 0.2;
-  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-  cursor: pointer;
 }
 </style>

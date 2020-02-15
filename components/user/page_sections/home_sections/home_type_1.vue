@@ -116,7 +116,6 @@ export default {
         this.validated_img_url = this.img_props.url
       } else if (!value && !this.upload_image) {
         this.upload_image = true
-        // this.validated_img_url = this.img_props.url
       }
     },
     upload_image(value) {
@@ -141,7 +140,8 @@ export default {
   },
   methods: {
     ...mapMutations({
-      updatePageImg: 'creator/updatePageImg'
+      updatePageImg: 'creator/updatePageImg',
+      addImageToUpload: 'creator/addImageToUpload'
     }),
     validateURL() {
       this.getValidatedURL().then((result) => {
@@ -163,15 +163,13 @@ export default {
         })
       return validation
     },
-    async updateImgURL() {
-      if (
-        !this.img_props.link &&
-        this.img_props.url !== this.validated_img_url
-      ) {
-        this.$axios.$post(
-          '/uploads/images/' + this.options.input_dict_name + '/delete'
-        )
-      }
+    updateImgURL() {
+      // if (
+      //   !this.img_props.link &&
+      //   this.img_props.url !== this.validated_img_url
+      // ) {
+      //   this.$axios.$delete('/uploads/images/' + this.options.input_dict_name)
+      // }
       if (this.upload_image) {
         const formData = new FormData()
         formData.append('image', this.upload_file)
@@ -180,36 +178,39 @@ export default {
           this.user.domain +
           '/' +
           this.options.input_dict_name
-        const config = {
-          headers: {
-            'content-type': 'multipart/form-data'
+        this.updatePageImg({
+          page_label: this.options.input_dict_name,
+          img_props: 'img_props',
+          data: {
+            url: this.validated_img_url,
+            contain: this.img_contain,
+            link: this.link_image,
+            upload: this.upload_image
           }
-        }
-        await this.$axios({
-          method: 'post',
-          url,
-          data: formData,
-          config
-        }).then(() => {
-          this.img_dialog = false
-          this.validated_img_url =
-            this.$axios.defaults.baseURL +
-            'uploads/images/' +
-            this.user.domain +
-            '/' +
-            this.options.input_dict_name
-          this.updatePageImg({
-            page_label: this.options.input_dict_name,
-            img_props: 'img_props',
-            data: {
-              url: this.validated_img_url,
-              contain: this.img_contain,
-              link: this.link_image,
-              upload: this.upload_image
-            }
-          })
-          this.upload_file = null
         })
+        this.addImageToUpload({
+          img_data: {
+            page_img_props: {
+              page_label: this.options.input_dict_name,
+              img_props: 'img_props',
+              data: {
+                url:
+                  this.$axios.defaults.baseURL +
+                  'uploads/images/' +
+                  this.user.domain +
+                  '/' +
+                  this.options.input_dict_name,
+                contain: this.img_contain,
+                link: this.link_image,
+                upload: this.upload_image
+              }
+            },
+            upload_form_data: formData,
+            url
+          }
+        })
+        this.upload_file = null
+        this.img_dialog = false
       } else {
         this.updatePageImg({
           page_label: this.options.input_dict_name,
@@ -257,25 +258,20 @@ export default {
                   site_props.selected_theme === 3 && !options.preview,
                 'has-border':
                   site_props.text_border_color &&
-                  site_props.selected_theme === null,
-                editable: !options.preview && !options.live
+                  site_props.selected_theme === null
               }"
-              class="user-hero-image elevation-2"
+              class="user-hero-image elevation-2 editable"
               :contain="img_props.contain"
               lazy-src="/img_lazy.jpeg"
               v-on="on"
-              @click.stop="
-                !options.preview && !options.live
-                  ? (img_dialog = true)
-                  : (img_dialog = false)
-              "
-              @mouseover="edit_img_tooltip = !options.preview && !options.live"
+              @click.stop="img_dialog = true"
+              @mouseover="edit_img_tooltip = true"
               @mouseout="edit_img_tooltip = false"
             >
             </v-img>
           </v-avatar>
         </template>
-        <span v-if="!options.preview && !options.live">Insert Image</span>
+        <span>Insert Image</span>
       </v-tooltip>
       <!-- </v-flex> -->
     </div>
@@ -286,11 +282,12 @@ export default {
       >
         <editor-content :editor="editor" />
       </div>
-      <SocialBar1 :live="options.live" />
+      <SocialBar1 />
     </div>
     <v-dialog v-model="img_dialog" width="500">
       <v-card>
         <v-card-title>Edit Image</v-card-title>
+        <v-divider></v-divider>
         <v-card-text>
           <v-container>
             <v-switch v-model="link_image" inset label="Link Image"></v-switch>
@@ -373,9 +370,9 @@ export default {
         <v-divider></v-divider>
         <v-card-actions>
           <v-flex>
-            <v-btn color="blue darken-1" @click="img_dialog = false"
-              >Close</v-btn
-            >
+            <v-btn color="error" @click="img_dialog = false">
+              Close
+            </v-btn>
             <v-btn color="success" @click="updateImgURL()">
               Save
             </v-btn>

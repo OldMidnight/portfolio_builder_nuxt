@@ -113,7 +113,7 @@ export default {
         <span>{{ social_media_btns[btn_index].name }}</span>
       </v-tooltip>
     </v-flex>
-    <v-flex v-if="!live" class="social-bar--btn">
+    <v-flex class="social-bar--btn">
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
           <v-btn
@@ -140,7 +140,7 @@ export default {
         <v-card-text>
           <v-container>
             <span>Edit the buttons available</span>
-            <v-item-group v-model="selected_social_btns" multiple mandatory>
+            <v-item-group v-model="selected_social_btns" multiple>
               <v-form
                 ref="social_btns_form"
                 class="social-bar-dialog--btn-options d-flex flex-wrap"
@@ -163,33 +163,21 @@ export default {
                     </v-card>
                   </v-item>
                   <v-flex class="social-bar-dialog--input d-flex my-2">
-                    <transition
-                      enter-active-class="animated fadeIn fast"
-                      leave-active-class="animated fadeOut fast"
-                      mode="out-in"
+                    <span
+                      v-if="selected_social_btns.includes(index)"
+                      class="social-bar-dialog--input-start mr-2"
                     >
-                      <span
-                        v-if="selected_social_btns.includes(index)"
-                        class="social-bar-dialog--input-start mr-2"
-                      >
-                        {{ btn.url }}
-                      </span>
-                    </transition>
-                    <transition
-                      enter-active-class="animated fadeIn fast"
-                      leave-active-class="animated fadeOut fast"
-                      mode="out-in"
-                    >
-                      <v-text-field
-                        v-if="selected_social_btns.includes(index)"
-                        v-model="selected_social_btns_urls[index]"
-                        :rules="[(value) => !!value || 'Required.']"
-                        dense
-                        label="Url..."
-                        outlined
-                        class="mt-2 social-bar-dialog--input-field"
-                      ></v-text-field>
-                    </transition>
+                      {{ btn.url }}
+                    </span>
+                    <v-text-field
+                      v-if="selected_social_btns.includes(index)"
+                      v-model="selected_social_btns_urls[index]"
+                      :rules="[(value) => !!value || 'Required.']"
+                      dense
+                      label="Url..."
+                      outlined
+                      class="mt-2 social-bar-dialog--input-field"
+                    ></v-text-field>
                   </v-flex>
                 </v-flex>
               </v-form>

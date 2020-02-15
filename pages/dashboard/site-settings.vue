@@ -97,9 +97,9 @@ export default {
       })
     },
     resetFavicon() {
-      this.$axios.$post('/uploads/favicon/delete', {
-        filename: this.site_props.favicon.link.split('/')[5]
-      })
+      this.$axios.$delete(
+        '/uploads/images/' + this.user.domain + '/favicon.ico'
+      )
       this.setFavicon({
         use: false,
         link: null

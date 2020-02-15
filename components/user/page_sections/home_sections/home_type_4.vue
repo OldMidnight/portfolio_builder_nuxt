@@ -132,9 +132,7 @@ export default {
         !this.img_props.link &&
         this.img_props.url !== this.validated_img_url
       ) {
-        this.$axios.$post(
-          '/uploads/images/' + this.options.input_dict_name + '/delete'
-        )
+        this.$axios.$delete('/uploads/images/' + this.options.input_dict_name)
       }
       if (this.upload_image) {
         const formData = new FormData()
@@ -222,7 +220,7 @@ export default {
         :contain="img_props.contain"
       ></v-img>
       <v-btn color="info" class="action--edit-btn" @click="edit_dialog = true">
-        Edit Landing Page
+        Edit Call To Action
       </v-btn>
     </v-col>
     <v-col cols="6" class="action--section">
@@ -387,7 +385,7 @@ export default {
                   </v-row>
                 </v-expansion-panel-content>
               </v-expansion-panel>
-              <v-expansion-panel>
+              <!-- <v-expansion-panel>
                 <v-expansion-panel-header>
                   <span class="font-weight-bold">Page URL</span>
                   <span class="caption">
@@ -408,7 +406,7 @@ export default {
                     ></v-text-field>
                   </v-row>
                 </v-expansion-panel-content>
-              </v-expansion-panel>
+              </v-expansion-panel> -->
             </v-expansion-panels>
           </v-container>
         </v-card-text>
@@ -442,6 +440,7 @@ export default {
 
 .action--img-container {
   border-right: 1px solid #777;
+  position: relative;
 }
 
 .action--content {

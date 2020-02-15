@@ -641,8 +641,8 @@ export default {
               :class="{ 'mx-3': !$vuetify.breakpoint.smAndDown }"
             >
               Not everything can be described through words, so having an online
-              presecnece where potential employers and interested parties can
-              view your work and learn about you, is more important than ever.
+              presence where potential employers and interested parties can view
+              your work and learn about you, is more important than ever.
             </p>
           </div>
           <p

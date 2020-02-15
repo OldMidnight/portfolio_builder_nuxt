@@ -424,7 +424,7 @@ export default {
               mdi-clock
             </v-icon>
             <span class="caption grey--text font-weight-light">
-              last registration: {{ cta_inter_stats.last_visitor_time }}
+              last interaction: {{ cta_inter_stats.last_visitor_time }}
             </span>
           </v-card-text>
         </v-card>

@@ -232,25 +232,23 @@
 }
 
 .creation-step-edit-options {
-  width: 40%;
+  width: 35%;
   // margin-right: 4px;
   overflow-y: scroll;
   overflow-x: hidden;
 }
 
 .creation-step-preview {
-  width: 60%;
+  width: 65%;
   // height: 95%;
   // left: 45%;
-  border-left: 1px solid #b6b6b6;
-  border-right: 1px solid #b6b6b6;
-  border-bottom: 1px solid #b6b6b6;
+  border: 1px solid #b6b6b6;
   border-radius: 5px;
 }
 
 .preview-page-wrapper {
   height: 80%;
-  width: 90%;
+  width: 80%;
   // margin-bottom: 5%;
   margin-top: 0px !important;
   // background-color: #fafafa;
@@ -258,13 +256,13 @@
 
 .preview-1-page-container {
   margin: 0px !important;
-  margin-top: 5% !important;
+  margin-top: 3% !important;
   width: 90%;
-  height: 90%;
+  height: 85%;
   margin-bottom: 5% !important;
   // border: 1px solid;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
+  // border-bottom-left-radius: 20px;
+  // border-bottom-right-radius: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
@@ -277,7 +275,7 @@
 }
 
 .preview-bottom-nav-arrows {
-  height: 10%;
+  height: 0%;
   margin: 0 !important;
   width: 25%
   // border: 1px solid;
@@ -295,9 +293,12 @@
 .preview-1-content-body {
   width: 100%;
   height: 85%;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
+  // margin-bottom: 1%;
+  // border-bottom-left-radius: 20px;
+  // border-bottom-right-radius: 20px;
   background-color: white;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .preview-1-top-nav-item {
@@ -549,3 +550,18 @@
   height: 100%;
   width: 100%;
 }
+
+// .tutorial--highlight {
+//   z-index: 11;
+//   position: relative;
+// }
+
+// .tutorial--btn {
+//   position: absolute;
+//   top: 90%;
+// }
+
+// .tutorial--container {
+//   height: 100%;
+//   width: 100%;
+// }

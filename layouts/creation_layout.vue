@@ -4,11 +4,15 @@ export default {
   data() {
     return {
       creationProgress: 0,
-      show_final_step: false
+      show_final_step: false,
+      resume_not_created: false
     }
   },
   computed: {
-    ...mapState('creator', ['creation_step', 'show_next_step'])
+    ...mapState('creator', ['creation_step', 'show_next_step', 'site_props']),
+    creation_step() {
+      return this.$store.state.creator.creation_step
+    }
   },
   methods: {
     ...mapMutations('creator', [
@@ -27,6 +31,13 @@ export default {
       this.setCreationStep('-')
       this.creationProgress -= 100 / 3
       this.showNextStep()
+    },
+    saveChanges() {
+      if (this.site_props.resume_page_inputs.resume_created) {
+        this.showNextStep()
+      } else {
+        this.resume_not_created = true
+      }
     }
   }
 }
@@ -34,12 +45,21 @@ export default {
 
 <template>
   <v-app>
-    <v-container fill-height class="creator-container">
+    <v-container fill-height class="creator-container pa-0">
       <v-layout column align-center class="creation-page-layout">
         <v-flex class="top-nav">
           <div class="mini-logo font-weight-bold">
             <v-img class="logo" src="/Logo_beta_text.png"></v-img>
           </div>
+          <transition
+            enter-active-class="animated fadeInRight faster"
+            leave-active-class="animated fadeOutRight faster"
+            mode="out-in"
+          >
+            <div v-if="creation_step === 1" class="save-btn pt-2">
+              <v-btn color="success" @click="saveChanges()">Save Changes</v-btn>
+            </div>
+          </transition>
         </v-flex>
         <nuxt class="creation-wrapper" />
         <v-flex class="next-creation-step">
@@ -86,6 +106,12 @@ export default {
         </v-flex>
       </v-layout>
     </v-container>
+    <v-snackbar v-model="resume_not_created" color="warning">
+      Make sure to create your resume on the resume tab before saving!
+      <v-btn icon @click="resume_not_created = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
   </v-app>
 </template>
 
@@ -102,7 +128,7 @@ export default {
   position: absolute;
   top: 0;
   width: 100%;
-  // background-color: #e6e6e6;
+  // background-color: #black;
 }
 
 .mini-logo {
@@ -124,6 +150,7 @@ export default {
 
 .logo {
   position: absolute;
+  left: 10%;
 }
 
 .mini-logo:hover {
@@ -135,7 +162,8 @@ export default {
   overflow: auto;
   position: absolute;
   top: 6%;
-  width: 90%;
+  width: 97%;
+  // border-top: 1px solid #777;
   // background-color: #cccccc;
 }
 
@@ -188,5 +216,10 @@ export default {
 .creation-page-layout {
   position: relative;
   height: 100%;
+}
+
+.save-btn {
+  position: absolute;
+  right: 2%;
 }
 </style>

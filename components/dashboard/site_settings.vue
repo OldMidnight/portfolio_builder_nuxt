@@ -145,9 +145,9 @@ export default {
       })
     },
     resetFavicon() {
-      this.$axios.$post('/uploads/favicon/delete', {
-        filename: this.site_props.favicon.link.split('/')[5]
-      })
+      this.$axios.$delete(
+        '/uploads/images/' + this.user.domain + '/favicon.ico'
+      )
       this.setFavicon({
         use: false,
         link: null
@@ -188,7 +188,7 @@ export default {
     async uploadFavicon() {
       const formData = new FormData()
       formData.append('favicon', this.favicon_file)
-      const url = 'uploads/favicon/set'
+      const url = 'uploads/images/' + this.user.domain + '/favicon.ico'
       const config = {
         headers: {
           'content-type': 'multipart/form-data'
@@ -205,12 +205,9 @@ export default {
           use: true,
           link:
             this.$axios.defaults.baseURL +
-            'uploads/favicon/' +
-            this.user.id +
-            '_' +
+            'uploads/images/' +
             this.user.domain +
-            '_' +
-            this.favicon_file.name
+            '/favicon.ico'
         })
         this.updateWebsite(this.site_props)
         this.favicon_file = null

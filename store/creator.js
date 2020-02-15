@@ -10,9 +10,9 @@ export const state = () => ({
     navigation: 0,
     navigation_style: '1',
     navigation_color: 'success',
-    navigation_text_color: null,
+    navigation_text_color: 'white',
     textify: false,
-    site_name: null,
+    site_name: 'My Website',
     nav_titles: {
       home: 'Home',
       projects: 'Projects',
@@ -34,7 +34,11 @@ export const state = () => ({
       projects: '#FFFFFF',
       resume: '#FFFFFF'
     },
-    tab_text_color: null,
+    tab_text_colors: {
+      home: 'black',
+      projects: 'black',
+      resume: 'black'
+    },
     text_border_color: false,
     text_border_color_value: '#000000',
     home_page_img_1: null,
@@ -168,7 +172,7 @@ export const state = () => ({
           details: {
             available: true,
             value:
-              'Is this a real sport? No. Am I still claiming to have played it? Yes.'
+              'Is this a real sport? Debatable. Am I still claiming to have played it? Yes.'
           }
         },
         {
@@ -198,7 +202,9 @@ export const state = () => ({
     name: null,
     available: false
   },
-  show_next_step: false
+  show_next_step: false,
+  images_to_upload: [],
+  project_images_to_upload: []
 })
 
 export const mutations = {
@@ -268,8 +274,8 @@ export const mutations = {
   setTabColor(state, payload) {
     state.site_props.tab_colors[payload.type] = payload.value
   },
-  setTabTextColor(state, value) {
-    state.site_props.tab_text_color = value
+  setTabTextColor(state, payload) {
+    state.site_props.tab_text_colors[payload.type] = payload.value
   },
   setInputDictValues(state, payload) {
     state.site_props[payload.inputDict] = payload.input_dict_values
@@ -281,6 +287,14 @@ export const mutations = {
       project: Object - a dictionary containing the new project data
     */
     state.site_props[payload.page_label].projects.push(payload.project)
+  },
+  deleteProject(state, payload) {
+    /* Method to remove a project from website props
+    Payload contains 2 varaibles:
+      page_label: String - dictionary for page data
+      index: Number - the index in the projects list the editing project appears
+    */
+    state.site_props[payload.page_label].projects.splice(payload.index, 1)
   },
   updateProject(state, payload) {
     /*
@@ -546,14 +560,26 @@ export const mutations = {
       value - String - New URL
     */
     state.callToActionURL = payload.value
+  },
+  addImageToUpload(state, payload) {
+    /*
+    Adds an object of data to an array of files to upload
+    */
+    state.images_to_upload.push(payload.img_data)
+  },
+  addProjectImageToUpload(state, payload) {
+    /*
+    Adds an object of data to an array of files to upload
+    */
+    state.project_images_to_upload.push(payload.img_data)
   }
 }
 
 export const actions = {
-  registerWebsite(props) {
-    this.$axios
+  async registerWebsite(context) {
+    await this.$axios
       .$post('/create/register_site', {
-        site_props: JSON.stringify(props.state.site_props)
+        site_props: JSON.stringify(context.state.site_props)
       })
       .then(() => {
         this.$axios.$get('/uploads/screenshot/grab').then(() => {
@@ -561,16 +587,50 @@ export const actions = {
         })
       })
   },
-  updateWebsite(props) {
-    this.$axios
+  async updateWebsite(context) {
+    await this.$axios
       .$post('/create/update_site', {
-        site_props: JSON.stringify(props.state.site_props)
+        site_props: JSON.stringify(context.state.site_props)
       })
       .then(() => {
         this.$axios.$get('/uploads/screenshot/grab').then(() => {
           this.$router.push({ path: '/dashboard' })
         })
       })
+  },
+  uploadImages(context) {
+    const config = {
+      headers: {
+        'content-type': 'multipart/form-data'
+      }
+    }
+    for (const image of context.state.images_to_upload) {
+      this.$axios({
+        method: 'post',
+        url: image.url,
+        data: image.upload_form_data,
+        config
+      }).then(() => {
+        context.commit('updatePageImg', image.page_img_props)
+      })
+    }
+  },
+  uploadProjectImages(context) {
+    const config = {
+      headers: {
+        'content-type': 'multipart/form-data'
+      }
+    }
+    for (const image of context.state.project_images_to_upload) {
+      this.$axios({
+        method: 'post',
+        url: image.url,
+        data: image.upload_form_data,
+        config
+      }).then(() => {
+        context.commit('updateProject', image.page_img_props)
+      })
+    }
   }
 }
 

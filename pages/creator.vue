@@ -109,7 +109,7 @@ export default {
       ],
       page_customise_select: [
         { text: 'Select Theme', value: 1 },
-        { text: 'Customize...', value: 2 }
+        { text: 'Custom Colors', value: 2 }
       ],
       page_option: null,
       page_theme_options_main: [
@@ -117,20 +117,20 @@ export default {
           id: 1,
           layout: 1,
           name: 'layout_1_slate',
-          title: 'Slate',
+          title: 'Space Grey',
           small_desc: 'Cool & Grey.',
           desc:
-            'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.'
+            'Give a website a slick and stealthy lick of paint. With consistent coloring for all components, ensure a clean and minimal look.'
         },
-        {
-          id: 2,
-          layout: 1,
-          name: 'layout_1_fresh',
-          title: 'Fresh',
-          small_desc: 'Light. Open.',
-          desc:
-            'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.'
-        },
+        // {
+        //   id: 2,
+        //   layout: 1,
+        //   name: 'layout_1_fresh',
+        //   title: 'Fresh',
+        //   small_desc: 'Light. Open.',
+        //   desc:
+        //     'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.'
+        // },
         {
           id: 3,
           layout: 1,
@@ -138,7 +138,7 @@ export default {
           title: 'Matrix',
           small_desc: 'Blue Pill Or Red Pill?',
           desc:
-            'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.'
+            'Taking inspiration from the Matrix Trilogy, enjoy and sleek matrix-style asthetic throughout your website.'
         }
       ],
       customise_page_option: null,
@@ -151,6 +151,11 @@ export default {
         projects: '#FFFFFF',
         resume: '#FFFFFF'
       },
+      tab_text_colors: {
+        home: 'black',
+        projects: 'black',
+        resume: 'black'
+      },
       show_nav_color_customiser: false,
       page_template_model: 1,
       show_page_add_error: false,
@@ -158,7 +163,6 @@ export default {
       show_page_add_success: false,
       show_page_delete_success: false,
       current_page_type: 1,
-      resume_not_created: false,
       loader: null,
       preview_images_interval: '',
       current_preview_img: 0,
@@ -191,7 +195,10 @@ export default {
       ],
       current_waiting_line: null,
       api_waiting_lines_interval: null,
-      show_help_dialog: false
+      show_help_dialog: false,
+      current_editors: []
+      // show_tutorial: false,
+      // tutorial_step: 1
     }
   },
   computed: {
@@ -214,13 +221,15 @@ export default {
       return options
     },
     home_pages() {
-      const options = []
-      for (const page of this.site_props.homePages) {
-        if (page.id === this.activeNav_index) {
-          options.push(page)
-        }
-      }
-      return options
+      // const options = []
+      // for (const page of this.site_props.homePages) {
+      //   if (page.id === this.activeNav_index) {
+      //     options.push(page)
+      //   }
+      // }
+      // return options
+      this.createEditors(this.site_props.homePages.length)
+      return this.site_props.homePages
     },
     projects_pages() {
       const options = []
@@ -346,14 +355,14 @@ export default {
         return this.site_props.navigation_text_color
       }
     },
-    tab_text_color: {
-      set(value) {
-        this.setTabTextColor(value)
-      },
-      get() {
-        return this.site_props.tab_text_color
-      }
-    },
+    // tab_text_color: {
+    //   set(value) {
+    //     this.setTabTextColor(value)
+    //   },
+    //   get() {
+    //     return this.site_props.tab_text_color
+    //   }
+    // },
     textify: {
       set(value) {
         this.setTextify(value)
@@ -481,8 +490,20 @@ export default {
       this.setTabColor({ type: 'projects', value })
     },
     'tab_colors.resume'(value) {
-      document.querySelector('.nav-resume').style.backgroundColor = value
+      document.querySelector('.nav-resume').style.color = value
       this.setTabColor({ type: 'resume', value })
+    },
+    'tab_text_colors.home'(value) {
+      document.querySelector('.nav-home').style.color = value
+      this.setTabTextColor({ type: 'home', value })
+    },
+    'tab_text_colors.projects'(value) {
+      document.querySelector('.nav-projects').style.color = value
+      this.setTabTextColor({ type: 'projects', value })
+    },
+    'tab_text_colors.resume'(value) {
+      document.querySelector('.nav-resume').style.color = value
+      this.setTabTextColor({ type: 'resume', value })
     },
     customise_page_option(value) {
       switch (value) {
@@ -591,6 +612,9 @@ export default {
     }
   },
   mounted() {
+    // if (!this.user.skip_tutorial) {
+    //   this.show_tutorial = true
+    // }
     this.api_waiting_lines_interval = setInterval(() => {
       const newLineIndex = Math.floor(
         Math.random() * this.api_waiting_lines.length
@@ -650,6 +674,9 @@ export default {
       this.tab_colors.home = this.site_props.tab_colors.home
       this.tab_colors.projects = this.site_props.tab_colors.projects
       this.tab_colors.resume = this.site_props.tab_colors.resume
+      this.tab_text_colors.home = this.site_props.tab_text_colors.home
+      this.tab_text_colors.projects = this.site_props.tab_text_colors.projects
+      this.tab_text_colors.resume = this.site_props.tab_text_colors.resume
       this.showNextStep()
       this.temp_site_props = JSON.stringify(this.site_props)
     } else {
@@ -746,7 +773,7 @@ export default {
             <p>
               <span style="text-align: center; display: block">
                 <span class="body-2">
-                  Below you will find a few of my featured projects I've worked on during my free time. The next page has a more comprehensive list of things I have worked on when I have the time to do so!
+                  Below you will find a few of my featured projects I've worked on during my free time.
                 </span>
               </span>
             </p>
@@ -910,18 +937,65 @@ export default {
     }),
     ...mapActions({
       registerWebsite: 'creator/registerWebsite',
-      updateWebsite: 'creator/updateWebsite'
+      updateWebsite: 'creator/updateWebsite',
+      uploadImages: 'creator/uploadImages',
+      uploadProjectImages: 'creator/uploadProjectImages'
     }),
-    // test() {
-    //   console.log('testfdgafdasging')
-    // },
-    selectLayout(e, index) {
+    createEditors(num) {
+      for (let i = 0; i < num; i++) {
+        const editor = new Editor({
+          editable: this.preview || this.live,
+          extensions: [
+            // new Align(),
+            new CenterAlign(),
+            new LeftAlign(),
+            new RightAlign(),
+            new FontSize(),
+            new Heading(),
+            new Bold(),
+            new BulletList(),
+            new Blockquote(),
+            new ListItem(),
+            new Italic(),
+            new Link(),
+            new OrderedList(),
+            new Strike(),
+            new Underline(),
+            new History(),
+            new CodeBlock(),
+            new Code(),
+            new Span(),
+            new TrailingNode({
+              node: 'paragraph',
+              notAfter: ['paragraph', 'align']
+            })
+          ],
+          onFocus: () => {
+            this.is_editing = true
+          },
+          onUpdate: (e) => {
+            // console.log(e)
+            this.startSaving()
+            const func = _.debounce(() => {
+              this.updatePageHTML({
+                page_label:
+                  this.activeNav + '_page_' + this.activeNav_index + '_data',
+                html: e.getHTML()
+              })
+              // this.test()
+              // console.log(e)
+              // console.log(this)
+            }, 4000)
+            func()
+          }
+        })
+        this.current_editors.push(editor)
+      }
+    },
+    selectLayout(index) {
       if (index === 0) {
-        const layoutItemContainer = document.querySelector('.layout-selected')
-
-        if (layoutItemContainer !== e.target.parentElement) {
+        if (this.layouts[index].component_name !== this.site_props.layout) {
           // If Clicking a different Layout
-
           this.setSiteLayout(this.layouts[index].component_name)
         } else {
           this.setSiteLayout(null)
@@ -939,17 +1013,7 @@ export default {
       this.activeNav_index = 1
     },
     checkStepCount(step) {
-      switch (step) {
-        case 0:
-          return this.creation_step === step
-
-        case 1:
-          // this.setSiteLayout(this.site_props.layout)
-          return this.creation_step === step
-
-        default:
-          return this.creation_step === step
-      }
+      return this.creation_step === step
     },
     changePreviewPage(direction) {
       switch (direction) {
@@ -1037,13 +1101,6 @@ export default {
       }
       this.activeNav_index = this.customise_page_option_number
     },
-    saveChanges() {
-      if (this.site_props.resume_page_inputs.resume_created) {
-        this.showNextStep()
-      } else {
-        this.resume_not_created = true
-      }
-    },
     clearChanges() {
       this.clearAllChanges()
       this.page_option = null
@@ -1058,6 +1115,9 @@ export default {
       this.tab_colors.home = '#FFFFFF'
       this.tab_colors.projects = '#FFFFFF'
       this.tab_colors.resume = '#FFFFFF'
+      this.tab_text_colors.home = 'black'
+      this.tab_text_colors.projects = 'black'
+      this.tab_text_colors.resume = 'black'
     },
     addNewPage() {
       switch (this.customise_page_option) {
@@ -1118,6 +1178,8 @@ export default {
     registerSite() {
       if (this.$refs.editor_site_name_form.validate()) {
         this.validating = true
+        this.uploadImages()
+        this.uploadProjectImages()
         if (!this.user.site_created) {
           this.registerWebsite(this.site_props)
         } else {
@@ -1208,15 +1270,15 @@ export default {
               'layout-selected': site_props.layout === layout.component_name,
               'layout-disabled': layout.id !== 1
             }"
-            @click.stop="selectLayout($event, index)"
           >
             <div
-              class="d-flex flex-column justify-center pa-3"
+              class="pa-3 d-flex"
               :class="{
                 'layout-item': layout.id === 1,
                 'layout-item-disabled': layout.id !== 1,
                 'layout-selected-2': site_props.layout === layout.component_name
               }"
+              @click.stop="selectLayout(index)"
             >
               <v-img
                 :key="index"
@@ -1240,28 +1302,17 @@ export default {
           <div class="title">Customize Your Website</div>
 
           <v-row align="center" class="edit-options-panels">
-            <v-expansion-panels focusable>
+            <v-expansion-panels popout>
               <!-- NAVIGATION TAB -->
 
-              <v-expansion-panel>
+              <!-- <v-expansion-panel>
                 <v-expansion-panel-header>
-                  <span>Navigation</span>
+                  <span class="font-weight-bold">Navigation</span>
                   <span class="caption">
                     Customize webiste navigation styles
                   </span>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                  <v-flex>
-                    <v-radio-group v-model="site_nav" @change="hideNextStep()">
-                      <v-radio
-                        v-for="nav in nav_types"
-                        :key="nav.id"
-                        :label="nav.name"
-                        :value="nav.id"
-                      >
-                      </v-radio>
-                    </v-radio-group>
-                  </v-flex>
                   <v-item-group
                     v-model="navigation_style"
                     value="1"
@@ -1381,14 +1432,16 @@ export default {
                     </v-flex>
                   </v-card>
                 </v-expansion-panel-content>
-              </v-expansion-panel>
+              </v-expansion-panel> -->
 
               <!-- TABS CUSTOMISATIONS -->
 
               <v-expansion-panel>
                 <v-expansion-panel-header>
-                  <span>Tabs</span>
-                  <span class="caption">Customize tab titles and colors</span>
+                  <span class="font-weight-bold">Tabs</span>
+                  <span class="caption text-right pr-2">
+                    Customize tab titles and colors
+                  </span>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content class="nav_titles_container">
                   <v-flex pt-3>
@@ -1416,26 +1469,33 @@ export default {
                         @change="hideNextStep()"
                       >
                       </v-text-field>
-                      <p class="align-self-center">Tab Color</p>
-                      <v-color-picker
-                        v-model="tab_colors.home"
-                        :disabled="site_props.selected_theme !== null"
-                        hide-inputs
-                        class="preview-color-pick align-self-center"
-                        @input="hideNextStep()"
-                      >
-                      </v-color-picker>
-                      <v-flex class="mt-3">
-                        <p>Text Color</p>
-                        <v-radio-group
-                          v-model="tab_text_color"
-                          :disabled="site_props.text_border_color"
-                          @change="hideNextStep()"
+                      <v-row>
+                        <v-col cols="7">
+                          <p class="text-center">Tab Color</p>
+                          <v-color-picker
+                            v-model="tab_colors.home"
+                            :disabled="site_props.selected_theme !== null"
+                            hide-inputs
+                            class="preview-color-pick align-self-center"
+                            @input="hideNextStep()"
+                          >
+                          </v-color-picker>
+                        </v-col>
+                        <v-col
+                          cols="4"
+                          class="mt-3 d-flex flex-column align-center justify-center"
                         >
-                          <v-radio label="White" value="white"></v-radio>
-                          <v-radio label="Black" value="black"></v-radio>
-                        </v-radio-group>
-                      </v-flex>
+                          <p>Text Color</p>
+                          <v-radio-group
+                            v-model="tab_text_colors.home"
+                            :disabled="site_props.text_border_color"
+                            @change="hideNextStep()"
+                          >
+                            <v-radio label="White" value="white"></v-radio>
+                            <v-radio label="Black" value="black"></v-radio>
+                          </v-radio-group>
+                        </v-col>
+                      </v-row>
                     </v-card>
 
                     <v-card class="d-flex flex-column pa-3 my-4" elevation="2">
@@ -1457,26 +1517,33 @@ export default {
                         @change="hideNextStep()"
                       >
                       </v-text-field>
-                      <p class="align-self-center">Tab Color</p>
-                      <v-color-picker
-                        v-model="tab_colors.projects"
-                        :disabled="site_props.selected_theme !== null"
-                        hide-inputs
-                        class="preview-color-pick align-self-center"
-                        @input="hideNextStep()"
-                      >
-                      </v-color-picker>
-                      <v-flex class="mt-3">
-                        <p>Text Color</p>
-                        <v-radio-group
-                          v-model="tab_text_color"
-                          :disabled="site_props.text_border_color"
-                          @change="hideNextStep()"
+                      <v-row>
+                        <v-col cols="7">
+                          <p class="text-center">Tab Color</p>
+                          <v-color-picker
+                            v-model="tab_colors.projects"
+                            :disabled="site_props.selected_theme !== null"
+                            hide-inputs
+                            class="preview-color-pick align-self-center"
+                            @input="hideNextStep()"
+                          >
+                          </v-color-picker>
+                        </v-col>
+                        <v-col
+                          cols="4"
+                          class="mt-3 d-flex flex-column align-center justify-center"
                         >
-                          <v-radio label="White" value="white"></v-radio>
-                          <v-radio label="Black" value="black"></v-radio>
-                        </v-radio-group>
-                      </v-flex>
+                          <p>Text Color</p>
+                          <v-radio-group
+                            v-model="tab_text_colors.projects"
+                            :disabled="site_props.text_border_color"
+                            @change="hideNextStep()"
+                          >
+                            <v-radio label="White" value="white"></v-radio>
+                            <v-radio label="Black" value="black"></v-radio>
+                          </v-radio-group>
+                        </v-col>
+                      </v-row>
                     </v-card>
 
                     <v-card class="d-flex flex-column pa-3 my-4" elevation="2">
@@ -1498,26 +1565,33 @@ export default {
                         @change="hideNextStep()"
                       >
                       </v-text-field>
-                      <p class="align-self-center">Tab Color</p>
-                      <v-color-picker
-                        v-model="tab_colors.resume"
-                        :disabled="site_props.selected_theme !== null"
-                        hide-inputs
-                        class="preview-color-pick align-self-center"
-                        @input="hideNextStep()"
-                      >
-                      </v-color-picker>
-                      <v-flex class="mt-3">
-                        <p>Text Color</p>
-                        <v-radio-group
-                          v-model="tab_text_color"
-                          :disabled="site_props.text_border_color"
-                          @change="hideNextStep()"
+                      <v-row>
+                        <v-col cols="7">
+                          <p class="text-center">Tab Color</p>
+                          <v-color-picker
+                            v-model="tab_colors.resume"
+                            :disabled="site_props.selected_theme !== null"
+                            hide-inputs
+                            class="preview-color-pick align-self-center"
+                            @input="hideNextStep()"
+                          >
+                          </v-color-picker>
+                        </v-col>
+                        <v-col
+                          cols="4"
+                          class="mt-3 d-flex flex-column align-center justify-center"
                         >
-                          <v-radio label="White" value="white"></v-radio>
-                          <v-radio label="Black" value="black"></v-radio>
-                        </v-radio-group>
-                      </v-flex>
+                          <p>Text Color</p>
+                          <v-radio-group
+                            v-model="tab_text_colors.resume"
+                            :disabled="site_props.text_border_color"
+                            @change="hideNextStep()"
+                          >
+                            <v-radio label="White" value="white"></v-radio>
+                            <v-radio label="Black" value="black"></v-radio>
+                          </v-radio-group>
+                        </v-col>
+                      </v-row>
                     </v-card>
                   </v-flex>
                 </v-expansion-panel-content>
@@ -1527,8 +1601,10 @@ export default {
 
               <v-expansion-panel>
                 <v-expansion-panel-header>
-                  <span>Pages</span>
-                  <span class="caption">Modify your pages</span>
+                  <span class="font-weight-bold">Pages</span>
+                  <span class="caption text-right pr-2">
+                    Modify your pages and page sections
+                  </span>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                   <v-flex class="pt-3">
@@ -1672,12 +1748,12 @@ export default {
                   <v-flex class="mt-3">
                     <p>Pages</p>
                     <span class="caption">
-                      Modify your page templates here
+                      Customise what components are used on your website.
                     </span>
                     <v-select
                       v-model="customise_page_option"
                       :items="currentTabs"
-                      label="Select Tab..."
+                      label="Select Page"
                       solo
                     >
                     </v-select>
@@ -1686,7 +1762,7 @@ export default {
                       v-if="customise_page_option !== null"
                       v-model="customise_page_option_number"
                       :items="currentPages"
-                      label="Select Page..."
+                      label="Select Section"
                       solo
                       @change="gotoPage()"
                     ></v-select>
@@ -1775,9 +1851,25 @@ export default {
                   </v-flex>
                 </v-expansion-panel-content>
               </v-expansion-panel>
+              <v-expansion-panel>
+                <v-expansion-panel-header>
+                  <span class="font-weight-bold">Uploads</span>
+                  <span class="caption text-right pr-2">
+                    Manage files you have uploaded
+                  </span>
+                </v-expansion-panel-header>
+              </v-expansion-panel>
+              <v-expansion-panel>
+                <v-expansion-panel-header>
+                  <span class="font-weight-bold">Transitions</span>
+                  <span class="caption text-right pr-2">
+                    Customize your page transitions
+                  </span>
+                </v-expansion-panel-header>
+              </v-expansion-panel>
             </v-expansion-panels>
           </v-row>
-          <v-flex
+          <!-- <v-flex
             class="save-btn-container d-flex justify-center align-center my-2"
           >
             <v-tooltip bottom>
@@ -1810,7 +1902,7 @@ export default {
               </template>
               <span>Delete All Changes</span>
             </v-tooltip>
-          </v-flex>
+          </v-flex> -->
         </div>
 
         <v-layout
@@ -1885,16 +1977,17 @@ export default {
                   :style="check_color_style"
                   :class="{
                     active:
-                      (activeNav === 'home' && !site_props.text_border_color) ||
-                      site_props.selected_theme !== null,
+                      activeNav === 'home' && !site_props.text_border_color,
                     customActive:
                       activeNav === 'home' &&
                       site_props.text_border_color &&
                       site_props.selected_theme === null,
                     'nav-1-item-slate': site_props.selected_theme === 1,
                     'nav-1-item-matrix': site_props.selected_theme === 3,
-                    'dark-nav-text': site_props.tab_text_color === 'black',
-                    'white-nav-text': site_props.tab_text_color === 'white'
+                    'dark-nav-text':
+                      site_props.tab_text_colors.home === 'black',
+                    'white-nav-text':
+                      site_props.tab_text_colors.home === 'white'
                   }"
                   @click.stop="changeActiveNav('home')"
                 >
@@ -1915,8 +2008,10 @@ export default {
                       site_props.selected_theme === null,
                     'nav-1-item-slate': site_props.selected_theme === 1,
                     'nav-1-item-matrix': site_props.selected_theme === 3,
-                    'dark-nav-text': site_props.tab_text_color === 'black',
-                    'white-nav-text': site_props.tab_text_color === 'white'
+                    'dark-nav-text':
+                      site_props.tab_text_colors.projects === 'black',
+                    'white-nav-text':
+                      site_props.tab_text_colors.projects === 'white'
                   }"
                   @click.stop="changeActiveNav('projects')"
                 >
@@ -1937,8 +2032,10 @@ export default {
                       site_props.selected_theme === null,
                     'nav-1-item-slate': site_props.selected_theme === 1,
                     'nav-1-item-matrix': site_props.selected_theme === 3,
-                    'dark-nav-text': site_props.tab_text_color === 'black',
-                    'white-nav-text': site_props.tab_text_color === 'white'
+                    'dark-nav-text':
+                      site_props.tab_text_colors.resume === 'black',
+                    'white-nav-text':
+                      site_props.tab_text_colors.resume === 'white'
                   }"
                   @click.stop="changeActiveNav('resume')"
                 >
@@ -1954,24 +2051,32 @@ export default {
                   'matrix-card': site_props.selected_theme === 3
                 }"
               >
-                <v-flex
-                  v-if="activeNav === 'home'"
-                  class="preview-1-content preview-1-home-content"
-                  :class="{
-                    slate: site_props.selected_theme === 1,
-                    matrix: site_props.selected_theme === 3
-                  }"
+                <transition-group
+                  name="page-section-transition"
+                  enter-active-class="animated fadeIn faster"
+                  leave-active-class="animated fadeOut faster"
+                  mode="out-in"
                 >
-                  <transition
-                    name="preview-page"
-                    enter-active-class="animated fadeIn faster"
-                    leave-active-class="animated fadeOut faster"
-                    mode="out-in"
+                  <v-row
+                    v-if="activeNav === 'home'"
+                    key="home"
+                    class="preview-1-content preview-1-home-content ma-0"
+                    :class="{
+                      slate: site_props.selected_theme === 1,
+                      matrix: site_props.selected_theme === 3
+                    }"
                   >
-                    <v-flex
+                    <!-- <transition
+                      name="preview-page"
+                      enter-active-class="animated fadeIn faster"
+                      leave-active-class="animated fadeOut faster"
+                      mode="out-in"
+                    > -->
+                    <v-col
                       v-for="preview_page in home_pages"
                       :key="preview_page.id"
-                      class="preview-1-page"
+                      cols="12"
+                      class="preview-1-page pa-0"
                       :class="{
                         slate: site_props.selected_theme === 1,
                         matrix: site_props.selected_theme === 3
@@ -1981,31 +2086,32 @@ export default {
                         :component-name="preview_page.component"
                         :options="{
                           input_dict_name:
-                            activeNav + '_page_' + activeNav_index + '_data',
+                            'home_page_' + preview_page.page_num + '_data',
                           preview: false,
                           height: '150',
                           width: '150'
                         }"
-                        :editor="editor"
+                        :editor="current_editors[preview_page.page_num - 1]"
                         @update="updateInput($event)"
                       ></LoadableComponent>
-                    </v-flex>
-                  </transition>
-                </v-flex>
-                <v-flex
-                  v-if="activeNav === 'projects'"
-                  class="preview-1-content preview-1-projects-content"
-                  :class="{
-                    slate: site_props.selected_theme === 1,
-                    matrix: site_props.selected_theme === 3
-                  }"
-                >
-                  <transition
-                    name="preview-page"
-                    enter-active-class="animated fadeIn faster"
-                    leave-active-class="animated fadeOut faster"
-                    mode="out-in"
+                    </v-col>
+                    <!-- </transition> -->
+                  </v-row>
+                  <v-flex
+                    v-if="activeNav === 'projects'"
+                    key="projects"
+                    class="preview-1-content preview-1-projects-content"
+                    :class="{
+                      slate: site_props.selected_theme === 1,
+                      matrix: site_props.selected_theme === 3
+                    }"
                   >
+                    <!-- <transition
+                      name="preview-page"
+                      enter-active-class="animated fadeIn faster"
+                      leave-active-class="animated fadeOut faster"
+                      mode="out-in"
+                    > -->
                     <v-flex
                       v-for="preview_page in projects_pages"
                       :key="preview_page.id"
@@ -2019,7 +2125,7 @@ export default {
                         :component-name="preview_page.component"
                         :options="{
                           input_dict_name:
-                            activeNav + '_page_' + activeNav_index + '_data',
+                            'projects_page_' + activeNav_index + '_data',
                           preview: false,
                           height: '150',
                           width: '150'
@@ -2027,22 +2133,23 @@ export default {
                         :editor="editor"
                       ></LoadableComponent>
                     </v-flex>
-                  </transition>
-                </v-flex>
-                <v-flex
-                  v-if="activeNav === 'resume'"
-                  class="preview-1-content preview-1-resume-content"
-                  :class="{
-                    slate: site_props.selected_theme === 1,
-                    matrix: site_props.selected_theme === 3
-                  }"
-                >
-                  <transition
-                    name="preview-page"
-                    enter-active-class="animated fadeIn faster"
-                    leave-active-class="animated fadeOut faster"
-                    mode="out-in"
+                    <!-- </transition> -->
+                  </v-flex>
+                  <v-flex
+                    v-if="activeNav === 'resume'"
+                    key="resume"
+                    class="preview-1-content preview-1-resume-content"
+                    :class="{
+                      slate: site_props.selected_theme === 1,
+                      matrix: site_props.selected_theme === 3
+                    }"
                   >
+                    <!-- <transition
+                      name="preview-page"
+                      enter-active-class="animated fadeIn faster"
+                      leave-active-class="animated fadeOut faster"
+                      mode="out-in"
+                    > -->
                     <v-flex
                       v-for="preview_page in resume_pages"
                       :key="preview_page.id"
@@ -2055,8 +2162,7 @@ export default {
                       <LoadableComponent
                         :component-name="preview_page.component"
                         :options="{
-                          input_dict_name:
-                            activeNav + '_page_' + activeNav_index + '_inputs',
+                          input_dict_name: 'resume_page_inputs',
                           preview: false,
                           height: '150',
                           width: '150'
@@ -2064,8 +2170,9 @@ export default {
                         @update="updateInput($event)"
                       ></LoadableComponent>
                     </v-flex>
-                  </transition>
-                </v-flex>
+                    <!-- </transition> -->
+                  </v-flex>
+                </transition-group>
               </v-flex>
             </v-layout>
 
@@ -2140,11 +2247,11 @@ export default {
             </v-btn>
           </v-layout>
 
-          <v-layout
+          <!-- <v-layout
             v-if="site_props.navigation === 0"
             class="preview-bottom-nav-arrows"
           >
-            <v-flex class="mx-2">
+            <v-flex class="mx-2 d-flex justify-center">
               <v-btn
                 v-if="site_props.navigation === 0"
                 :icon="
@@ -2178,7 +2285,7 @@ export default {
                 </p>
               </v-btn>
             </v-flex>
-            <v-flex class="d-flex justify-end mx-2">
+            <v-flex class="d-flex justify-center mx-2">
               <v-btn
                 v-if="site_props.navigation === 0"
                 :icon="
@@ -2214,7 +2321,7 @@ export default {
                 </p>
               </v-btn>
             </v-flex>
-          </v-layout>
+          </v-layout> -->
         </v-layout>
       </v-layout>
 
@@ -2267,7 +2374,7 @@ export default {
               <v-flex v-else class="creation-name--form">
                 <v-flex>
                   <p class="title font-weight-light">
-                    Your Kreoh Site is being generated
+                    Your Kreoh Site is being generated!
                   </p>
                 </v-flex>
                 <div class="lds-ellipsis">
@@ -2354,12 +2461,6 @@ export default {
     <v-snackbar v-model="show_page_add_success" color="success" left>
       Added new page!
       <v-btn icon @click="show_page_add_success = false">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-snackbar>
-    <v-snackbar v-model="resume_not_created" color="warning">
-      Make sure to create your resume on the resume tab before saving!
-      <v-btn icon @click="resume_not_created = false">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-snackbar>
@@ -2558,6 +2659,11 @@ export default {
         </editor-menu-bar>
       </v-toolbar>
     </transition>
+    <!-- <v-overlay z-index="10" :value="show_tutorial" class="tutorial--container">
+      <v-btn v-if="tutorial_step === 1" color="info" class="tutorial--btn">
+        Continue
+      </v-btn>
+    </v-overlay> -->
   </div>
 </template>
 

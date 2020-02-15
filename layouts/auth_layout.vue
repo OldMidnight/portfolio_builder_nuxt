@@ -6,9 +6,12 @@ export default {}
   <v-app>
     <v-container fluid fill-height>
       <v-layout column justify-center align-center class="form-layout">
-        <span class="logo mb-7 font-weight-bold">
-          Kreoh.com
-        </span>
+        <div class="mb-2">
+          <!-- <span class="logo mb-7 font-weight-bold">
+            Kreoh.com
+          </span> -->
+          <v-img class="logo mx-auto" src="/Logo_beta_text.png"></v-img>
+        </div>
         <v-flex pa-7 xs1 class="form elevation-1">
           <transition
             name="auth-transition"
@@ -33,12 +36,13 @@ export default {}
 
 <style lang="scss" scoped>
 .logo {
-  font-size: 48px;
-  color: #0066ff;
+  // font-size: 48px;
+  // color: #0066ff;
+  width: 20%;
 }
 
 .form {
-  border-radius: 20px;
+  border-radius: 10px;
 }
 
 .footer {
