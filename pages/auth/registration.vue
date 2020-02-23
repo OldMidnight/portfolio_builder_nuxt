@@ -32,18 +32,10 @@ export default {
     status() {
       return this.$store.state.user_auth.status
     },
-    form() {
-      return {
-        f_name: this.f_name,
-        s_name: this.s_name,
-        email: this.email,
-        password: this.password
-      }
-    },
     user() {
       return {
-        f_name: this.f_name,
-        s_name: this.s_name,
+        f_name: this.f_name.charAt(0).toUpperCase() + this.f_name.slice(1),
+        s_name: this.s_name.charAt(0).toUpperCase() + this.s_name.slice(1),
         email: this.email,
         password: this.password,
         domain: this.domain
@@ -140,6 +132,7 @@ export default {
         ]"
         class="auth-input"
         outlined
+        @keyup.enter="validateForm()"
       >
       </v-text-field>
       <!-- <v-btn color="success" @click.stop="validateInfo()">Submit</v-btn> -->

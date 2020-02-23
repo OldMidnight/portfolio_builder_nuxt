@@ -1,7 +1,7 @@
 <script>
-// import Prices from '@/components/home/prices_component'
+import Prices from '@/components/home/prices_component'
 export default {
-  // components: { Prices },
+  components: { Prices },
   data() {
     return {
       nav_state: false,
@@ -542,7 +542,7 @@ export default {
           </v-row>
         </v-col>
       </v-row>
-      <!-- <v-row
+      <v-row
         class="content--pricing"
         :class="{ 'm-content--pricing': $vuetify.breakpoint.smAndDown }"
       >
@@ -595,7 +595,7 @@ export default {
             Get Started
           </v-btn>
         </v-col>
-      </v-row> -->
+      </v-row>
       <v-row
         class="content--about"
         :class="{ 'm-content--about': $vuetify.breakpoint.smAndDown }"
@@ -640,9 +640,10 @@ export default {
               }"
               :class="{ 'mx-3': !$vuetify.breakpoint.smAndDown }"
             >
-              Not everything can be described through words, so having an online
-              presence where potential employers and interested parties can view
-              your work and learn about you, is more important than ever.
+              Not everyone needs an online store or business. A simple website,
+              where your work and interests are at the forefront offer the
+              simplicity for both you and visitors of you website to understand
+              you as a person.
             </p>
           </div>
           <p
@@ -864,16 +865,16 @@ export default {
                             :style="{ fontSize: '18px' }"
                             class="font-weight-bold text-center"
                           >
-                            Interested in becoming a kreoh tester and help shape
+                            Interested in becoming a Kreoh tester and help shape
                             kreoh's future?
                           </p>
                           <p class="font-weight-bold mt-4">
                             As a beta tester you can:
                           </p>
                           <ul>
-                            <li>Early access to kreoh</li>
-                            <li>Ability to reserve a kreoh domain</li>
-                            <li>Test all features of kreoh</li>
+                            <li>Early access to Kreoh</li>
+                            <li>Ability to reserve a Kreoh subdomain</li>
+                            <li>Test all features of Kreoh</li>
                             <li>Provide feedback on current features</li>
                             <li>
                               Recommend and design features to be implemented

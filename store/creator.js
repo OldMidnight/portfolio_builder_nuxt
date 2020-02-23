@@ -2,6 +2,11 @@ export const state = () => ({
   creation_step: 0,
   saving: false,
   site_props: {
+    transition: {
+      name: 'Fade',
+      enterActiveClass: 'fadeIn',
+      leaveActiveClass: 'fadeOut'
+    },
     favicon: {
       use: false,
       link: null
@@ -204,7 +209,9 @@ export const state = () => ({
   },
   show_next_step: false,
   images_to_upload: [],
-  project_images_to_upload: []
+  project_images_to_upload: [],
+  user_uploads: [],
+  user_storage: {}
 })
 
 export const mutations = {
@@ -230,6 +237,9 @@ export const mutations = {
     state.site_props.text_border_color = false
     state.site_props.text_border_color_value = '#000000'
     state.show_next_step = false
+  },
+  resetCreationStep(state) {
+    state.creation_step = 0
   },
   setCreationStep(state, sym) {
     if (sym === '+') {
@@ -565,47 +575,64 @@ export const mutations = {
     /*
     Adds an object of data to an array of files to upload
     */
-    state.images_to_upload.push(payload.img_data)
+    let upload = true
+    for (const image of state.images_to_upload) {
+      if (payload.img_data.url === image.url) {
+        upload = false
+      }
+    }
+    if (upload) {
+      state.images_to_upload.push(payload.img_data)
+    }
   },
   addProjectImageToUpload(state, payload) {
     /*
     Adds an object of data to an array of files to upload
     */
     state.project_images_to_upload.push(payload.img_data)
+  },
+  setUserUploads(state, payload) {
+    state.user_uploads = payload.uploads
+    state.user_storage = payload.storage
+  },
+  setPageTransition(state, payload) {
+    state.site_props.transition = payload.transition
   }
 }
 
 export const actions = {
-  async registerWebsite(context) {
-    await this.$axios
+  registerWebsite(context) {
+    this.$axios
       .$post('/create/register_site', {
         site_props: JSON.stringify(context.state.site_props)
       })
       .then(() => {
         this.$axios.$get('/uploads/screenshot/grab').then(() => {
+          context.commit('resetCreationStep')
           this.$router.push({ path: '/dashboard' })
         })
       })
   },
-  async updateWebsite(context) {
-    await this.$axios
+  updateWebsite(context) {
+    this.$axios
       .$post('/create/update_site', {
         site_props: JSON.stringify(context.state.site_props)
       })
       .then(() => {
         this.$axios.$get('/uploads/screenshot/grab').then(() => {
+          context.commit('resetCreationStep')
           this.$router.push({ path: '/dashboard' })
         })
       })
   },
-  uploadImages(context) {
+  async uploadImages(context) {
     const config = {
       headers: {
         'content-type': 'multipart/form-data'
       }
     }
     for (const image of context.state.images_to_upload) {
-      this.$axios({
+      await this.$axios({
         method: 'post',
         url: image.url,
         data: image.upload_form_data,
@@ -614,15 +641,8 @@ export const actions = {
         context.commit('updatePageImg', image.page_img_props)
       })
     }
-  },
-  uploadProjectImages(context) {
-    const config = {
-      headers: {
-        'content-type': 'multipart/form-data'
-      }
-    }
     for (const image of context.state.project_images_to_upload) {
-      this.$axios({
+      await this.$axios({
         method: 'post',
         url: image.url,
         data: image.upload_form_data,
@@ -631,6 +651,14 @@ export const actions = {
         context.commit('updateProject', image.page_img_props)
       })
     }
+  },
+  async fetchUserUploads(context) {
+    await this.$axios.$get('/uploads/').then((response) => {
+      context.commit('setUserUploads', {
+        uploads: response.uploads,
+        storage: response.storage
+      })
+    })
   }
 }
 
@@ -641,10 +669,16 @@ export const getters = {
   getNextStepState: (state) => {
     return state.show_next_step
   },
-  getSiteProp: (state) => {
-    return state.site_props.home_page_1_inputs
+  site_props: (state) => {
+    return state.site_props
   },
   getProps: (state) => {
     return state.site_props
+  },
+  userUploads: (state) => {
+    return state.user_uploads
+  },
+  userStorage: (state) => {
+    return state.user_storage
   }
 }

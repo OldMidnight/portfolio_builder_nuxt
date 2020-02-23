@@ -172,12 +172,17 @@ export default {
       // }
       if (this.upload_image) {
         const formData = new FormData()
+        const ext = this.upload_file.name.split('.')[
+          this.upload_file.name.split('.').length - 1
+        ]
         formData.append('image', this.upload_file)
         const url =
           'uploads/images/' +
           this.user.domain +
           '/' +
-          this.options.input_dict_name
+          this.options.input_dict_name +
+          '.' +
+          ext
         this.updatePageImg({
           page_label: this.options.input_dict_name,
           img_props: 'img_props',
@@ -194,12 +199,7 @@ export default {
               page_label: this.options.input_dict_name,
               img_props: 'img_props',
               data: {
-                url:
-                  this.$axios.defaults.baseURL +
-                  'uploads/images/' +
-                  this.user.domain +
-                  '/' +
-                  this.options.input_dict_name,
+                url: this.$axios.defaults.baseURL + url,
                 contain: this.img_contain,
                 link: this.link_image,
                 upload: this.upload_image
@@ -232,20 +232,28 @@ export default {
         this.validated_img_url = reader.result
       }
       reader.readAsDataURL(e)
+    },
+    // scrollDown() {
+    //   location.hash = '#call-to-action'
+    //   // this.$vuetify.goTo('#call-to-action')
+    // },
+    scrollDown() {
+      const el = document.getElementById('call-to-action')
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }
 }
 </script>
 
 <template>
-  <v-layout
-    column
+  <v-row
     :style="check_color_style"
     :class="{ slate: site_props.selected_theme === 1 && options.show_theme }"
-    class="template-container d-flex flex-column align-center justify-start"
+    class="template-container align-center justify-start"
   >
-    <div
-      class="home--img-container d-flex flex-column align-center justify-end"
+    <v-col
+      cols="12"
+      class="home--img-container d-flex flex-column align-center justify-end pb-0"
     >
       <v-tooltip v-model="edit_img_tooltip" right>
         <template v-slot:activator="{ on }">
@@ -255,7 +263,7 @@ export default {
               :src="img_props.url"
               :class="{
                 'user-hero-image-border':
-                  site_props.selected_theme === 3 && !options.preview,
+                  site_props.selected_theme === 2 && !options.preview,
                 'has-border':
                   site_props.text_border_color &&
                   site_props.selected_theme === null
@@ -274,8 +282,11 @@ export default {
         <span>Insert Image</span>
       </v-tooltip>
       <!-- </v-flex> -->
-    </div>
-    <div class="home--content-container d-flex flex-column align-center pt-4">
+    </v-col>
+    <v-col
+      cols="12"
+      class="home--content-container d-flex flex-column align-center mt-0 pt-0"
+    >
       <div
         :style="check_color_style"
         class="user-landing-text d-flex flex-column pa-0 px-4 align-center"
@@ -283,7 +294,19 @@ export default {
         <editor-content :editor="editor" />
       </div>
       <SocialBar1 />
-    </div>
+    </v-col>
+    <v-col cols="12" class="home--content-scroll d-flex justify-center">
+      <v-btn
+        :color="`${site_props.selected_theme === 2 ? 'white' : ''}`"
+        icon
+        x-large
+        @click="scrollDown()"
+      >
+        <v-icon>
+          mdi-chevron-down
+        </v-icon>
+      </v-btn>
+    </v-col>
     <v-dialog v-model="img_dialog" width="500">
       <v-card>
         <v-card-title>Edit Image</v-card-title>
@@ -380,7 +403,7 @@ export default {
         </v-card-actions>
       </v-card>
     </v-dialog>
-  </v-layout>
+  </v-row>
 </template>
 
 <style lang="scss" scoped>
@@ -390,7 +413,7 @@ export default {
   // background-color: white !important;
   position: relative;
   z-index: 5;
-  overflow: auto;
+  // overflow: auto;
 }
 
 .img-preview-container {
@@ -436,12 +459,16 @@ export default {
 }
 
 .home--img-container {
-  height: 40%;
+  // height: 40%;
   width: 100%;
 }
 
 .home--content-container {
-  height: 60%;
+  // height: 50%;
   width: 100%;
+}
+
+.home--content-scroll {
+  height: 10%;
 }
 </style>

@@ -172,7 +172,7 @@ export default {
               "
               :class="{
                 'user-hero-image-border':
-                  site_props.selected_theme === 3 && !options.preview,
+                  site_props.selected_theme === 2 && !options.preview,
                 'has-border':
                   site_props.text_border_color &&
                   site_props.selected_theme === null,

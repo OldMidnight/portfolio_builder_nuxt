@@ -1,5 +1,5 @@
 <script>
-import { mapMutations, mapActions } from 'vuex'
+import { mapMutations, mapActions, mapGetters } from 'vuex'
 export default {
   name: 'SiteSettings',
   layout: 'dashboard_layout',
@@ -22,38 +22,43 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      hourlyStats: 'dashboard/hourlyStats',
+      weeklyStats: 'dashboard/weeklyStats',
+      monthlyStats: 'dashboard/monthlyStats'
+    }),
     hourly_stats() {
       return {
-        labels: this.$store.state.dashboard.stats.hourly.labels,
+        labels: this.hourlyStats.labels,
         datasets: [
           {
             label: 'Visitors By Hour',
             backgroundColor: '#BBDEFB',
-            data: this.$store.state.dashboard.stats.hourly.data
+            data: this.hourlyStats.data
           }
         ]
       }
     },
     weekly_stats() {
       return {
-        labels: this.$store.state.dashboard.stats.weekly.labels,
+        labels: this.weeklyStats.labels,
         datasets: [
           {
             label: 'Visitors By Day',
             backgroundColor: '#BBDEFB',
-            data: this.$store.state.dashboard.stats.weekly.data
+            data: this.weeklyStats.data
           }
         ]
       }
     },
     monthly_stats() {
       return {
-        labels: this.$store.state.dashboard.stats.monthly.labels,
+        labels: this.monthlyStats.labels,
         datasets: [
           {
             label: 'Visitors By Month',
             backgroundColor: '#BBDEFB',
-            data: this.$store.state.dashboard.stats.monthly.data
+            data: this.monthlyStats.data
           }
         ]
       }
@@ -130,7 +135,7 @@ export default {
     async activateSite() {
       if (this.user.email_confirmed) {
         await this.$axios
-          .$post('/helper/site_config/site_activation')
+          .$post('/helpers/site_config/site_activation')
           .then(() => {
             window.location.reload()
           })
@@ -198,8 +203,8 @@ export default {
         <span class="headline font-weight-light">
           Website Settings
         </span>
-        <span class="font-weight-bold site-name-header info--text">
-          Kreoh
+        <span class="font-weight-bold">
+          Manage Your favicon, uploads and view your website metrics.
         </span>
       </div>
     </div>
@@ -209,19 +214,19 @@ export default {
           Navigation
         </span>
         <v-btn
-          color="#ECEFF1"
-          depressed
+          :color="`${user.dark_mode ? '' : '#ECEFF1'}`"
+          tile
           width="100%"
-          class="site-setting-nav-btn pa-9"
+          class="site-setting-nav-btn pa-9 elevation-0"
           @click="scrollTo('metrics_section')"
         >
           Metrics
         </v-btn>
         <v-btn
-          depressed
-          color="#ECEFF1  "
+          :color="`${user.dark_mode ? '' : '#ECEFF1'}`"
+          tile
           width="100%"
-          class="site-setting-nav-btn pa-9"
+          class="site-setting-nav-btn pa-9 elevation-0"
           @click="scrollTo('functionality_section')"
         >
           Functionality
@@ -267,10 +272,10 @@ export default {
               <div class="stat-labels d-flex flex-column">
                 <span class="title">Details:</span>
                 <span class="font-weight-light">
-                  Highest for period: {{ hourly_stats.highest }}
+                  Highest for period: {{ hourlyStats.highest }}
                 </span>
                 <span class="font-weight-light">
-                  Average for period: {{ hourly_stats.avg }}
+                  Total for period: {{ hourlyStats.total }}
                 </span>
               </div>
             </v-card-text>
@@ -308,10 +313,10 @@ export default {
               <div class="stat-labels d-flex flex-column">
                 <span class="title">Details:</span>
                 <span class="font-weight-light">
-                  Highest for period: {{ weekly_stats.highest }}
+                  Highest for period: {{ weeklyStats.highest }}
                 </span>
                 <span class="font-weight-light">
-                  Average for period: {{ weekly_stats.avg }}
+                  Total for period: {{ weeklyStats.total }}
                 </span>
               </div>
             </v-card-text>
@@ -349,10 +354,10 @@ export default {
               <div class="stat-labels d-flex flex-column">
                 <span class="title">Details:</span>
                 <span class="font-weight-light">
-                  Highest for period: {{ monthly_stats.highest }}
+                  Highest for period: {{ monthlyStats.highest }}
                 </span>
                 <span class="font-weight-light">
-                  Average for period: {{ monthly_stats.avg }}
+                  Total for period: {{ monthlyStats.total }}
                 </span>
               </div>
             </v-card-text>
@@ -574,7 +579,6 @@ export default {
 }
 
 .site-name-header {
-  color: #0066ff;
   font-size: 22px;
 }
 

@@ -5,14 +5,14 @@ export const state = () => ({
   },
   stats: {
     hourly: {
-      avg: 0,
+      total: 0,
       highest: 0,
       data: [1],
       autodraw: false,
       labels: ['a']
     },
     weekly: {
-      avg: 0,
+      total: 0,
       highest: 0,
       data: [1],
       autodraw: false,
@@ -20,14 +20,14 @@ export const state = () => ({
       last_visitor_time: `'tis a lonely road you walk...`
     },
     monthly: {
-      avg: 0,
+      total: 0,
       highest: 0,
       data: [1],
       autodraw: false,
       labels: ['a']
     },
     cta_inter: {
-      avg: 0,
+      total: 0,
       highest: 0,
       data: [1],
       autodraw: false,
@@ -39,7 +39,7 @@ export const state = () => ({
 
 export const mutations = {
   updateStatsData(state, payload) {
-    state.stats[payload.type].weekly_stats_avg = payload.avg
+    state.stats[payload.type].total = payload.total
     state.stats[payload.type].autodraw = payload.autodraw
     state.stats[payload.type].data = payload.data
     state.stats[payload.type].labels = payload.labels
@@ -55,7 +55,7 @@ export const actions = {
     await this.$axios.$get('/stats/fetch_hourly').then((response) => {
       commit('updateStatsData', {
         type: 'hourly',
-        avg: response.avg,
+        total: response.total,
         autodraw: true,
         data: response.values,
         labels: response.labels,
@@ -65,7 +65,7 @@ export const actions = {
     await this.$axios.$get('/stats/fetch_weekly').then((response) => {
       commit('updateStatsData', {
         type: 'weekly',
-        avg: response.avg,
+        total: response.total,
         autodraw: true,
         data: response.values,
         labels: response.labels,
@@ -76,7 +76,7 @@ export const actions = {
     await this.$axios.$get('/stats/fetch_monthly').then((response) => {
       commit('updateStatsData', {
         type: 'monthly',
-        avg: response.avg,
+        total: response.total,
         autodraw: true,
         data: response.values,
         labels: response.labels,
@@ -86,7 +86,7 @@ export const actions = {
     await this.$axios.$get('/stats/fetch_cta_inter').then((response) => {
       commit('updateStatsData', {
         type: 'cta_inter',
-        avg: response.avg,
+        total: response.total,
         autodraw: true,
         data: response.values,
         labels: response.labels,
@@ -95,4 +95,10 @@ export const actions = {
       })
     })
   }
+}
+
+export const getters = {
+  hourlyStats: (state) => state.stats.hourly,
+  weeklyStats: (state) => state.stats.weekly,
+  monthlyStats: (state) => state.stats.monthly
 }

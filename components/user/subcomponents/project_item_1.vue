@@ -73,7 +73,7 @@ export default {
   <v-layout
     :style="[check_custom_style]"
     :class="{
-      'matrix-border': site_props.selected_theme === 3
+      'matrix-border': site_props.selected_theme === 2
     }"
     class="item-container mb-2 mx-auto"
   >
@@ -94,7 +94,14 @@ export default {
           {{ description }}
         </p>
         <v-divider v-if="link.use"></v-divider>
-        <a v-if="link.use" class="caption mt-1 primary--text">
+        <a
+          v-if="link.use"
+          :class="
+            `caption mt-1 primary--text ${
+              site_props.selected_theme === 1 ? 'white--text' : ''
+            }`
+          "
+        >
           {{ link.link_text }}
         </a>
       </v-flex>

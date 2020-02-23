@@ -96,7 +96,7 @@ export default {
 
 .section-editor {
   // border: 1px solid;
-  height: 50%;
+  // height: 50%;
   width: 100%;
   overflow: auto;
 }

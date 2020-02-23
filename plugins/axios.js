@@ -6,15 +6,23 @@ export default function(context) {
   context.$axios.onResponseError((error) => {
     const response = error.response
     const originalRequest = response.config
-    if (response.status === 401 && !originalRequest._retry) {
+    // console.log('CHECK RETRY 1:', originalRequest._retry)
+    // console.log(originalRequest)
+    if (
+      response.status === 401 &&
+      !originalRequest._retry &&
+      originalRequest.url !== '/helpers/refresh_token'
+    ) {
+      // console.log('CHECK RETRY 2:', originalRequest._retry)
       originalRequest._retry = true
       // const originalRequest = response.config
       const refresh = context.$auth.getRefreshToken('local')
       context.$axios.setHeader('Authorization', refresh)
       context.$axios.setToken(refresh)
       return context.$axios
-        .$post('/helper/refresh_token')
+        .$post('/helpers/refresh_token')
         .then((response) => {
+          // console.log('NO ERROR GETTING REFRESH')
           context.$auth.setUserToken(response.access_token)
           context.$axios.setToken(response.access_token, 'Bearer')
           originalRequest.headers.Authorization =
@@ -27,9 +35,11 @@ export default function(context) {
           return context.$axios(originalRequest)
         })
         .catch(() => {
+          // console.log('ERROR GETTING REFRESH')
           context.redirect(301, '/auth/login')
         })
     } else {
+      // console.log('401 AND RETRIED')
       context.redirect(301, '/auth/login')
     }
   })

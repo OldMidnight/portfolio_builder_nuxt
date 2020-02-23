@@ -7,7 +7,7 @@ export default {
   layout: 'dashboard_layout',
   // components: { SiteSettings, UserSettings },
   fetch({ store, $axios }) {
-    return $axios.$get('/helper/auth_site_config').then((response) => {
+    return $axios.$get('/helpers/auth_site_config').then((response) => {
       if (!response.site_not_created) {
         store.commit('creator/setSiteProps', response.site_config)
       }
@@ -77,11 +77,11 @@ export default {
       }
       this.messages = response.messages
     })
-    if (this.messages.length <= 3) {
+    if (this.messages.length <= 2) {
       this.prev_messages = this.messages
     } else {
       this.prev_messages = this.messages.slice(
-        this.messages.length - 3,
+        this.messages.length - 2,
         this.messages.length
       )
     }
@@ -95,7 +95,7 @@ export default {
     }),
     deleteSite() {
       this.$axios
-        .$post('/helper/delete_site', { domain: this.user.domain })
+        .$post('/helpers/delete_site', { domain: this.user.domain })
         .then((response) => {
           this.delete_msg = response.message
           this.delete_success = true
@@ -114,6 +114,9 @@ export default {
       this.$axios.$post('/u/email_verify').then(() => {
         this.activation_resent = true
       })
+    },
+    openMessage(id) {
+      this.$router.push({ path: '/dashboard/message-center?id=' + id })
     }
   },
   head() {
@@ -128,10 +131,18 @@ export default {
   <v-layout>
     <div class="general-settings-container">
       <div
-        class="general-settings-wrapper d-flex flex-column align-center justify-center pl-3 pr-2 pt-3"
+        :class="
+          `general-settings-wrapper ${
+            $vuetify.theme.dark ? 'darkmode' : ''
+          } d-flex flex-column align-center justify-center pl-3 pr-2 pt-3`
+        "
       >
         <div
-          class="gen-setting-item gen-setting-settings ma-2 pa-4 d-flex flex-column align-center justify-center elevation-2 gen-setting--border"
+          :class="
+            `gen-setting-item ${
+              $vuetify.theme.dark ? 'darkmode' : ''
+            } gen-setting-settings ma-2 pa-4 d-flex flex-column align-center justify-center elevation-2 gen-setting--border`
+          "
         >
           <div>
             <v-icon class="gen-setting--icon" color="success">
@@ -163,7 +174,11 @@ export default {
           </div>
         </div>
         <div
-          class="gen-setting-item gen-setting-messages messages ma-2 py-4 px-2 d-flex flex-column align-center elevation-2 gen-setting--border"
+          :class="
+            `gen-setting-item ${
+              $vuetify.theme.dark ? 'darkmode' : ''
+            } gen-setting-messages messages ma-2 py-4 px-2 d-flex flex-column align-center elevation-2 gen-setting--border`
+          "
         >
           <div>
             <v-icon class="gen-setting--icon" color="info">
@@ -173,12 +188,17 @@ export default {
           </div>
           <div
             v-if="messages"
-            class="messages-preview my-3 py-2 d-flex flex-column align-center"
+            class="messages-preview py-2 d-flex flex-column align-center"
           >
-            <div
+            <nuxt-link
               v-for="(message, index) in messages"
               :key="index"
-              class="messages-container my-1"
+              :class="
+                `messages-container my-1 ${
+                  user.dark_mode ? 'white' : 'black'
+                }--text`
+              "
+              :to="`/dashboard/message-center?id=${message.id}`"
             >
               <v-hover v-slot:default="{ hover }">
                 <div
@@ -188,7 +208,7 @@ export default {
                   <div
                     class="message-details d-flex flex-column justify-center"
                   >
-                    <span :style="{ fontSize: '16px' }">
+                    <span :style="{ fontSize: '16px' }" class="text-truncate">
                       {{ message.subject }}
                     </span>
                     <span :style="{ fontSize: '12px' }">
@@ -204,7 +224,21 @@ export default {
                   </div>
                 </div>
               </v-hover>
-            </div>
+            </nuxt-link>
+            <v-btn
+              :class="`messages-container my-1`"
+              color="info"
+              outlined
+              nuxt
+              to="/dashboard/message-center?support=true"
+            >
+              <span>
+                Send us a message!
+              </span>
+              <v-icon large class="ml-1">
+                mdi-face-agent
+              </v-icon>
+            </v-btn>
           </div>
           <div
             v-else
@@ -213,17 +247,22 @@ export default {
             <span class="text-center">No Unread Messages</span>
           </div>
           <v-btn
-            class="align-self-center gen-setting-btn--border"
+            class="align-self-center gen-setting-btn--border mb-2"
             color="info"
             small
             outlined
-            @click="flipTo('messages')"
+            nuxt
+            to="/dashboard/message-center"
           >
             Messages
           </v-btn>
         </div>
         <div
-          class="gen-setting-item gen-setting-plan ma-2 pa-4 d-flex flex-column align-center justify-space-around elevation-2 gen-setting--border"
+          :class="
+            `gen-setting-item ${
+              $vuetify.theme.dark ? 'darkmode' : ''
+            } gen-setting-plan ma-2 pa-4 d-flex flex-column align-center justify-space-around elevation-2 gen-setting--border`
+          "
         >
           <div>
             <v-icon class="gen-setting--icon" color="#FDD835">
@@ -244,11 +283,11 @@ export default {
             &euro; {{ accout_types[user.account_type].price }}
           </span>
           <v-btn
+            disabled
             color="info"
             small
             outlined
             class="gen-setting-btn--border"
-            @click="flipTo('subscriptions')"
           >
             {{ user.account_type === 0 ? 'Upgrade' : 'Manage' }}
           </v-btn>
@@ -265,7 +304,11 @@ export default {
           {{ (user.domain + '.kreoh.com').toUpperCase() }}
         </span>
         <div
-          class="website-container d-flex flex-column justify-space-between align-center elevation-2 website-container--border pb-4"
+          :class="
+            `website-container ${
+              $vuetify.theme.dark ? 'darkmode' : ''
+            } d-flex flex-column justify-space-between align-center elevation-2 website-container--border pb-4`
+          "
         >
           <div
             v-if="user.site_created"
@@ -274,7 +317,11 @@ export default {
             <v-img
               v-for="(img, index) in website_images"
               :key="index"
-              class="website-img website-img--border mx-1"
+              :class="
+                `website-img ${
+                  $vuetify.theme.dark ? 'darkmode--border' : ''
+                } mx-1`
+              "
               contain
               :src="img"
             ></v-img>
@@ -283,27 +330,32 @@ export default {
             v-else
             class="website-preview-container d-flex align-center justify-center pt-2"
           >
-            <!-- <v-img
-              v-for="(img, index) in preview_images"
-              :key="index"
-              class="website-img website-img--border mx-1"
-              contain
-              :src="img.src"
-            ></v-img> -->
             <div
-              class="img-preview-text d-flex justify-center align-center mx-1"
+              :class="
+                `${
+                  $vuetify.theme.dark ? 'darkmode' : ''
+                } img-preview-text d-flex justify-center align-center mx-1`
+              "
             >
               <v-icon>mdi-image</v-icon>
               <p class="font-weight-bold ml-3">Home</p>
             </div>
             <div
-              class="img-preview-text d-flex justify-center align-center mx-1"
+              :class="
+                `${
+                  $vuetify.theme.dark ? 'darkmode' : ''
+                } img-preview-text d-flex justify-center align-center mx-1`
+              "
             >
               <v-icon>mdi-image</v-icon>
               <p class="font-weight-bold ml-3">Projects</p>
             </div>
             <div
-              class="img-preview-text d-flex justify-center align-center mx-1"
+              :class="
+                `${
+                  $vuetify.theme.dark ? 'darkmode' : ''
+                } img-preview-text d-flex justify-center align-center mx-1`
+              "
             >
               <v-icon>mdi-image</v-icon>
               <p class="font-weight-bold ml-3">Resume</p>
@@ -315,8 +367,10 @@ export default {
             <v-btn
               v-if="user.site_created"
               outlined
+              :class="`${$vuetify.theme.dark ? 'darkmode' : ''}`"
               color="info"
-              href="/creator"
+              to="/creator"
+              nuxt
             >
               <v-icon>mdi-pencil</v-icon> Edit
             </v-btn>
@@ -329,7 +383,7 @@ export default {
             >
               <v-icon>mdi-open-in-new</v-icon> Visit
             </v-btn>
-            <v-btn v-if="!user.site_created" color="info" href="/creator">
+            <v-btn v-if="!user.site_created" color="info" nuxt to="/creator">
               <v-icon>mdi-plus</v-icon> Create
             </v-btn>
             <v-btn
@@ -380,8 +434,8 @@ export default {
               Site Visitors
             </div>
             <div class="subheading font-weight-light grey--text">
-              Weekly Average - {{ weekly_stats.avg }}
-              / visitors per week
+              Weekly Total - {{ weekly_stats.total }}
+              / visitors this week
             </div>
             <v-divider class="my-2"></v-divider>
             <v-icon class="mr-2" small>
@@ -416,8 +470,8 @@ export default {
               Call-To-Action Analytics
             </div>
             <div class="subheading font-weight-light grey--text">
-              Weekly Interactions - {{ cta_inter_stats.avg }}
-              / interactions per week
+              Weekly Interactions - {{ cta_inter_stats.total }}
+              / interactions this week
             </div>
             <v-divider class="my-2"></v-divider>
             <v-icon class="mr-2" small>
@@ -592,9 +646,6 @@ export default {
 .website-actions-container {
   height: 10%;
   width: 70%;
-  button {
-    background-color: #fafafa;
-  }
   // border: 1px solid #e6e6e6;
 }
 
@@ -617,7 +668,7 @@ export default {
 }
 
 .message {
-  height: 100%;
+  // height: 100%;
   width: 100%;
   border-radius: 5px;
   cursor: pointer;

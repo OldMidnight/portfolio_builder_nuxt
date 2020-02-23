@@ -129,7 +129,9 @@ export default {
         })
       } else {
         // eslint-disable-next-line prettier/prettier
-        ev.target.textContent = this.site_props[this.options.input_dict_name][type]
+        ev.target.textContent = this.site_props[this.options.input_dict_name][
+          type
+        ]
       }
     }
   }
@@ -166,7 +168,7 @@ export default {
                   site_props.selected_theme === 1 &&
                   (!options.preview || options.live),
                 'matrix-border':
-                  site_props.selected_theme === 3 &&
+                  site_props.selected_theme === 2 &&
                   (!options.preview || options.live),
                 'preview-main-img': options.preview,
                 'main-img': !options.preview || options.live,
@@ -214,7 +216,7 @@ export default {
                   site_props.selected_theme === 1 &&
                   (!options.preview || options.live),
                 'matrix-border':
-                  site_props.selected_theme === 3 &&
+                  site_props.selected_theme === 2 &&
                   (!options.preview || options.live),
                 'preview-main-img': options.preview,
                 'main-img': !options.preview || options.live,
@@ -330,7 +332,7 @@ export default {
                   site_props.selected_theme === 1 &&
                   (!options.preview || options.live),
                 'matrix-border':
-                  site_props.selected_theme === 3 &&
+                  site_props.selected_theme === 2 &&
                   (!options.preview || options.live),
                 'preview-main-img': options.preview,
                 'main-img': !options.preview || options.live,

@@ -1,8 +1,9 @@
 <script>
 export default {
   name: 'DashboardLayout',
+  // middleware: ['toggle_dark_mode'],
   fetch({ store, $axios }) {
-    return $axios.$get('/helper/auth_site_config').then((response) => {
+    return $axios.$get('/helpers/auth_site_config').then((response) => {
       if (!response.site_not_created) {
         store.commit('creator/setSiteProps', response.site_config)
       }
@@ -16,10 +17,16 @@ export default {
   },
   created() {
     this.$auth.fetchUser()
+    this.$vuetify.theme.dark = this.$auth.user.dark_mode
   },
   methods: {
     logout() {
       this.$auth.logout()
+    },
+    async toggleDarkMode() {
+      this.$vuetify.theme.dark = !this.$auth.user.dark_mode
+      await this.$axios.$put('/helpers/toggle_dark_mode')
+      this.$auth.fetchUser()
     }
   }
 }
@@ -28,16 +35,31 @@ export default {
 <template>
   <v-app>
     <v-container
-      class="dashboard-wrapper dashboard--gradient"
+      :class="
+        `dashboard-wrapper ${$vuetify.theme.dark ? '' : 'dashboard--gradient'}`
+      "
       fluid
       fill-height
     >
       <v-layout class="dashboard-container d-flex flex-column">
         <v-layout
-          class="dashboard-topnav elevation-3 px-5 d-flex topnav--neumorph"
+          :class="
+            `dashboard-topnav ${
+              $vuetify.theme.dark ? 'darkmode' : ''
+            } elevation-1 px-5 d-flex`
+          "
         >
           <div class="logo-container d-flex align-center">
-            <v-img class="logo" src="/Logo_beta_text.png"></v-img>
+            <v-img
+              class="logo"
+              :src="
+                `${
+                  $vuetify.theme.dark
+                    ? '/Logo_beta_white.png'
+                    : '/Logo_beta_text.png'
+                }`
+              "
+            ></v-img>
           </div>
           <div class="links-container d-flex align-center justify-end">
             <v-text-field
@@ -49,16 +71,29 @@ export default {
               prepend-inner-icon="mdi-magnify"
             ></v-text-field>
             <v-btn text nuxt>FAQ</v-btn>
-            <v-btn text nuxt>Support</v-btn>
-            <v-btn
-              color="error"
-              small
-              outlined
-              class="mx-2"
-              @click.stop="logout()"
-            >
-              <v-icon>mdi-power</v-icon>
+            <v-btn text nuxt to="/dashboard/message-center?support=true">
+              Support
             </v-btn>
+            <v-btn icon @click="toggleDarkMode()">
+              <v-icon>
+                mdi-brightness-{{ $auth.user.dark_mode ? '4' : '5' }}
+              </v-icon>
+            </v-btn>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  color="error"
+                  small
+                  outlined
+                  class="mx-2 "
+                  v-on="on"
+                  @click.stop="logout()"
+                >
+                  <v-icon>mdi-power</v-icon>
+                </v-btn>
+              </template>
+              <span>Logout</span>
+            </v-tooltip>
           </div>
         </v-layout>
         <v-layout
@@ -66,7 +101,11 @@ export default {
         >
           <nuxt
             id="dashboard"
-            class="elevation-15 dashboard--border mt-0 mb-9"
+            :class="
+              `elevation-2 dashboard--border mt-0 mb-9 ${
+                $vuetify.theme.dark ? 'darkmode' : ''
+              }`
+            "
           />
           <div
             class="dashboard--footer-container d-flex flex-column justify-end"

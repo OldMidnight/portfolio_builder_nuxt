@@ -1,4 +1,5 @@
 <script>
+import { mapActions, mapGetters } from 'vuex'
 export default {
   name: 'UserSettings',
   layout: 'dashboard_layout',
@@ -29,10 +30,26 @@ export default {
       password_validating: false,
       account_delete_dialog: false,
       deletion_confirmation_text: '',
-      deletion_btn: false
+      deletion_btn: false,
+      upload_image_types: [
+        'image/png',
+        'image/bmp',
+        'image/jpeg',
+        'image/jpg',
+        'image/gif',
+        'image/svg+xml',
+        'image/vnd.microsoft.icon',
+        'image/x-icon'
+      ],
+      upload_delete_dialog: false,
+      file_to_del: null
     }
   },
   computed: {
+    ...mapGetters({
+      userUploads: 'creator/userUploads',
+      userStorage: 'creator/userStorage'
+    }),
     user() {
       return this.$store.state.auth.user
     },
@@ -41,6 +58,13 @@ export default {
     },
     password_snack_msg() {
       return this.password_message
+    },
+    storage_percent() {
+      return Math.ceil(
+        (this.userStorage.current_storage_space /
+          this.userStorage.max_storage_space) *
+          100
+      )
     }
   },
   watch: {
@@ -52,7 +76,22 @@ export default {
       }
     }
   },
+  created() {
+    this.fetchUserUploads()
+  },
   methods: {
+    ...mapActions({
+      fetchUserUploads: 'creator/fetchUserUploads',
+      deleteFile: 'functions/deleteFile'
+    }),
+    formatBytes(bytes, decimals = 2) {
+      if (bytes === 0) return '0 Bytes'
+      const k = 1000
+      const dm = decimals < 0 ? 0 : decimals
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+      const i = Math.floor(Math.log(bytes) / Math.log(k))
+      return parseFloat((bytes / k ** i).toFixed(dm)) + ' ' + sizes[i]
+    },
     scrollTo(id) {
       const el = document.getElementById(id)
       el.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -121,6 +160,11 @@ export default {
         })
       }
     }
+  },
+  head() {
+    return {
+      title: 'User Settings - Kreoh'
+    }
   }
 }
 </script>
@@ -149,6 +193,42 @@ export default {
         <span class="font-weight-bold text-center my-5">
           Navigation
         </span>
+        <v-btn
+          :color="`${user.dark_mode ? '' : '#ECEFF1'}`"
+          tile
+          width="100%"
+          class="site-setting-nav-btn pa-9 elevation-0"
+          @click="scrollTo('change_email_section')"
+        >
+          Change Email
+        </v-btn>
+        <v-btn
+          tile
+          :color="`${user.dark_mode ? '' : '#ECEFF1'}`"
+          width="100%"
+          class="site-setting-nav-btn pa-9 elevation-0"
+          @click="scrollTo('change_password_section')"
+        >
+          Change Password
+        </v-btn>
+        <v-btn
+          :color="`${user.dark_mode ? '' : '#ECEFF1'}`"
+          tile
+          width="100%"
+          class="site-setting-nav-btn pa-9 elevation-0"
+          @click="scrollTo('uploads_section')"
+        >
+          Manage Uploads
+        </v-btn>
+        <v-btn
+          tile
+          :color="`${user.dark_mode ? '' : '#ECEFF1'}`"
+          width="100%"
+          class="site-setting-nav-btn pa-9 elevation-0"
+          @click="scrollTo('del_acc_section')"
+        >
+          Delete Account
+        </v-btn>
       </div>
       <div class="flipped-section-content-wrapper px-6">
         <div class="flipped-section-content mb-3 mt-10">
@@ -238,12 +318,118 @@ export default {
         </div>
         <div class="flipped-section-content mb-3 mt-10">
           <span
-            id="delete_account_section"
+            id="uploads_section"
             class="headline ml-4 my-3 font-weight-light"
           >
-            Delete Account
+            Manage Uploads
           </span>
-          <div class="d-flex flex-column justify-center align-center mt-4">
+          <v-row class="w-100 border-rounded elevation-2">
+            <v-col cols="12" class="">
+              <v-progress-linear
+                background-color="error"
+                color="success"
+                :value="storage_percent"
+                rounded
+                height="20"
+              >
+                <template>
+                  <p class="font-weight-bold caption">
+                    {{ formatBytes(userStorage.current_storage_space) }}
+                    /
+                    {{ formatBytes(userStorage.max_storage_space) }}
+                  </p>
+                </template>
+              </v-progress-linear>
+            </v-col>
+            <v-col cols="12" class="">
+              <v-row justify="center" align="center">
+                <v-col
+                  v-for="(upload, index) in userUploads"
+                  :key="index"
+                  cols="6"
+                  class="border-rounded elevation-1"
+                >
+                  <v-row>
+                    <v-col cols="2" class="d-flex justify-center align-center">
+                      <v-icon
+                        v-if="upload_image_types.includes(upload.type)"
+                        color="info"
+                        x-large
+                      >
+                        mdi-image
+                      </v-icon>
+                      <v-icon v-else color="info" x-large>
+                        mdi-file-document-outline
+                      </v-icon>
+                    </v-col>
+                    <v-col cols="8">
+                      <v-row class="text-center">
+                        <v-col cols="12" class="px-0 py-1">
+                          <p><strong>File name:</strong> {{ upload.name }}</p>
+                        </v-col>
+                        <v-col cols="12" class="px-0 py-1">
+                          <p><strong>File size:</strong> {{ upload.size }}</p>
+                        </v-col>
+                        <v-col cols="12" class="px-0 py-1">
+                          <p>
+                            <strong>Uploaded:</strong> {{ upload.upload_date }}
+                          </p>
+                        </v-col>
+                      </v-row>
+                    </v-col>
+                    <v-col
+                      cols="2"
+                      class="d-flex flex-column justify-center align-center"
+                    >
+                      <v-tooltip top>
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            color="info"
+                            icon
+                            x-large
+                            class="my-1"
+                            :href="
+                              'http://127.0.0.1:5000/uploads/images/' +
+                                upload.url
+                            "
+                            target="_blank"
+                            v-on="on"
+                          >
+                            <v-icon>mdi-download</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Download</span>
+                      </v-tooltip>
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            color="error"
+                            icon
+                            x-large
+                            class="my-1"
+                            v-on="on"
+                            @click="
+                              file_to_del = upload.url
+                              upload_delete_dialog = true
+                            "
+                          >
+                            <v-icon>mdi-delete</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Delete</span>
+                      </v-tooltip>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </div>
+        <div class="flipped-section-content mb-3 mt-10">
+          <div
+            id="del_acc_section"
+            class="d-flex flex-column justify-center align-center mt-4"
+          >
             <v-btn color="error" @click="account_delete_dialog = true">
               <v-icon>mdi-delete</v-icon> Delete Your Account
             </v-btn>
@@ -284,6 +470,41 @@ export default {
             </v-layout>
           </v-container>
         </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-dialog
+      v-model="upload_delete_dialog"
+      width="500"
+      transition="slide-y-transition"
+    >
+      <v-card>
+        <v-card-title>Delete Upload</v-card-title>
+        <v-divider></v-divider>
+        <v-card-text>
+          <v-container>
+            <v-layout class="d-flex flex-column align-center justify-center">
+              <span class="font-weight-bold text-center">
+                You MAY have this file in use on your website. Deleting it will
+                prevent it from loading. Do you want to continue?
+              </span>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-btn
+            color="info"
+            @click.stop="
+              file_to_del = null
+              upload_delete_dialog = false
+            "
+          >
+            Cancel
+          </v-btn>
+          <v-btn color="error" @click.stop="deleteFile({ url: file_to_del })">
+            Yes, Delete This file
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
     <v-snackbar v-model="email_valid_snackbar" color="success">

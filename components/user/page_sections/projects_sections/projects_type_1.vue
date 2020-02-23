@@ -171,6 +171,9 @@ export default {
     saveProject() {
       if (this.temp_project.img.upload) {
         const formData = new FormData()
+        const ext = this.upload_file.name.split('.')[
+          this.upload_file.name.split('.').length - 1
+        ]
         formData.append('image', this.upload_file)
         const url =
           'uploads/images/' +
@@ -178,7 +181,9 @@ export default {
           '/' +
           this.options.input_dict_name +
           '_' +
-          this.temp_project.id
+          this.temp_project.id +
+          '.' +
+          ext
         this.addProjectImageToUpload({
           img_data: {
             page_img_props: {
@@ -271,7 +276,16 @@ export default {
 <template>
   <v-container fill-height class="projects-container pa-0">
     <v-row class="justify-start projects-wrapper ma-0">
-      <v-col cols="12" class="align-self-center projects--html-content pt-5">
+      <v-col
+        cols="12"
+        :class="
+          `w-100 align-self-center pt-5 ${
+            site_props.selected_theme === 2
+              ? 'matrix'
+              : 'projects--html-content'
+          }`
+        "
+      >
         <editor-content :editor="editor" />
       </v-col>
       <v-col cols="12" class="projects--item-container">
@@ -529,7 +543,6 @@ export default {
 }
 
 .projects--html-content {
-  width: 100%;
   // height: 10%;
   border-bottom: 1px solid #a5a5a5;
 }

@@ -277,7 +277,7 @@ export default {
             Resume Creation Wizard
           </span>
         </v-card-title>
-        <v-card-text>
+        <v-card-text class="dialog-card-text">
           <v-container class="wizard-container">
             <transition
               enter-active-class="animated fadeInUp faster"
@@ -294,8 +294,9 @@ export default {
                 class="wizard-step"
                 :class="{ 'intro-step': !resume_created }"
               >
-                <div class="logo my-9">
-                  <p class="font-weight-light">Kreoh.com</p>
+                <div class="logo w-30">
+                  <!-- <p class="font-weight-light">Kreoh.com</p> -->
+                  <v-img class="logo-img" src="/Logo_beta_text.png"></v-img>
                 </div>
                 <div class="wizard-desc d-flex flex-column align-center">
                   <span class="title">Easy and customisable resume editor</span>
@@ -557,7 +558,7 @@ export default {
                 <div
                   class="customise-section-desc d-flex flex-column align-center"
                 >
-                  <span class="title">
+                  <span class="title mb-0">
                     Customise your: {{ section.name }} section!
                   </span>
                   <span>
@@ -710,6 +711,10 @@ export default {
   overflow: auto;
 }
 
+.dialog-card-text {
+  // overflow-y: !important;
+}
+
 .sections-display {
   // border: 1px solid #e6e6e6;
   border-radius: 10px;
@@ -728,7 +733,7 @@ export default {
 
 .wizard-container {
   height: 100%;
-  overflow: hidden;
+  // overflow: hidden;
 }
 
 .wizard-step {
@@ -747,10 +752,11 @@ export default {
 }
 
 .logo {
-  p {
-    font-size: 60px;
-    color: #0066ff;
-  }
+  // p {
+  //   font-size: 60px;
+  //   color: #0066ff;
+  // }
+  height: auto;
 }
 
 .layout-editor-desc {

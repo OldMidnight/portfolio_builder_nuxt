@@ -49,7 +49,7 @@ export default {
       return function(type) {
         if (vm.site_props.selected_theme === 1) {
           return 'info'
-        } else if (vm.site_props.selected_theme === 3) {
+        } else if (vm.site_props.selected_theme === 2) {
           if (type === 'next') {
             return 'error'
           } else if (type === 'back') {
@@ -148,7 +148,7 @@ export default {
       class="site-container d-flex flex-column justify-center align-center"
       :class="{
         'slate-light': site_props.selected_theme === 1,
-        matrix: site_props.selected_theme === 3
+        matrix: site_props.selected_theme === 2
       }"
       column
     >
@@ -201,7 +201,7 @@ export default {
             class="content-body"
             :class="{
               slate: site_props.selected_theme === 1,
-              'matrix-card': site_props.selected_theme === 3
+              'matrix-card': site_props.selected_theme === 2
             }"
           >
             <v-flex
@@ -209,7 +209,7 @@ export default {
               class="content home-content"
               :class="{
                 slate: site_props.selected_theme === 1,
-                matrix: site_props.selected_theme === 3
+                matrix: site_props.selected_theme === 2
               }"
             >
               <transition
@@ -237,7 +237,7 @@ export default {
               class="content projects-content"
               :class="{
                 slate: site_props.selected_theme === 1,
-                matrix: site_props.selected_theme === 3
+                matrix: site_props.selected_theme === 2
               }"
             >
               <transition
@@ -252,7 +252,7 @@ export default {
                   class="page"
                   :class="{
                     slate: site_props.selected_theme === 1,
-                    matrix: site_props.selected_theme === 3
+                    matrix: site_props.selected_theme === 2
                   }"
                 >
                   <LoadableComponent
@@ -274,7 +274,7 @@ export default {
               class="content resume-content"
               :class="{
                 slate: site_props.selected_theme === 1,
-                matrix: site_props.selected_theme === 3
+                matrix: site_props.selected_theme === 2
               }"
             >
               <transition
@@ -289,7 +289,7 @@ export default {
                   class="page"
                   :class="{
                     slate: site_props.selected_theme === 1,
-                    matrix: site_props.selected_theme === 3
+                    matrix: site_props.selected_theme === 2
                   }"
                 >
                   <LoadableComponent

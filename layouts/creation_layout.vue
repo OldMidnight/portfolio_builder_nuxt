@@ -14,6 +14,9 @@ export default {
       return this.$store.state.creator.creation_step
     }
   },
+  created() {
+    this.$vuetify.theme.dark = this.$auth.user.dark_mode
+  },
   methods: {
     ...mapMutations('creator', [
       'setCreationStep',
@@ -49,7 +52,16 @@ export default {
       <v-layout column align-center class="creation-page-layout">
         <v-flex class="top-nav">
           <div class="mini-logo font-weight-bold">
-            <v-img class="logo" src="/Logo_beta_text.png"></v-img>
+            <v-img
+              class="logo"
+              :src="
+                `${
+                  $vuetify.theme.dark
+                    ? '/Logo_beta_white.png'
+                    : '/Logo_beta_text.png'
+                }`
+              "
+            ></v-img>
           </div>
           <transition
             enter-active-class="animated fadeInRight faster"

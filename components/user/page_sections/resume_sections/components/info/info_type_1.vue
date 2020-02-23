@@ -231,7 +231,7 @@ export default {
 }
 
 .info-viewer {
-  height: 50%;
+  // height: 50%;
   width: 100%;
 }
 

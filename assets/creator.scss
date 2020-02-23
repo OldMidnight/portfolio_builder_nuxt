@@ -565,3 +565,16 @@
 //   height: 100%;
 //   width: 100%;
 // }
+
+.upload {
+  border-radius: 5px;
+}
+
+.upload-name, .upload-size {
+  border-left: 1px solid #c0c0c0;
+  font-size: 14px;
+}
+
+.upload-content {
+  border-bottom: 1px solid #c0c0c0;
+}

@@ -127,7 +127,7 @@ export default {
         })
       return validation
     },
-    async updateCallToAction() {
+    updateCallToAction() {
       if (
         !this.img_props.link &&
         this.img_props.url !== this.validated_img_url
@@ -136,42 +136,45 @@ export default {
       }
       if (this.upload_image) {
         const formData = new FormData()
+        const ext = this.upload_file.name.split('.')[
+          this.upload_file.name.split('.').length - 1
+        ]
         formData.append('image', this.upload_file)
         const url =
           'uploads/images/' +
           this.user.domain +
           '/' +
-          this.options.input_dict_name
-        const config = {
-          headers: {
-            'content-type': 'multipart/form-data'
+          this.options.input_dict_name +
+          '.' +
+          ext
+        this.updatePageDataObject({
+          page_label: this.options.input_dict_name,
+          type: 'img_props',
+          data: {
+            url: this.validated_img_url,
+            contain: this.img_contain,
+            link: this.link_image,
+            upload: this.upload_image
           }
-        }
-        await this.$axios({
-          method: 'post',
-          url,
-          data: formData,
-          config
-        }).then(() => {
-          this.edit_dialog = false
-          this.validated_img_url =
-            this.$axios.defaults.baseURL +
-            'uploads/images/' +
-            this.user.domain +
-            '/' +
-            this.options.input_dict_name
-          this.updatePageDataObject({
-            page_label: this.options.input_dict_name,
-            type: 'img_props',
-            data: {
-              url: this.validated_img_url,
-              contain: this.img_contain,
-              link: this.link_image,
-              upload: this.upload_image
-            }
-          })
-          this.upload_file = null
         })
+        this.addImageToUpload({
+          img_data: {
+            page_img_props: {
+              page_label: this.options.input_dict_name,
+              img_props: 'img_props',
+              data: {
+                url: this.$axios.defaults.baseURL + url,
+                contain: this.img_contain,
+                link: this.link_image,
+                upload: this.upload_image
+              }
+            },
+            upload_form_data: formData,
+            url
+          }
+        })
+        this.upload_file = null
+        this.edit_dialog = false
       } else {
         this.updatePageDataObject({
           page_label: this.options.input_dict_name,
@@ -209,7 +212,7 @@ export default {
 </script>
 
 <template>
-  <v-row class="component-layout py-3">
+  <v-row id="call-to-action" class="component-layout py-3">
     <v-col
       cols="6"
       class="action--section action--img-container d-flex justify-center pa-12"

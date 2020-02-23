@@ -43,7 +43,7 @@ export default {
   <v-flex
     class="top-nav nav-bar"
     :class="{
-      'matrix-card-opp': site_props.selected_theme === 3,
+      'matrix-card-opp': site_props.selected_theme === 2,
       'nav-slate': site_props.selected_theme === 1
     }"
   >
@@ -58,7 +58,7 @@ export default {
           site_props.text_border_color &&
           site_props.selected_theme === null,
         'nav-item-slate': site_props.selected_theme === 1,
-        'nav-item-matrix': site_props.selected_theme === 3,
+        'nav-item-matrix': site_props.selected_theme === 2,
         'dark-nav-text': site_props.tab_text_color === 'black',
         'white-nav-text': site_props.tab_text_color === 'white'
       }"
@@ -79,7 +79,7 @@ export default {
           site_props.text_border_color &&
           site_props.selected_theme === null,
         'nav-item-slate': site_props.selected_theme === 1,
-        'nav-item-matrix': site_props.selected_theme === 3,
+        'nav-item-matrix': site_props.selected_theme === 2,
         'dark-nav-text': site_props.tab_text_color === 'black',
         'white-nav-text': site_props.tab_text_color === 'white'
       }"
@@ -100,7 +100,7 @@ export default {
           site_props.text_border_color &&
           site_props.selected_theme === null,
         'nav-item-slate': site_props.selected_theme === 1,
-        'nav-item-matrix': site_props.selected_theme === 3,
+        'nav-item-matrix': site_props.selected_theme === 2,
         'dark-nav-text': site_props.tab_text_color === 'black',
         'white-nav-text': site_props.tab_text_color === 'white'
       }"

@@ -77,7 +77,7 @@ export default {
       :style="[check_custom_style]"
       :class="{
         slate: site_props.selected_theme === 1,
-        'matrix matrix-border': site_props.selected_theme === 3
+        'matrix matrix-border': site_props.selected_theme === 2
       }"
     >
       <v-card-title class="d-flex justify-center">
@@ -113,7 +113,7 @@ export default {
           <template v-slot:activator="{ on }">
             <v-btn
               class="edit-icon pa-2"
-              :color="site_props.selected_theme === 3 ? '#00E676' : 'warning'"
+              :color="site_props.selected_theme === 2 ? '#00E676' : 'warning'"
               outlined
               @click.stop="editProject()"
               v-on="on"
@@ -126,7 +126,7 @@ export default {
       </v-card-actions>
     </v-card>
     <!-- <v-btn
-      :color="site_props.selected_theme === 3 ? '#00E676' : 'info'"
+      :color="site_props.selected_theme === 2 ? '#00E676' : 'info'"
       class="edit-icon mt-4 ml-3 pa-1 px-2"
       @click.stop="editProject()"
     >

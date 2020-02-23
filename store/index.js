@@ -1,5 +1,5 @@
 export const actions = {
-  async nuxtServerInit({ commit }, { req, $axios }) {
+  async nuxtServerInit({ commit }, { req, $axios, $auth, $vuetify }) {
     if (req.hostname !== undefined) {
       const hosts = req.hostname.split('.')
       let hostNum = 2
@@ -9,7 +9,7 @@ export const actions = {
       if (req.hostname.split('.').length === hostNum) {
         commit('creator/setIsSubdomain')
         await $axios
-          .$post('/helper/check_domain', {
+          .$post('/helpers/check_domain', {
             domain: req.hostname.split('.')[0]
           })
           .then((response) => {

@@ -1,6 +1,6 @@
 <script>
 import _ from 'lodash'
-import { mapMutations, mapActions } from 'vuex'
+import { mapMutations, mapActions, mapGetters } from 'vuex'
 import { Editor, EditorMenuBar } from 'tiptap'
 import {
   Bold,
@@ -34,7 +34,7 @@ export default {
   },
   fetch({ store, $axios }) {
     if (store.state.auth.user.site_created) {
-      return $axios.get('/helper/auth_site_config').then((response) => {
+      return $axios.get('/helpers/auth_site_config').then((response) => {
         store.commit('creator/setSiteProps', response.data.site_config)
       })
     }
@@ -57,14 +57,14 @@ export default {
           component_name: 'Layout_Type_2',
           name: 'STARK',
           img_path: '#',
-          preview_image: '/layout_images/kreoh_layout_1_fresh.png'
+          preview_image: '/layout_images/coming_soon.gif'
         },
         {
           id: 3,
           component_name: 'Layout_Type_3',
           name: 'CLEAR',
           img_path: '#',
-          preview_image: '/layout_images/kreoh_layout_1_fresh.png'
+          preview_image: '/layout_images/coming_soon.gif'
         }
       ],
       site_nav: 0,
@@ -118,6 +118,8 @@ export default {
           layout: 1,
           name: 'layout_1_slate',
           title: 'Space Grey',
+          title_color: 'black',
+          img: '/creator_misc/space_gray_img.png',
           small_desc: 'Cool & Grey.',
           desc:
             'Give a website a slick and stealthy lick of paint. With consistent coloring for all components, ensure a clean and minimal look.'
@@ -132,10 +134,12 @@ export default {
         //     'Lorem ipsum dolor sit amet consectetur adipiscing elit, varius eu class ante enim fringilla congue, mollis montes nam hendrerit sollicitudin iaculis.'
         // },
         {
-          id: 3,
+          id: 2,
           layout: 1,
           name: 'layout_1_matrix',
           title: 'Matrix',
+          title_color: 'white',
+          img: '/creator_misc/matrix_img.jpeg',
           small_desc: 'Blue Pill Or Red Pill?',
           desc:
             'Taking inspiration from the Matrix Trilogy, enjoy and sleek matrix-style asthetic throughout your website.'
@@ -196,20 +200,114 @@ export default {
       current_waiting_line: null,
       api_waiting_lines_interval: null,
       show_help_dialog: false,
-      current_editors: []
+      current_editors: [],
+      active_editor_index: null,
       // show_tutorial: false,
       // tutorial_step: 1
+      upload_image_types: [
+        'image/png',
+        'image/bmp',
+        'image/jpeg',
+        'image/jpg',
+        'image/gif',
+        'image/svg+xml',
+        'image/vnd.microsoft.icon',
+        'image/x-icon'
+      ],
+      page_transitions: [
+        {
+          name: 'Bounce',
+          enterActiveClass: 'bounceIn',
+          leaveActiveClass: 'bounceOut'
+        },
+        {
+          name: 'Fade',
+          enterActiveClass: 'fadeIn',
+          leaveActiveClass: 'fadeOut'
+        },
+        {
+          name: 'FadeLeft',
+          enterActiveClass: 'fadeInLeft',
+          leaveActiveClass: 'fadeOutRight'
+        },
+        {
+          name: 'FadeRight',
+          enterActiveClass: 'fadeInRight',
+          leaveActiveClass: 'fadeOutLeft'
+        },
+        {
+          name: 'FadeUp',
+          enterActiveClass: 'fadeInUp',
+          leaveActiveClass: 'fadeOutUp'
+        },
+        {
+          name: 'FadeDown',
+          enterActiveClass: 'fadeInDown',
+          leaveActiveClass: 'fadeOutDown'
+        },
+        {
+          name: 'FlipX',
+          enterActiveClass: 'flipInX',
+          leaveActiveClass: 'flipOutX'
+        },
+        {
+          name: 'FlipY',
+          enterActiveClass: 'flipInY',
+          leaveActiveClass: 'flipOutY'
+        },
+        {
+          name: 'SlideUp',
+          enterActiveClass: 'slideInUp',
+          leaveActiveClass: 'slideOutUp'
+        },
+        {
+          name: 'SlideDown',
+          enterActiveClass: 'slideInDown',
+          leaveActiveClass: 'slideOutDown'
+        },
+        {
+          name: 'SlideLeft',
+          enterActiveClass: 'slideInLeft',
+          leaveActiveClass: 'slideOutRight'
+        },
+        {
+          name: 'SlideRight',
+          enterActiveClass: 'slideInRight',
+          leaveActiveClass: 'slideOutLeft'
+        },
+        {
+          name: 'Zoom',
+          enterActiveClass: 'zoomIn',
+          leaveActiveClass: 'zoomOut'
+        }
+      ]
     }
   },
   computed: {
+    ...mapGetters({
+      userUploads: 'creator/userUploads',
+      userStorage: 'creator/userStorage',
+      site_props: 'creator/site_props'
+    }),
+    activeEditor() {
+      if (this.activeNav !== 'home') {
+        return this.editor
+      } else {
+        return this.current_editors[this.active_editor_index]
+      }
+    },
+    storage_percent() {
+      return Math.ceil(
+        (this.userStorage.current_storage_space /
+          this.userStorage.max_storage_space) *
+          100
+      )
+    },
     saving() {
       return this.$store.state.creator.saving
     },
     creation_step() {
       return this.$store.state.creator.creation_step
-    },
-    site_props() {
-      return this.$store.state.creator.site_props
     },
     page_theme_options() {
       const options = []
@@ -221,13 +319,6 @@ export default {
       return options
     },
     home_pages() {
-      // const options = []
-      // for (const page of this.site_props.homePages) {
-      //   if (page.id === this.activeNav_index) {
-      //     options.push(page)
-      //   }
-      // }
-      // return options
       this.createEditors(this.site_props.homePages.length)
       return this.site_props.homePages
     },
@@ -251,6 +342,16 @@ export default {
     },
     user() {
       return this.$store.state.auth.user
+    },
+    page_transition: {
+      set(value) {
+        this.setPageTransition({
+          transition: value
+        })
+      },
+      get() {
+        return this.site_props.transition
+      }
     },
     nav_title_home: {
       set(title) {
@@ -402,7 +503,7 @@ export default {
       return function(type) {
         if (vm.site_props.selected_theme === 1) {
           return 'info'
-        } else if (vm.site_props.selected_theme === 3) {
+        } else if (vm.site_props.selected_theme === 2) {
           if (type === 'next') {
             return 'error'
           } else if (type === 'back') {
@@ -667,6 +768,7 @@ export default {
         func()
       }
     })
+    this.fetchUserUploads()
     if (this.user.site_created) {
       this.customise_background_color = this.site_props.background.color
       this.customise_foreground_color = this.site_props.foreground.color
@@ -692,13 +794,15 @@ export default {
           html: `
             <p>
               <span style="text-align: center; display: block">
-                <span class="display-1">Your Name Here</span>
+                <span class="display-1">${this.user.f_name +
+                  ' ' +
+                  this.user.s_name}</span>
               </span>
             </p>
             <p>
               <span style="text-align: center; display: block">
                 <span class="body-2">
-                  your@email.com - 08xxxxxxxx
+                  ${this.user.email} - 08xxxxxxxx
                 </span>
               </span>
             </p>
@@ -933,14 +1037,24 @@ export default {
       updatePageData: 'creator/updatePageData',
       updatePageDataObject: 'creator/updatePageDataObject',
       updatePageHTML: 'creator/updatePageHTML',
-      startSaving: 'creator/startSaving'
+      startSaving: 'creator/startSaving',
+      setPageTransition: 'creator/setPageTransition'
     }),
     ...mapActions({
       registerWebsite: 'creator/registerWebsite',
       updateWebsite: 'creator/updateWebsite',
       uploadImages: 'creator/uploadImages',
-      uploadProjectImages: 'creator/uploadProjectImages'
+      fetchUserUploads: 'creator/fetchUserUploads',
+      deleteFile: 'functions/deleteFile'
     }),
+    formatBytes(bytes, decimals = 2) {
+      if (bytes === 0) return '0 Bytes'
+      const k = 1000
+      const dm = decimals < 0 ? 0 : decimals
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+      const i = Math.floor(Math.log(bytes) / Math.log(k))
+      return parseFloat((bytes / k ** i).toFixed(dm)) + ' ' + sizes[i]
+    },
     createEditors(num) {
       for (let i = 0; i < num; i++) {
         const editor = new Editor({
@@ -972,6 +1086,7 @@ export default {
           ],
           onFocus: () => {
             this.is_editing = true
+            this.active_editor_index = i
           },
           onUpdate: (e) => {
             // console.log(e)
@@ -1020,7 +1135,9 @@ export default {
         case 'left':
           if (this.activeNav_index === 1) {
             // eslint-disable-next-line prettier/prettier
-            this.activeNav_index = this.site_props[this.activeNav + 'Pages'].length
+            this.activeNav_index = this.site_props[
+              this.activeNav + 'Pages'
+            ].length
           } else {
             this.activeNav_index -= 1
           }
@@ -1069,7 +1186,7 @@ export default {
         this.setNavStyle('1')
       } else {
         this.setTheme(id)
-        if (this.site_props.selected_theme === 3) {
+        if (this.site_props.selected_theme === 2) {
           this.setNavStyle('2')
         } else {
           this.setNavStyle('1')
@@ -1178,13 +1295,13 @@ export default {
     registerSite() {
       if (this.$refs.editor_site_name_form.validate()) {
         this.validating = true
-        this.uploadImages()
-        this.uploadProjectImages()
-        if (!this.user.site_created) {
-          this.registerWebsite(this.site_props)
-        } else {
-          this.updateWebsite(this.site_props)
-        }
+        this.uploadImages().then(() => {
+          if (!this.user.site_created) {
+            this.registerWebsite(this.site_props)
+          } else {
+            this.updateWebsite(this.site_props)
+          }
+        })
       }
     },
     showLinkMenu(attrs) {
@@ -1303,137 +1420,6 @@ export default {
 
           <v-row align="center" class="edit-options-panels">
             <v-expansion-panels popout>
-              <!-- NAVIGATION TAB -->
-
-              <!-- <v-expansion-panel>
-                <v-expansion-panel-header>
-                  <span class="font-weight-bold">Navigation</span>
-                  <span class="caption">
-                    Customize webiste navigation styles
-                  </span>
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <v-item-group
-                    v-model="navigation_style"
-                    value="1"
-                    mandatory
-                    @change="hideNextStep()"
-                  >
-                    <p>Navigation Style</p>
-                    <v-container>
-                      <v-row>
-                        <v-col cols="12" md="4">
-                          <v-item v-slot:default="{ active, toggle }" value="1">
-                            <v-card
-                              class="d-flex align-center flex-column"
-                              height="100"
-                              @click.stop="toggle"
-                            >
-                              <v-icon class="align-self-end">{{
-                                active ? 'mdi-check' : 'mdi-plus'
-                              }}</v-icon>
-
-                              <v-btn
-                                :icon="site_props.textify"
-                                color="info ml-1"
-                                fab
-                              >
-                                <v-icon class="x2">mdi-chevron-right</v-icon>
-                              </v-btn>
-                            </v-card>
-                          </v-item>
-                        </v-col>
-                        <v-col cols="12" md="4">
-                          <v-item v-slot:default="{ active, toggle }" value="2">
-                            <v-card
-                              class="d-flex align-center flex-column"
-                              height="100"
-                              @click.stop="toggle"
-                            >
-                              <v-icon class="align-self-end">{{
-                                active ? 'mdi-check' : 'mdi-plus'
-                              }}</v-icon>
-
-                              <v-btn
-                                color="info ml-1"
-                                class="mt-2"
-                                :outlined="!site_props.textify"
-                                :text="site_props.textify"
-                              >
-                                Next
-                              </v-btn>
-                            </v-card>
-                          </v-item>
-                        </v-col>
-                        <v-col cols="12" md="4">
-                          <v-item v-slot:default="{ active, toggle }" value="3">
-                            <v-card
-                              class="d-flex align-center flex-column"
-                              height="100"
-                              @click.stop="toggle"
-                            >
-                              <v-icon class="align-self-end">{{
-                                active ? 'mdi-check' : 'mdi-plus'
-                              }}</v-icon>
-
-                              <v-btn
-                                color="info ml-1"
-                                class="mt-2"
-                                :rounded="!site_props.textify"
-                                :text="site_props.textify"
-                              >
-                                Next
-                              </v-btn>
-                            </v-card>
-                          </v-item>
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  </v-item-group>
-                  <v-switch
-                    v-model="textify"
-                    label="Textify Navigation"
-                    inset
-                    @change="hideNextStep()"
-                  ></v-switch>
-                  <v-switch
-                    v-model="show_nav_color_customiser"
-                    label="Customise Colors"
-                    :disabled="site_props.selected_theme !== null"
-                    hint="Disable theme to change colors"
-                    :persistent-hint="site_props.selected_theme !== null"
-                    inset
-                    @change="hideNextStep()"
-                    @click.native="reset_color()"
-                  >
-                  </v-switch>
-                  <v-card
-                    v-if="show_nav_color_customiser"
-                    class="d-flex flex-column pa-3"
-                  >
-                    <p class="align-self-center">Colors</p>
-                    <v-color-picker
-                      v-model="navigation_color"
-                      hide-inputs
-                      class="preview-color-pick"
-                      @input="hideNextStep()"
-                    >
-                    </v-color-picker>
-                    <v-flex class="mt-3">
-                      <p>Text Color</p>
-                      <v-radio-group
-                        v-model="navigation_text_color"
-                        @change="hideNextStep()"
-                      >
-                        <v-radio label="White" value="white"></v-radio>
-                        <v-radio label="Black" value="black"></v-radio>
-                        <v-radio label="Custom" value="custom"></v-radio>
-                      </v-radio-group>
-                    </v-flex>
-                  </v-card>
-                </v-expansion-panel-content>
-              </v-expansion-panel> -->
-
               <!-- TABS CUSTOMISATIONS -->
 
               <v-expansion-panel>
@@ -1634,10 +1620,20 @@ export default {
                         class="mx-auto"
                         min-height="380"
                       >
-                        <v-img class="black--text" height="200px" src="#">
-                          <v-card-title class="align-end fill-height">{{
-                            theme.title
-                          }}</v-card-title>
+                        <v-img
+                          class="black--text"
+                          height="200px"
+                          :src="theme.img"
+                        >
+                          <v-card-title class="pa-0 align-end fill-height">
+                            <p
+                              :class="
+                                `ma-0 pt-2 px-5 font-weight-bold headline white`
+                              "
+                            >
+                              {{ theme.title }}
+                            </p>
+                          </v-card-title>
                         </v-img>
                         <v-card-text>
                           <span>{{ theme.small_desc }}</span
@@ -1858,6 +1854,92 @@ export default {
                     Manage files you have uploaded
                   </span>
                 </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-row>
+                    <v-col
+                      v-for="(upload, index) in userUploads"
+                      :key="index"
+                      class="upload py-0 d-flex flex-column elevation-1 my-2"
+                      cols="12"
+                    >
+                      <v-row class="align-center upload-content">
+                        <v-col cols="2" class="upload-icon">
+                          <v-icon
+                            v-if="upload_image_types.includes(upload.type)"
+                            color="info"
+                            large
+                          >
+                            mdi-image
+                          </v-icon>
+                          <v-icon v-else large color="info">
+                            mdi-file-document-outline
+                          </v-icon>
+                        </v-col>
+                        <v-col
+                          cols="5"
+                          class="d-inline-block upload-name text-center text-truncate"
+                        >
+                          <v-tooltip bottom open-on-hover open-delay="400">
+                            <template v-slot:activator="{ on }">
+                              <p class="font-weight-bold" v-on="on">
+                                File Name: {{ upload.name }}
+                              </p>
+                            </template>
+                            <span>{{ upload.name }}</span>
+                          </v-tooltip>
+                        </v-col>
+                        <v-col cols="5" class="upload-size text-center">
+                          <p class="font-weight-bold">
+                            Size: {{ upload.size }}
+                          </p>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col cols="12" class="d-flex justify-center">
+                          <v-btn
+                            small
+                            color="success"
+                            class="mx-2"
+                            :href="
+                              'http://127.0.0.1:5000/uploads/images/' +
+                                upload.url
+                            "
+                            target="_blank"
+                          >
+                            <v-icon>mdi-download</v-icon> Download
+                          </v-btn>
+                          <v-btn
+                            small
+                            color="error"
+                            class="mx-2"
+                            @click="deleteFile({ url: upload.url })"
+                          >
+                            <v-icon>mdi-delete</v-icon> Delete
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="12">
+                      <v-progress-linear
+                        background-color="error"
+                        color="success"
+                        :value="storage_percent"
+                        rounded
+                        height="20"
+                      >
+                        <template>
+                          <p class="font-weight-bold caption">
+                            {{ formatBytes(userStorage.current_storage_space) }}
+                            /
+                            {{ formatBytes(userStorage.max_storage_space) }}
+                          </p>
+                        </template>
+                      </v-progress-linear>
+                    </v-col>
+                  </v-row>
+                </v-expansion-panel-content>
               </v-expansion-panel>
               <v-expansion-panel>
                 <v-expansion-panel-header>
@@ -1866,52 +1948,96 @@ export default {
                     Customize your page transitions
                   </span>
                 </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-sheet class="mx-auto" elevation="8" max-width="800">
+                    <v-slide-group
+                      v-model="page_transition"
+                      class="pa-1"
+                      show-arrows
+                      mandatory
+                      center-active
+                    >
+                      <v-slide-item
+                        v-for="(transition, index) in page_transitions"
+                        :key="index"
+                        v-slot:default="{ active, toggle }"
+                        :value="transition"
+                      >
+                        <v-card
+                          :color="active ? 'primary' : 'grey lighten-1'"
+                          class="ma-4"
+                          height="200"
+                          width="100"
+                          @click="toggle"
+                        >
+                          <v-row
+                            class="fill-height flex-column"
+                            align="center"
+                            justify="center"
+                          >
+                            <p class="title font-weight-light">
+                              {{ transition.name }}
+                            </p>
+                            <v-scale-transition>
+                              <v-icon
+                                v-if="active"
+                                color="white"
+                                size="48"
+                                v-text="'mdi-close-circle-outline'"
+                              ></v-icon>
+                            </v-scale-transition>
+                          </v-row>
+                        </v-card>
+                      </v-slide-item>
+                    </v-slide-group>
+
+                    <v-expand-transition
+                      v-for="(transition, index) in page_transitions"
+                      :key="index"
+                    >
+                      <v-sheet
+                        v-if="page_transition === transition"
+                        color="grey lighten-4"
+                        height="200"
+                        tile
+                      >
+                        <v-row
+                          class="fill-height"
+                          align="center"
+                          justify="center"
+                        >
+                          <transition
+                            appear
+                            :enter-active-class="
+                              `animated ${transition.enterActiveClass} slower`
+                            "
+                            :leave-active-class="
+                              `animated ${transition.leaveActiveClass} slower`
+                            "
+                            mode="out-in"
+                          >
+                            <v-col
+                              cols="6"
+                              class="border-rounded pa-9 elevation-6"
+                            ></v-col>
+                          </transition>
+                        </v-row>
+                      </v-sheet>
+                    </v-expand-transition>
+                  </v-sheet>
+                </v-expansion-panel-content>
               </v-expansion-panel>
             </v-expansion-panels>
           </v-row>
-          <!-- <v-flex
-            class="save-btn-container d-flex justify-center align-center my-2"
-          >
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  large=""
-                  rounded
-                  color="success"
-                  class="mr-3"
-                  v-on="on"
-                  @click="saveChanges()"
-                >
-                  <v-icon>mdi-content-save</v-icon>
-                </v-btn>
-              </template>
-              <span>Save Changes</span>
-            </v-tooltip>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  large
-                  rounded
-                  color="error"
-                  class="ml-3"
-                  v-on="on"
-                  @click="clearChanges()"
-                >
-                  <v-icon>mdi-delete-forever</v-icon>
-                </v-btn>
-              </template>
-              <span>Delete All Changes</span>
-            </v-tooltip>
-          </v-flex> -->
         </div>
 
         <v-layout
           id="creation-step-preview"
           align-center
-          class="preview-edit-window creation-step-preview ma-0"
+          class="preview-edit-window creation-step-preview ma-0 main-light-theme"
           :class="{
             'slate-light': site_props.selected_theme === 1,
-            matrix: site_props.selected_theme === 3
+            matrix: site_props.selected_theme === 2
           }"
           column
         >
@@ -1924,35 +2050,6 @@ export default {
           </v-system-bar>
           <!-- <v-flex class="preview-username-container">Your Name Here</v-flex> -->
           <v-layout align-center class="preview-page-wrapper">
-            <v-btn
-              v-if="site_props.navigation === 1"
-              :icon="site_props.textify && site_props.navigation_style === '1'"
-              :text="site_props.textify"
-              :color="getThemeColor('back')"
-              :outlined="site_props.navigation_style === '2'"
-              :rounded="site_props.navigation_style === '3'"
-              :fab="site_props.navigation_style === '1'"
-              class="preview-sidenav-btn-left"
-              @click.stop="changePreviewPage('left')"
-            >
-              <v-icon
-                v-if="site_props.navigation_style === '1'"
-                :color="site_props.navigation_text_color"
-                class="x2"
-                >mdi-chevron-left</v-icon
-              >
-              <p
-                v-else
-                :class="{
-                  'dark-nav-text': site_props.navigation_text_color === 'black',
-                  'white-nav-text': site_props.navigation_text_color === 'white'
-                }"
-                class="ma-0"
-              >
-                Back
-              </p>
-            </v-btn>
-
             <!-- PREVIEW CONTAINER -->
 
             <v-layout
@@ -1969,7 +2066,7 @@ export default {
             >
               <v-flex
                 class="preview-1-top-nav preview-nav-bar"
-                :class="{ 'matrix-card-opp': site_props.selected_theme === 3 }"
+                :class="{ 'matrix-card-opp': site_props.selected_theme === 2 }"
               >
                 <!-- NAV ITEMS -->
                 <v-flex
@@ -1983,7 +2080,7 @@ export default {
                       site_props.text_border_color &&
                       site_props.selected_theme === null,
                     'nav-1-item-slate': site_props.selected_theme === 1,
-                    'nav-1-item-matrix': site_props.selected_theme === 3,
+                    'nav-1-item-matrix': site_props.selected_theme === 2,
                     'dark-nav-text':
                       site_props.tab_text_colors.home === 'black',
                     'white-nav-text':
@@ -2007,7 +2104,7 @@ export default {
                       site_props.text_border_color &&
                       site_props.selected_theme === null,
                     'nav-1-item-slate': site_props.selected_theme === 1,
-                    'nav-1-item-matrix': site_props.selected_theme === 3,
+                    'nav-1-item-matrix': site_props.selected_theme === 2,
                     'dark-nav-text':
                       site_props.tab_text_colors.projects === 'black',
                     'white-nav-text':
@@ -2031,7 +2128,7 @@ export default {
                       site_props.text_border_color &&
                       site_props.selected_theme === null,
                     'nav-1-item-slate': site_props.selected_theme === 1,
-                    'nav-1-item-matrix': site_props.selected_theme === 3,
+                    'nav-1-item-matrix': site_props.selected_theme === 2,
                     'dark-nav-text':
                       site_props.tab_text_colors.resume === 'black',
                     'white-nav-text':
@@ -2048,13 +2145,18 @@ export default {
                 class="preview-1-content-body content-body"
                 :class="{
                   slate: site_props.selected_theme === 1,
-                  'matrix-card': site_props.selected_theme === 3
+                  'matrix-card': site_props.selected_theme === 2
                 }"
               >
                 <transition-group
+                  appear
                   name="page-section-transition"
-                  enter-active-class="animated fadeIn faster"
-                  leave-active-class="animated fadeOut faster"
+                  :enter-active-class="
+                    `animated ${page_transition.enterActiveClass} fast`
+                  "
+                  :leave-active-class="
+                    `animated ${page_transition.leaveActiveClass} fast`
+                  "
                   mode="out-in"
                 >
                   <v-row
@@ -2063,15 +2165,9 @@ export default {
                     class="preview-1-content preview-1-home-content ma-0"
                     :class="{
                       slate: site_props.selected_theme === 1,
-                      matrix: site_props.selected_theme === 3
+                      matrix: site_props.selected_theme === 2
                     }"
                   >
-                    <!-- <transition
-                      name="preview-page"
-                      enter-active-class="animated fadeIn faster"
-                      leave-active-class="animated fadeOut faster"
-                      mode="out-in"
-                    > -->
                     <v-col
                       v-for="preview_page in home_pages"
                       :key="preview_page.id"
@@ -2079,7 +2175,7 @@ export default {
                       class="preview-1-page pa-0"
                       :class="{
                         slate: site_props.selected_theme === 1,
-                        matrix: site_props.selected_theme === 3
+                        matrix: site_props.selected_theme === 2
                       }"
                     >
                       <LoadableComponent
@@ -2095,7 +2191,6 @@ export default {
                         @update="updateInput($event)"
                       ></LoadableComponent>
                     </v-col>
-                    <!-- </transition> -->
                   </v-row>
                   <v-flex
                     v-if="activeNav === 'projects'"
@@ -2103,22 +2198,16 @@ export default {
                     class="preview-1-content preview-1-projects-content"
                     :class="{
                       slate: site_props.selected_theme === 1,
-                      matrix: site_props.selected_theme === 3
+                      matrix: site_props.selected_theme === 2
                     }"
                   >
-                    <!-- <transition
-                      name="preview-page"
-                      enter-active-class="animated fadeIn faster"
-                      leave-active-class="animated fadeOut faster"
-                      mode="out-in"
-                    > -->
                     <v-flex
                       v-for="preview_page in projects_pages"
                       :key="preview_page.id"
                       class="preview-1-page"
                       :class="{
                         slate: site_props.selected_theme === 1,
-                        matrix: site_props.selected_theme === 3
+                        matrix: site_props.selected_theme === 2
                       }"
                     >
                       <LoadableComponent
@@ -2133,7 +2222,6 @@ export default {
                         :editor="editor"
                       ></LoadableComponent>
                     </v-flex>
-                    <!-- </transition> -->
                   </v-flex>
                   <v-flex
                     v-if="activeNav === 'resume'"
@@ -2141,22 +2229,16 @@ export default {
                     class="preview-1-content preview-1-resume-content"
                     :class="{
                       slate: site_props.selected_theme === 1,
-                      matrix: site_props.selected_theme === 3
+                      matrix: site_props.selected_theme === 2
                     }"
                   >
-                    <!-- <transition
-                      name="preview-page"
-                      enter-active-class="animated fadeIn faster"
-                      leave-active-class="animated fadeOut faster"
-                      mode="out-in"
-                    > -->
                     <v-flex
                       v-for="preview_page in resume_pages"
                       :key="preview_page.id"
                       class="preview-1-page"
                       :class="{
                         slate: site_props.selected_theme === 1,
-                        matrix: site_props.selected_theme === 3
+                        matrix: site_props.selected_theme === 2
                       }"
                     >
                       <LoadableComponent
@@ -2170,7 +2252,6 @@ export default {
                         @update="updateInput($event)"
                       ></LoadableComponent>
                     </v-flex>
-                    <!-- </transition> -->
                   </v-flex>
                 </transition-group>
               </v-flex>
@@ -2216,112 +2297,7 @@ export default {
                 ></v-flex>
               </v-layout>
             </v-layout>
-
-            <v-btn
-              v-if="site_props.navigation === 1"
-              :icon="site_props.textify && site_props.navigation_style === '1'"
-              :text="site_props.textify"
-              :color="getThemeColor('next')"
-              :outlined="site_props.navigation_style === '2'"
-              :rounded="site_props.navigation_style === '3'"
-              :fab="site_props.navigation_style === '1'"
-              class="preview-sidenav-btn-right"
-              @click.stop="changePreviewPage('right')"
-            >
-              <v-icon
-                v-if="site_props.navigation_style === '1'"
-                :color="site_props.navigation_text_color"
-                class="x2"
-                >mdi-chevron-right</v-icon
-              >
-              <p
-                v-else
-                :class="{
-                  'dark-nav-text': site_props.navigation_text_color === 'black',
-                  'white-nav-text': site_props.navigation_text_color === 'white'
-                }"
-                class="ma-0"
-              >
-                Next
-              </p>
-            </v-btn>
           </v-layout>
-
-          <!-- <v-layout
-            v-if="site_props.navigation === 0"
-            class="preview-bottom-nav-arrows"
-          >
-            <v-flex class="mx-2 d-flex justify-center">
-              <v-btn
-                v-if="site_props.navigation === 0"
-                :icon="
-                  site_props.textify && site_props.navigation_style === '1'
-                "
-                :text="site_props.textify"
-                :color="getThemeColor('back')"
-                :outlined="site_props.navigation_style === '2'"
-                :rounded="site_props.navigation_style === '3'"
-                :fab="site_props.navigation_style === '1'"
-                class="preview-bottom-nav-btn-left"
-                @click.stop="changePreviewPage('left')"
-              >
-                <v-icon
-                  v-if="site_props.navigation_style === '1'"
-                  :color="site_props.navigation_text_color"
-                  class="x2"
-                  >mdi-chevron-left</v-icon
-                >
-                <p
-                  v-else
-                  :class="{
-                    'dark-nav-text':
-                      site_props.navigation_text_color === 'black',
-                    'white-nav-text':
-                      site_props.navigation_text_color === 'white'
-                  }"
-                  class="ma-0"
-                >
-                  Back
-                </p>
-              </v-btn>
-            </v-flex>
-            <v-flex class="d-flex justify-center mx-2">
-              <v-btn
-                v-if="site_props.navigation === 0"
-                :icon="
-                  site_props.textify && site_props.navigation_style === '1'
-                "
-                :text="site_props.textify"
-                :color="getThemeColor('next')"
-                :outlined="site_props.navigation_style === '2'"
-                :rounded="site_props.navigation_style === '3'"
-                :fab="site_props.navigation_style === '1'"
-                class="preview-bottom-nav-btn-right"
-                @click.stop="changePreviewPage('right')"
-              >
-                <v-icon
-                  v-if="site_props.navigation_style === '1'"
-                  :color="site_props.navigation_text_color"
-                  class="x2"
-                  >mdi-chevron-right</v-icon
-                >
-                <p
-                  v-else
-                  :class="{
-                    'dark-nav-text':
-                      site_props.navigation_text_color === 'black' &&
-                      site_props.selected_theme === null,
-                    'white-nav-text':
-                      site_props.navigation_text_color === 'white' &&
-                      site_props.selected_theme === null
-                  }"
-                  class="ma-0"
-                >
-                  Next
-                </p>
-              </v-btn>
-            </v-flex>
-          </v-layout> -->
         </v-layout>
       </v-layout>
 
@@ -2475,7 +2451,7 @@ export default {
       <v-toolbar v-show="is_editing" class="editor-toolbar">
         <editor-menu-bar
           v-slot="{ commands, isActive, getMarkAttrs }"
-          :editor="editor"
+          :editor="activeEditor"
         >
           <div
             class="d-flex justify-space-between align-center edit-items-container"
