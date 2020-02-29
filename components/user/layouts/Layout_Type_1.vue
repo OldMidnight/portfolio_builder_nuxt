@@ -17,6 +17,9 @@ export default {
     site_props() {
       return this.$store.state.creator.site_props
     },
+    user() {
+      return this.$auth.user
+    },
     home_pages() {
       const options = []
       for (const page of this.site_props.homePages) {
@@ -81,7 +84,7 @@ export default {
   },
   created() {
     const dateTime = new Date()
-    const domain = this.$store.state.creator.domain.name
+    const domain = this.user.domain
     this.$axios.$post('/stats/add_record', {
       domain,
       date_time: dateTime
