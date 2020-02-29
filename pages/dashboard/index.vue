@@ -25,11 +25,9 @@ export default {
         { src: '/layout_images/kreoh_layout_1_matrix.png' }
       ],
       accout_types: {
-        0: { title: 'Free Trial', price: 'Free' },
-        1: { title: 'Basic', price: '3.50' },
-        2: { title: 'Plus', price: '5' },
-        3: { title: 'Pro', price: '8.50' },
-        4: { title: 'Beta Tester', price: 'Free' }
+        0: { title: 'Free', price: '0.00' },
+        1: { title: 'Premium', price: '5.00' },
+        4: { title: 'Beta Tester', price: '0.00' }
       },
       website_delete_dialog: false,
       emailNotConfirmed: false,
@@ -49,7 +47,7 @@ export default {
     },
     user_domain() {
       if (this.$axios.defaults.baseURL !== 'http://127.0.0.1:5000/') {
-        return 'http://' + this.user.domain + '.kreoh-client.herokuapp.com/'
+        return 'http://' + this.user.domain + '.kreoh.com/'
       } else {
         return 'http://' + this.user.domain + '.localhost:3001/'
       }
