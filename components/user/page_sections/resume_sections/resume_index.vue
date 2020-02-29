@@ -71,7 +71,7 @@ export default {
       upload_resume_dialog: false,
       upload_rules: [
         (value) =>
-          !value ||/       
+          !value ||
           value.size < 10000000 ||
           'File size should be less than 10 MB!'
       ],
@@ -122,11 +122,9 @@ export default {
   },
   created() {
     // highest = The value of the list of components which has the highest number of components
-    if (this.resume_created 
-    
-    ion_component = this.resume_sections
-    
-                                                                    his./* resume_layout = this.site_props.resume_page_inputs.resume_layout
+    if (this.resume_created && !this.upload_props.use) {
+      this.section_component = this.resume_sections
+      this.resume_layout = this.site_props.resume_page_inputs.resume_layout
     } else {
       const highest = 3
 
