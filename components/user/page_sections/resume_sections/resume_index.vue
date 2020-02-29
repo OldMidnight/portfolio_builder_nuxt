@@ -1,5 +1,5 @@
 <script>
-import { mapMutations, mapState } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 import LoadableComponent from '@/components/helpers/loadable_component'
 export default {
   components: { LoadableComponent },
@@ -67,18 +67,35 @@ export default {
         certifications_component: null,
         interests_component: null
       },
-      resume_layout: []
+      resume_layout: [],
+      upload_resume_dialog: false,
+      upload_rules: [
+        (value) =>
+          !value ||/       
+          value.size < 10000000 ||
+          'File size should be less than 10 MB!'
+      ],
+      upload_file: null,
+      temp_upload_url: null,
+      use_regular_creator_when_upload: false
     }
   },
   computed: {
-    ...mapState('creator', ['site_props']),
+    ...mapGetters({
+      site_props: 'creator/site_props',
+      filesToUpload: 'creator/filesToUpload'
+    }),
+    user() {
+      return this.$auth.user
+    },
+    upload_props() {
+      return this.site_props.resume_page_inputs.resume_upload
+    },
     resume_created() {
-      return this.$store.state.creator.site_props.resume_page_inputs
-        .resume_created
+      return this.site_props.resume_page_inputs.resume_created
     },
     resume_sections() {
-      return this.$store.state.creator.site_props.resume_page_inputs
-        .resume_sections
+      return this.site_props.resume_page_inputs.resume_sections
     },
     component_list() {
       const vm = this
@@ -105,9 +122,11 @@ export default {
   },
   created() {
     // highest = The value of the list of components which has the highest number of components
-    if (this.resume_created) {
-      this.section_component = this.resume_sections
-      this.resume_layout = this.$store.state.creator.site_props.resume_page_inputs.resume_layout
+    if (this.resume_created 
+    
+    ion_component = this.resume_sections
+    
+                                                                    his./* resume_layout = this.site_props.resume_page_inputs.resume_layout
     } else {
       const highest = 3
 
@@ -166,7 +185,10 @@ export default {
   },
   methods: {
     ...mapMutations({
-      setResumeCreated: 'creator/setResumeCreated'
+      setResumeCreated: 'creator/setResumeCreated',
+      addFileToUpload: 'creator/addFileToUpload',
+      updateResumeUpload: 'creator/updateResumeUpload',
+      removeFilesToUpload: 'creator/removeFilesToUpload'
     }),
     moveUp(id) {
       const layout = this.wizard_layout_list.splice(id, 1)[0]
@@ -208,12 +230,69 @@ export default {
       this.resume_layout = this.wizard_layout_list.map((val) => {
         return val.name.toLowerCase()
       })
+      this.updateResumeUpload({
+        resume_upload: { use: false, url: this.temp_upload_url }
+      })
       this.setResumeCreated({
         sections: this.section_component,
         layout: this.resume_layout
       })
       this.resume_wizard_step = 0
       this.progress = 0
+      this.use_regular_creator_when_upload = false
+    },
+    saveUpload() {
+      if (this.upload_file) {
+        const formData = new FormData()
+        formData.append('upload', this.upload_file)
+        const ext = this.upload_file.name.split('.')[
+          this.upload_file.name.split('.').length - 1
+        ]
+        const url =
+          'uploads/user-content/' +
+          this.user.domain +
+          '/' +
+          this.user.domain +
+          '_resume' +
+          '.' +
+          ext
+        // TODO TEST RESUME PDF UPLOAD
+
+        this.updateResumeUpload({
+          resume_upload: { use: true, url: this.temp_upload_url }
+        })
+
+        this.addFileToUpload({
+          file: {
+            type: 'resume_pdf',
+            url: this.$axios.defaults.baseURL + url,
+            upload_data: formData
+          }
+        })
+        this.upload_resume_dialog = false
+        this.resume_wizard_dialog = false
+        this.resume_wizard_step = 0
+        this.progress = 0
+        this.use_regular_creator_when_upload = false
+      } else {
+        const currentResumeToUpload = this.filesToUpload.filter((file) => {
+          return file.type === 'resume_pdf'
+        })
+        if (currentResumeToUpload.length > 0) {
+          this.removeFilesToUpload({
+            files_to_remove: currentResumeToUpload
+          })
+        }
+      }
+    },
+    previewUpload(e) {
+      if (e !== null) {
+        const reader = new FileReader()
+        reader.onload = () => {
+          this.temp_upload_url = reader.result
+        }
+        reader.readAsDataURL(e)
+      }
     }
   }
 }
@@ -221,7 +300,13 @@ export default {
 
 <template>
   <v-container class="resume-container" fill-height>
-    <v-layout class="resume-wrapper d-flex flex-column">
+    <v-row
+      :class="
+        `resume-wrapper d-flex flex-column ${
+          upload_props.use ? ' pa-0' : ''
+        } h-100 ma-0`
+      "
+    >
       <v-btn
         v-if="!resume_created"
         class="align-self-center my-auto"
@@ -230,7 +315,26 @@ export default {
       >
         Create Your Resume!
       </v-btn>
-      <div v-else class="sections-display pa-2 d-flex flex-column">
+      <v-col
+        v-else-if="upload_props.use"
+        cols="12"
+        class="d-flex flex-column align-center justify-center pa-0 pos-rel"
+      >
+        <v-btn
+          v-if="!options.live"
+          color="info"
+          class="pos-abs top-0 right-0 mt-2 mr-2"
+          @click="resume_wizard_dialog = true"
+        >
+          Edit Resume
+        </v-btn>
+        <object
+          :data="upload_props.url"
+          type="application/pdf"
+          class="h-100 w-100"
+        ></object>
+      </v-col>
+      <div v-else class="sections-display pa-2 d-flex flex-column pos-rel">
         <div class="edit-btn d-flex flex-column align-center my-3">
           <v-btn
             v-if="!options.live"
@@ -262,13 +366,12 @@ export default {
           </v-btn>
         </div>
       </div>
-    </v-layout>
+    </v-row>
     <v-dialog
       v-if="!options.preview && !options.live"
       v-model="resume_wizard_dialog"
       scrollable
       transition="slide-x-transition"
-      persistent
       width="800"
     >
       <v-card height="600" class="wizard-dialog">
@@ -304,16 +407,64 @@ export default {
                     With Kreoh's in-built and customisable editor, put together
                     a resume purpose built for you.
                   </span>
+                  <div
+                    v-if="resume_created && !upload_props.use"
+                    class="w-100 d-flex justify-center align-center mt-5"
+                  >
+                    <p class="mr-4">Or upload a pdf:</p>
+                    <v-btn
+                      color="info"
+                      :disabled="use_regular_creator_when_upload"
+                      @click="upload_resume_dialog = true"
+                    >
+                      <v-icon>mdi-upload</v-icon> Upload Resume
+                    </v-btn>
+                  </div>
                 </div>
-                <div v-if="!resume_created" class="wizard-get-started-btn">
+                <div
+                  v-if="!resume_created"
+                  class="wizard-get-started-btn d-flex flex-column align-center justify-center"
+                >
+                  <v-btn
+                    color="info"
+                    :disabled="use_regular_creator_when_upload"
+                    class="my-1"
+                    @click="upload_resume_dialog = true"
+                  >
+                    <v-icon>mdi-upload</v-icon> Upload Resume
+                  </v-btn>
                   <v-btn
                     color="success"
+                    class="my-1"
                     @click="
                       resume_wizard_step += 1
                       progress += 100 / (wizard_layout_list.length + 3)
                     "
                   >
-                    Get Started!
+                    Use Kreoh Editor!
+                  </v-btn>
+                </div>
+                <div
+                  v-else-if="upload_props.use"
+                  class="d-flex flex-column align-center justify-center"
+                >
+                  <v-btn
+                    color="info"
+                    class="my-1"
+                    @click="upload_resume_dialog = true"
+                  >
+                    <v-icon>mdi-upload</v-icon> Upload Resume
+                  </v-btn>
+                  <v-btn
+                    color="success"
+                    class="my-1"
+                    @click="
+                      use_regular_creator_when_upload = true
+                      resume_wizard_step += 1
+                      progress += 100 / (wizard_layout_list.length + 3)
+                    "
+                  >
+                    Switch to Kreoh Resume Creator
                   </v-btn>
                 </div>
                 <div
@@ -614,7 +765,7 @@ export default {
             mode="out-in"
           >
             <div
-              v-if="resume_wizard_step !== 0"
+              v-if="resume_wizard_step !== 0 || use_regular_creator_when_upload"
               key="next"
               class="d-flex wizard-btns px-7"
             >
@@ -649,7 +800,7 @@ export default {
                 <v-btn
                   v-if="
                     resume_wizard_step > wizard_layout_list.length + 2 ||
-                      resume_created
+                      (resume_created && !upload_props.use)
                   "
                   key="save"
                   :disabled="transitioning"
@@ -671,7 +822,7 @@ export default {
                   class="align-self-center"
                 ></v-progress-linear>
               </div>
-              <div v-if="resume_created">
+              <div v-if="resume_created && !upload_props.use">
                 <transition
                   enter-active-class="animated fadeInUp faster"
                   leave-active-class="animated fadeOutDown faster"
@@ -694,6 +845,58 @@ export default {
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="upload_resume_dialog" width="500" persistent>
+      <v-card>
+        <v-card-title>Upload your resume</v-card-title>
+        <v-divider></v-divider>
+        <v-card-text>
+          <v-row>
+            <v-col cols="12">
+              <p class="text-center">
+                Use the below box to upload your PDF.
+                <strong>
+                  This file will count towards your storage quota </strong
+                >.
+              </p>
+            </v-col>
+            <v-col cols="12">
+              <v-file-input
+                v-model="upload_file"
+                :rules="upload_rules"
+                :show-size="1000"
+                color="info"
+                counter
+                chips
+                accept="application/pdf"
+                label="Click to upload a document"
+                prepend-icon="mdi-image"
+                outlined
+                @change="previewUpload($event)"
+              >
+                <template v-slot:selection="{ index, text }">
+                  <v-chip
+                    v-if="index < 2"
+                    color="deep-purple accent-4"
+                    dark
+                    label
+                  >
+                    {{ text }}
+                  </v-chip>
+                </template>
+              </v-file-input>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="success" @click="saveUpload()">
+            Save
+          </v-btn>
+          <v-btn color="error" @click="upload_resume_dialog = false">
+            Cancel
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -709,10 +912,6 @@ export default {
   left: 0;
   padding: 0 10%;
   overflow: auto;
-}
-
-.dialog-card-text {
-  // overflow-y: !important;
 }
 
 .sections-display {

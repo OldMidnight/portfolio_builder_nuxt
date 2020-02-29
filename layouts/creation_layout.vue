@@ -17,6 +17,9 @@ export default {
   created() {
     this.$vuetify.theme.dark = this.$auth.user.dark_mode
   },
+  mounted() {
+    this.$auth.fetchUser()
+  },
   methods: {
     ...mapMutations('creator', [
       'setCreationStep',

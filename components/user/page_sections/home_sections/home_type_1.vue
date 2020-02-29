@@ -1,5 +1,5 @@
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 import { EditorContent } from 'tiptap'
 import SocialBar1 from '@/components/user/social_media_bar/bar_1'
 export default {
@@ -41,6 +41,7 @@ export default {
     return {
       img_dialog: false,
       img_url: '',
+      upload_img_url: '',
       img_contain: false,
       edit_img_tooltip: false,
       validated_img_url: '',
@@ -50,15 +51,16 @@ export default {
         (value) =>
           !value ||
           value.size < 2000000 ||
-          'Avatar size should be less than 2 MB!'
+          'File size should be less than 2 MB!'
       ],
       upload_file: null
     }
   },
   computed: {
-    site_props() {
-      return this.$store.state.creator.site_props
-    },
+    ...mapGetters({
+      site_props: 'creator/site_props',
+      imagesToUpload: 'creator/imagesToUpload'
+    }),
     user() {
       return this.$store.state.auth.user
     },
@@ -121,7 +123,7 @@ export default {
     upload_image(value) {
       if (value && this.link_image) {
         this.link_image = false
-        this.validated_img_url = ''
+        this.validated_img_url = this.upload_img_url
       } else if (!value && !this.link_image) {
         this.link_image = true
         this.validated_img_url = this.img_props.url
@@ -141,7 +143,8 @@ export default {
   methods: {
     ...mapMutations({
       updatePageImg: 'creator/updatePageImg',
-      addImageToUpload: 'creator/addImageToUpload'
+      addImageToUpload: 'creator/addImageToUpload',
+      removeImagesToUpload: 'creator/removeImagesToUpload'
     }),
     validateURL() {
       this.getValidatedURL().then((result) => {
@@ -168,16 +171,16 @@ export default {
       //   !this.img_props.link &&
       //   this.img_props.url !== this.validated_img_url
       // ) {
-      //   this.$axios.$delete('/uploads/images/' + this.options.input_dict_name)
+      //   this.$axios.$delete('/uploads/user-content/' + this.options.input_dict_name)
       // }
       if (this.upload_image) {
         const formData = new FormData()
         const ext = this.upload_file.name.split('.')[
           this.upload_file.name.split('.').length - 1
         ]
-        formData.append('image', this.upload_file)
+        formData.append('upload', this.upload_file)
         const url =
-          'uploads/images/' +
+          'uploads/user-content/' +
           this.user.domain +
           '/' +
           this.options.input_dict_name +
@@ -212,6 +215,16 @@ export default {
         this.upload_file = null
         this.img_dialog = false
       } else {
+        const currentImagesToUpload = this.imagesToUpload.filter((img) => {
+          return img.page_img_props.page_label === this.options.input_dict_name
+        })
+
+        if (currentImagesToUpload.length > 0) {
+          this.removeImagesToUpload({
+            images_to_remove: currentImagesToUpload
+          })
+        }
+
         this.updatePageImg({
           page_label: this.options.input_dict_name,
           img_props: 'img_props',
@@ -230,6 +243,7 @@ export default {
       const reader = new FileReader()
       reader.onload = () => {
         this.validated_img_url = reader.result
+        this.upload_img_url = reader.result
       }
       reader.readAsDataURL(e)
     },
@@ -255,33 +269,28 @@ export default {
       cols="12"
       class="home--img-container d-flex flex-column align-center justify-end pb-0"
     >
-      <v-tooltip v-model="edit_img_tooltip" right>
-        <template v-slot:activator="{ on }">
-          <v-avatar :size="avatar_size">
-            <v-img
-              alt="User Profile Picture"
-              :src="img_props.url"
-              :class="{
-                'user-hero-image-border':
-                  site_props.selected_theme === 2 && !options.preview,
-                'has-border':
-                  site_props.text_border_color &&
-                  site_props.selected_theme === null
-              }"
-              class="user-hero-image elevation-2 editable"
-              :contain="img_props.contain"
-              lazy-src="/img_lazy.jpeg"
-              v-on="on"
-              @click.stop="img_dialog = true"
-              @mouseover="edit_img_tooltip = true"
-              @mouseout="edit_img_tooltip = false"
-            >
-            </v-img>
-          </v-avatar>
-        </template>
+      <v-avatar :size="avatar_size">
+        <v-img
+          alt="User Profile Picture"
+          :src="img_props.url"
+          :class="{
+            'user-hero-image-border':
+              site_props.selected_theme === 2 && !options.preview,
+            'has-border':
+              site_props.text_border_color && site_props.selected_theme === null
+          }"
+          class="user-hero-image elevation-2 editable"
+          :contain="img_props.contain"
+          lazy-src="/img_lazy.jpeg"
+          @click.stop="img_dialog = true"
+          @mouseover="edit_img_tooltip = true"
+          @mouseout="edit_img_tooltip = false"
+        >
+        </v-img>
+      </v-avatar>
+      <v-tooltip v-model="edit_img_tooltip" attach=".home--img-container">
         <span>Insert Image</span>
       </v-tooltip>
-      <!-- </v-flex> -->
     </v-col>
     <v-col
       cols="12"
@@ -453,8 +462,8 @@ export default {
 
 .editable:hover {
   background-color: #bdbdbd;
-  opacity: 0.2;
-  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  opacity: 0.3;
+  transition: 0.3s;
   cursor: pointer;
 }
 

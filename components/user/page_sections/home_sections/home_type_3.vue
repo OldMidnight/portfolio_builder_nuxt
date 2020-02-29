@@ -318,54 +318,6 @@ export default {
       <client-only>
         <editor-content :editor="editor" />
       </client-only>
-      <!-- <div
-        :class="{
-          'preview-image-container': options.preview,
-          'image-container': !options.preview || options.live
-        }"
-      >
-        <v-tooltip v-model="edit_img_tooltip_2" right>
-          <template v-slot:activator>
-            <v-img
-              :class="{
-                'slate-border':
-                  site_props.selected_theme === 1 &&
-                  (!options.preview || options.live),
-                'matrix-border':
-                  site_props.selected_theme === 2 &&
-                  (!options.preview || options.live),
-                'preview-main-img': options.preview,
-                'main-img': !options.preview || options.live,
-                'has-border': site_props.text_border_color,
-                editable: !options.preview && !options.live
-              }"
-              class="elevation-2"
-              :src="
-                !options.preview &&
-                site_props[options.input_dict_name].img_props_2
-                  ? site_props[options.input_dict_name].img_props_2.url
-                  : 'https://images.unsplash.com/photo-1517148815978-75f6acaaf32c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80'
-              "
-              :contain="
-                site_props[options.input_dict_name].img_props_2
-                  ? site_props[options.input_dict_name].img_props_2.contain
-                  : false
-              "
-              @click.stop="
-                !options.preview && !options.live
-                  ? (img_dialog_2 = true)
-                  : (img_dialog_2 = false)
-              "
-              @mouseover="
-                edit_img_tooltip_2 = !options.preview && !options.live
-              "
-              @mouseout="edit_img_tooltip_2 = false"
-            >
-            </v-img>
-          </template>
-          <span v-if="!options.preview && !options.live">Insert Image</span>
-        </v-tooltip>
-      </div> -->
     </div>
     <v-dialog v-model="img_dialog_1" width="500">
       <v-card>

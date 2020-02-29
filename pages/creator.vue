@@ -216,11 +216,6 @@ export default {
       ],
       page_transitions: [
         {
-          name: 'Bounce',
-          enterActiveClass: 'bounceIn',
-          leaveActiveClass: 'bounceOut'
-        },
-        {
           name: 'Fade',
           enterActiveClass: 'fadeIn',
           leaveActiveClass: 'fadeOut'
@@ -244,6 +239,11 @@ export default {
           name: 'FadeDown',
           enterActiveClass: 'fadeInDown',
           leaveActiveClass: 'fadeOutDown'
+        },
+        {
+          name: 'Bounce',
+          enterActiveClass: 'bounceIn',
+          leaveActiveClass: 'bounceOut'
         },
         {
           name: 'FlipX',
@@ -1043,7 +1043,7 @@ export default {
     ...mapActions({
       registerWebsite: 'creator/registerWebsite',
       updateWebsite: 'creator/updateWebsite',
-      uploadImages: 'creator/uploadImages',
+      uploadFiles: 'creator/uploadFiles',
       fetchUserUploads: 'creator/fetchUserUploads',
       deleteFile: 'functions/deleteFile'
     }),
@@ -1295,7 +1295,7 @@ export default {
     registerSite() {
       if (this.$refs.editor_site_name_form.validate()) {
         this.validating = true
-        this.uploadImages().then(() => {
+        this.uploadFiles().then(() => {
           if (!this.user.site_created) {
             this.registerWebsite(this.site_props)
           } else {
@@ -1901,7 +1901,7 @@ export default {
                             color="success"
                             class="mx-2"
                             :href="
-                              'http://127.0.0.1:5000/uploads/images/' +
+                              'http://127.0.0.1:5000/uploads/user-content/' +
                                 upload.url
                             "
                             target="_blank"
@@ -2152,10 +2152,10 @@ export default {
                   appear
                   name="page-section-transition"
                   :enter-active-class="
-                    `animated ${page_transition.enterActiveClass} fast`
+                    `animated ${page_transition.enterActiveClass} faster`
                   "
                   :leave-active-class="
-                    `animated ${page_transition.leaveActiveClass} fast`
+                    `animated ${page_transition.leaveActiveClass} faster`
                   "
                   mode="out-in"
                 >

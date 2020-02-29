@@ -32,7 +32,7 @@ export default {
         (value) =>
           !value ||
           value.size < 2000000 ||
-          'Avatar size should be less than 2 MB!'
+          'File size should be less than 2 MB!'
       ],
       upload_file: null,
       button_text: '',
@@ -132,16 +132,18 @@ export default {
         !this.img_props.link &&
         this.img_props.url !== this.validated_img_url
       ) {
-        this.$axios.$delete('/uploads/images/' + this.options.input_dict_name)
+        this.$axios.$delete(
+          '/uploads/user-content/' + this.options.input_dict_name
+        )
       }
       if (this.upload_image) {
         const formData = new FormData()
         const ext = this.upload_file.name.split('.')[
           this.upload_file.name.split('.').length - 1
         ]
-        formData.append('image', this.upload_file)
+        formData.append('upload', this.upload_file)
         const url =
-          'uploads/images/' +
+          'uploads/user-content/' +
           this.user.domain +
           '/' +
           this.options.input_dict_name +

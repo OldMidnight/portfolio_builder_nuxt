@@ -35,7 +35,8 @@ export default {
       emailNotConfirmed: false,
       messages: [],
       prev_messages: [],
-      activation_resent: false
+      activation_resent: false,
+      website_images: []
     }
   },
   computed: {
@@ -52,18 +53,6 @@ export default {
       } else {
         return 'http://' + this.user.domain + '.localhost:3001/'
       }
-    },
-    website_images() {
-      const images = []
-      const url =
-        this.$axios.defaults.baseURL === 'http://127.0.0.1:5000/'
-          ? 'http://127.0.0.1:5000/uploads/images/'
-          : 'https://api.kreoh.com/uploads/images/'
-
-      for (const page of ['home', 'projects', 'resume']) {
-        images.push(url + this.user.domain + '/' + page + '.kreoh.com.png')
-      }
-      return images
     }
     // weekly_stats() {
     //   return this.$store.state.dashboard.stats.weekly
@@ -88,6 +77,16 @@ export default {
   },
   mounted() {
     this.updateStats()
+    const url =
+      this.$axios.defaults.baseURL === 'http://127.0.0.1:5000/'
+        ? 'http://127.0.0.1:5000/uploads/user-content/'
+        : 'https://api.kreoh.com/uploads/user-content/'
+
+    for (const page of ['home', 'projects', 'resume']) {
+      this.website_images.push(
+        url + this.user.domain + '/' + page + '.kreoh.com.png'
+      )
+    }
   },
   methods: {
     ...mapActions({
@@ -226,7 +225,7 @@ export default {
               </v-hover>
             </nuxt-link>
             <v-btn
-              :class="`messages-container my-1`"
+              class="messages-container my-1"
               color="info"
               outlined
               nuxt

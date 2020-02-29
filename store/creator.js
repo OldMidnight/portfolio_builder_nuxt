@@ -57,6 +57,10 @@ export const state = () => ({
       resume_created: false,
       resume_sections: {},
       resume_layout: [],
+      resume_upload: {
+        use: false,
+        url: null
+      },
       info_section: {
         name: null,
         phone: '0811111111',
@@ -210,6 +214,7 @@ export const state = () => ({
   show_next_step: false,
   images_to_upload: [],
   project_images_to_upload: [],
+  files_to_upload: [],
   user_uploads: [],
   user_storage: {}
 })
@@ -575,13 +580,10 @@ export const mutations = {
     /*
     Adds an object of data to an array of files to upload
     */
-    let upload = true
-    for (const image of state.images_to_upload) {
-      if (payload.img_data.url === image.url) {
-        upload = false
-      }
-    }
-    if (upload) {
+    const images = state.images_to_upload.filter((img) => {
+      return img.url === payload.img_data.url
+    })
+    if (images.length === 0) {
       state.images_to_upload.push(payload.img_data)
     }
   },
@@ -589,7 +591,44 @@ export const mutations = {
     /*
     Adds an object of data to an array of files to upload
     */
-    state.project_images_to_upload.push(payload.img_data)
+    const images = state.project_images_to_upload.filter((img) => {
+      return img.url === payload.img_data.url
+    })
+    if (images.length === 0) {
+      state.project_images_to_upload.push(payload.img_data)
+    }
+  },
+  addFileToUpload(state, payload) {
+    /*
+    Adds a file to an array of file to be uploaded
+    */
+    const files = state.files_to_upload.filter((file) => {
+      return file.type === payload.file.type
+    })
+    if (files.length === 0) {
+      state.files_to_upload.push(payload.file)
+    }
+  },
+  removeFilesToUpload(state, payload) {
+    const newFilesToUpload = state.files_to_upload.filter((file) => {
+      return payload.files_to_remove.includes(file)
+    })
+
+    state.files_to_upload = newFilesToUpload
+  },
+  removeImagesToUpload(state, payload) {
+    const newImagesToUpload = state.images_to_upload.filter((img) => {
+      return payload.images_to_remove.includes(img)
+    })
+
+    state.images_to_upload = newImagesToUpload
+  },
+  removeProjectImagesToUpload(state, payload) {
+    const newImagesToUpload = state.project_images_to_upload.filter((img) => {
+      return payload.images_to_remove.includes(img)
+    })
+
+    state.project_images_to_upload = newImagesToUpload
   },
   setUserUploads(state, payload) {
     state.user_uploads = payload.uploads
@@ -597,6 +636,10 @@ export const mutations = {
   },
   setPageTransition(state, payload) {
     state.site_props.transition = payload.transition
+  },
+  updateResumeUpload(state, payload) {
+    state.site_props.resume_page_inputs.resume_upload = payload.resume_upload
+    state.site_props.resume_page_inputs.resume_created = true
   }
 }
 
@@ -625,7 +668,7 @@ export const actions = {
         })
       })
   },
-  async uploadImages(context) {
+  async uploadFiles(context) {
     const config = {
       headers: {
         'content-type': 'multipart/form-data'
@@ -649,6 +692,20 @@ export const actions = {
         config
       }).then(() => {
         context.commit('updateProject', image.page_img_props)
+      })
+    }
+    for (const userFile of context.state.files_to_upload) {
+      await this.$axios({
+        method: 'post',
+        url: userFile.url,
+        data: userFile.upload_data,
+        config
+      }).then(() => {
+        if (userFile.type === 'resume_pdf') {
+          context.commit('updateResumeUpload', {
+            resume_upload: { use: true, url: userFile.url }
+          })
+        }
       })
     }
   },
@@ -680,5 +737,14 @@ export const getters = {
   },
   userStorage: (state) => {
     return state.user_storage
+  },
+  filesToUpload: (state) => {
+    return state.files_to_upload
+  },
+  imagesToUpload: (state) => {
+    return state.images_to_upload
+  },
+  projectImagesToUpload: (state) => {
+    return state.project_images_to_upload
   }
 }

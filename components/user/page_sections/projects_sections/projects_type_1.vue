@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import { EditorContent } from 'tiptap'
 import ProjectItem from '@/components/user/subcomponents/project_item_1'
 export default {
@@ -65,14 +65,19 @@ export default {
     }
   },
   computed: {
-    ...mapState('creator', ['site_props']),
+    ...mapGetters({
+      site_props: 'creator/site_props',
+      projectImagesToUpload: 'creator/projectImagesToUpload'
+    }),
     projects() {
       // eslint-disable-next-line prettier/prettier
-      return this.$store.state.creator.site_props[this.options.input_dict_name].projects
+      return this.$store.state.creator.site_props[this.options.input_dict_name]
+        .projects
     },
     html() {
       // eslint-disable-next-line prettier/prettier
-      return this.$store.state.creator.site_props[this.options.input_dict_name].html
+      return this.$store.state.creator.site_props[this.options.input_dict_name]
+        .html
     },
     user() {
       return this.$store.state.auth.user
@@ -131,7 +136,8 @@ export default {
       addProject: 'creator/addProject',
       updateProject: 'creator/updateProject',
       storeDeleteProject: 'creator/deleteProject',
-      addProjectImageToUpload: 'creator/addProjectImageToUpload'
+      addProjectImageToUpload: 'creator/addProjectImageToUpload',
+      removeProjectImagesToUpload: 'creator/removeProjectImagesToUpload'
     }),
     validateURL() {
       if (this.temp_project.img.url !== '') {
@@ -174,9 +180,9 @@ export default {
         const ext = this.upload_file.name.split('.')[
           this.upload_file.name.split('.').length - 1
         ]
-        formData.append('image', this.upload_file)
+        formData.append('upload', this.upload_file)
         const url =
-          'uploads/images/' +
+          'uploads/user-content/' +
           this.user.domain +
           '/' +
           this.options.input_dict_name +
@@ -195,6 +201,20 @@ export default {
             url
           }
         })
+      } else {
+        const currentImagesToUpload = this.projectImagesToUpload.filter(
+          (img) => {
+            return (
+              img.page_img_props.page_label === this.options.input_dict_name
+            )
+          }
+        )
+
+        if (currentImagesToUpload.length > 0) {
+          this.removeProjectImagesToUpload({
+            images_to_remove: currentImagesToUpload
+          })
+        }
       }
       this.updateProject({
         page_label: this.options.input_dict_name,

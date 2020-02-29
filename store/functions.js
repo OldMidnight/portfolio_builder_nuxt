@@ -4,9 +4,11 @@ export const state = () => ({
 
 export const actions = {
   async deleteFile(context, payload) {
-    await this.$axios.$delete('/uploads/images/' + payload.url).then(() => {
-      context.commit('creator/fetchUserUploads')
-    })
+    await this.$axios
+      .$delete('/uploads/user-content/' + payload.url)
+      .then(() => {
+        context.commit('creator/fetchUserUploads')
+      })
   }
 }
 
