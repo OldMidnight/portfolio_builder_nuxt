@@ -1,5 +1,5 @@
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 import { EditorContent } from 'tiptap'
 export default {
   components: { EditorContent },
@@ -42,9 +42,10 @@ export default {
     }
   },
   computed: {
-    site_props() {
-      return this.$store.state.creator.site_props
-    },
+    ...mapGetters({
+      site_props: 'creator/site_props',
+      imagesToUpload: 'creator/imagesToUpload'
+    }),
     user() {
       return this.$store.state.auth.user
     },
@@ -105,7 +106,9 @@ export default {
   methods: {
     ...mapMutations({
       updatePageDataObject: 'creator/updatePageDataObject',
-      setCallToActionURL: 'creator/setCallToActionURL'
+      setCallToActionURL: 'creator/setCallToActionURL',
+      addImageToUpload: 'creator/addImageToUpload',
+      removeImagesToUpload: 'creator/removeImagesToUpload'
     }),
     validateURL() {
       this.getValidatedURL().then((result) => {
@@ -178,6 +181,15 @@ export default {
         this.upload_file = null
         this.edit_dialog = false
       } else {
+        const currentImagesToUpload = this.imagesToUpload.filter((img) => {
+          return img.page_img_props.page_label === this.options.input_dict_name
+        })
+
+        if (currentImagesToUpload.length > 0) {
+          this.removeImagesToUpload({
+            images_to_remove: currentImagesToUpload
+          })
+        }
         this.updatePageDataObject({
           page_label: this.options.input_dict_name,
           type: 'img_props',

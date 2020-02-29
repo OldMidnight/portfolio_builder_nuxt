@@ -4,9 +4,9 @@ export default {
     return {
       price_plans: [
         {
-          name: 'Basic',
-          subtitle: 'Simple, Easy, Fast',
-          price: '3.50',
+          name: 'Free',
+          subtitle: 'Simple, Easy, Fast.',
+          price: '0.00',
           special: false,
           features: [
             'Access To All Layouts',
@@ -16,32 +16,32 @@ export default {
             'Unlimited Bandwidth'
           ]
         },
+        // {
+        //   name: 'Plus',
+        //   subtitle: 'All round package',
+        //   price: '5',
+        //   special: true,
+        //   features: [
+        //     'Access To All Layouts',
+        //     'Access To All Themes',
+        //     '300MB Storage',
+        //     'Mobile Optimized Website',
+        //     'Unlimited Bandwidth',
+        //     'Temporary Site Add-On',
+        //     'Automatic Site Backups (Monthly)',
+        //     'Connect Your Domain',
+        //     'Remove Kreoh Branding'
+        //   ]
+        // },
         {
-          name: 'Plus',
-          subtitle: 'All round package',
-          price: '5',
-          special: true,
-          features: [
-            'Access To All Layouts',
-            'Access To All Themes',
-            '300MB Storage',
-            'Mobile Optimized Website',
-            'Unlimited Bandwidth',
-            'Temporary Site Add-On',
-            'Automatic Site Backups (Monthly)',
-            'Connect Your Domain',
-            'Remove Kreoh Branding'
-          ]
-        },
-        {
-          name: 'Pro',
-          subtitle: 'Priority Support',
-          price: '8.50',
+          name: 'Premium',
+          subtitle: 'You now have the high ground',
+          price: '5.00',
           special: false,
           features: [
             'Access To All Layouts',
             'Access To All Themes',
-            '500MB - 1GB Storage*',
+            '300MB',
             'Mobile Optimized Website',
             'Priority Response',
             'Feature Requests',
@@ -64,7 +64,10 @@ export default {
     class="pricing--content"
     :class="{ 'm-pricing--content': $vuetify.breakpoint.xs }"
   >
-    <v-row v-if="!$vuetify.breakpoint.xs" class="pricing--wrapper">
+    <v-row
+      v-if="!$vuetify.breakpoint.xs"
+      class="pricing--wrapper justify-center"
+    >
       <v-col
         v-for="(plan, index) in price_plans"
         :key="index"

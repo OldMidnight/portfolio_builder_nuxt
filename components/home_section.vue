@@ -583,9 +583,9 @@ export default {
             'justify-center': !$vuetify.breakpoint.smAndDown
           }"
         >
-          <p style="font-size: 10px" class="font-weight-light my-2">
+          <!-- <p style="font-size: 10px" class="font-weight-light my-2">
             * Pro accounts can request additional storage up to 1GB
-          </p>
+          </p> -->
           <v-btn
             color="info"
             class="pa-7 font-weight-bold"

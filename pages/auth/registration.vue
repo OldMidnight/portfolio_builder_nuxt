@@ -47,18 +47,18 @@ export default {
       register: 'user_auth/register'
     }),
     validateForm() {
-      if (this.$refs.reg_form.validate(true)) {
-        this.$axios
-          .post('create/validate_domain', { domain: this.user.domain })
-          .then((response) => {
-            if (response.data.validated) {
-              this.register(this.user)
-            }
-          })
-          .catch(() => {
-            this.domainInvalid = true
-          })
-      }
+      // if (this.$refs.reg_form.validate(true)) {
+      //   this.$axios
+      //     .post('create/validate_domain', { domain: this.user.domain })
+      //     .then((response) => {
+      //       if (response.data.validated) {
+      //         this.register(this.user)
+      //       }
+      //     })
+      //     .catch(() => {
+      //       this.domainInvalid = true
+      //     })
+      // }
     }
   },
   head() {

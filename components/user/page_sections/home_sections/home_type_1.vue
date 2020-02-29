@@ -167,12 +167,6 @@ export default {
       return validation
     },
     updateImgURL() {
-      // if (
-      //   !this.img_props.link &&
-      //   this.img_props.url !== this.validated_img_url
-      // ) {
-      //   this.$axios.$delete('/uploads/user-content/' + this.options.input_dict_name)
-      // }
       if (this.upload_image) {
         const formData = new FormData()
         const ext = this.upload_file.name.split('.')[
@@ -247,10 +241,6 @@ export default {
       }
       reader.readAsDataURL(e)
     },
-    // scrollDown() {
-    //   location.hash = '#call-to-action'
-    //   // this.$vuetify.goTo('#call-to-action')
-    // },
     scrollDown() {
       const el = document.getElementById('call-to-action')
       el.scrollIntoView({ behavior: 'smooth', block: 'start' })
