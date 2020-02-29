@@ -80,7 +80,7 @@ export default {
     const url =
       this.$axios.defaults.baseURL === 'http://127.0.0.1:5000/'
         ? 'http://127.0.0.1:5000/uploads/user-content/'
-        : 'https://api.kreoh.com/uploads/user-content/'
+        : 'http://api.kreoh.com/uploads/user-content/'
 
     for (const page of ['home', 'projects', 'resume']) {
       this.website_images.push(
