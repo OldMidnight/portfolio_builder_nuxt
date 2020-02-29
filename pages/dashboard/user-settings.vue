@@ -389,7 +389,8 @@ export default {
                             x-large
                             class="my-1"
                             :href="
-                              'http://127.0.0.1:5000/uploads/user-content/' +
+                              $axios.defaults.baseURL +
+                                '/uploads/user-content/' +
                                 upload.url
                             "
                             target="_blank"

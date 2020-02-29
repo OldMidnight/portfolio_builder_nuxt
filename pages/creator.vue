@@ -1901,7 +1901,8 @@ export default {
                             color="success"
                             class="mx-2"
                             :href="
-                              'http://127.0.0.1:5000/uploads/user-content/' +
+                              $axios.defaults.baseURL +
+                                '/uploads/user-content/' +
                                 upload.url
                             "
                             target="_blank"

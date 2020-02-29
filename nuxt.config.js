@@ -126,7 +126,7 @@ module.exports = {
   axios: {
     baseURL:
       process.env.NODE_ENV === 'production'
-        ? 'http://kreoh-api.herokuapp.com/'
+        ? 'http://api.kreoh.com/'
         : 'http://127.0.0.1:5000/'
   },
   /*
