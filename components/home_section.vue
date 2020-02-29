@@ -615,9 +615,6 @@ export default {
           class="about--text pt-5 white--text d-flex flex-column justify-space-around"
           :class="{ 'm-about--text': $vuetify.breakpoint.smAndDown }"
         >
-          <!-- <p style="font-size: 52px" class="font-weight-bold">
-            About Kreoh
-          </p> -->
           <div
             class="about--text-wrapper d-flex pb-7"
             :class="{
@@ -687,7 +684,6 @@ export default {
               <p style="font-size: 22px" class="font-weight-bold mb-9">
                 Support
               </p>
-              <!-- <a class="footer--text">Addons</a> -->
               <a class="footer--text">Reddit</a>
               <a class="footer--text">FAQ</a>
               <a class="footer--text">Email</a>

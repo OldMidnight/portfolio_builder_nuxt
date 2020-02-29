@@ -24,7 +24,9 @@ export default {
 
 <template>
   <v-layout class="app-container d-flex flex-column align-center">
-    <HomeSection />
+    <client-only placeholder="Loading Home Page">
+      <HomeSection />
+    </client-only>
   </v-layout>
 </template>
 
