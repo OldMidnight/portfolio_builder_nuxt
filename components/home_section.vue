@@ -29,6 +29,11 @@ export default {
       loading: false
     }
   },
+  computed: {
+    smAndDown() {
+      return this.$vuetify.breakpoint.smAndDown
+    }
+  },
   created() {
     this.loading = true
     this.slogan_interval = setInterval(() => {
@@ -74,29 +79,29 @@ export default {
       class="top-nav d-flex"
       :class="{
         'top-nav-scrolled': nav_state,
-        'm-top-nav': $vuetify.breakpoint.smAndDown
+        'm-top-nav': smAndDown
       }"
       no-gutters
     >
       <v-col
-        :cols="$vuetify.breakpoint.smAndDown ? '2' : '2'"
+        :cols="smAndDown ? '2' : '2'"
         class="d-flex align-center nav--item"
         :class="{
-          'nav--item': !$vuetify.breakpoint.smAndDown
+          'nav--item': !smAndDown
         }"
       >
         <v-row class="item--container">
           <v-col
-            :cols="$vuetify.breakpoint.smAndDown ? '12' : '12'"
+            :cols="smAndDown ? '12' : '12'"
             class="item--logo-container pa-0 d-flex align-center"
             :class="{
-              'pl-9': !$vuetify.breakpoint.smAndDown,
-              'ml-4': $vuetify.breakpoint.smAndDown
+              'pl-9': !smAndDown,
+              'ml-4': smAndDown
             }"
           >
             <v-img
               class="item--logo"
-              :class="{ 'm-item--logo': $vuetify.breakpoint.smAndDown }"
+              :class="{ 'm-item--logo': smAndDown }"
               :src="nav_state ? '/Logo_beta_white.png' : '/Logo_beta_black.png'"
               contain
             ></v-img>
@@ -139,11 +144,11 @@ export default {
         </v-btn>
       </v-col>
       <v-col
-        :cols="$vuetify.breakpoint.smAndDown ? '10' : '4'"
+        :cols="smAndDown ? '10' : '4'"
         class="d-flex align-center nav--item nav-btns justify-end pr-3"
       >
         <v-btn
-          :color="$vuetify.breakpoint.smAndDown || nav_state ? 'white' : ''"
+          :color="smAndDown || nav_state ? 'white' : ''"
           text
           class="mx-2"
           @click="beta_dialog = true"
@@ -153,7 +158,11 @@ export default {
         <v-btn
           color="white"
           depressed
-          class="mx-2 pa-7 elevation-0 d-none d-md-flex d-lg-flex d-xl-flex"
+          :class="
+            `mx-2 h-auto pa-${
+              smAndDown ? '5' : '5'
+            } elevation-0 d-none d-md-flex d-lg-flex d-xl-flex`
+          "
           @click="beta_dialog = true"
         >
           Get Started
@@ -163,18 +172,18 @@ export default {
     <v-row class="home--content" no-gutters>
       <v-row
         class="content--landing"
-        :class="{ 'm-content--landing': $vuetify.breakpoint.smAndDown }"
+        :class="{ 'm-content--landing': smAndDown }"
       >
         <transition appear appear-active-class="animated fadeIn" mode="out-in">
           <v-col
-            :cols="$vuetify.breakpoint.smAndDown ? '12' : '5'"
+            :cols="smAndDown ? '12' : '5'"
             class="home--landing-container home--landing-main d-flex flex-column align-end justify-center"
-            :class="{ 'm-home--landing-main': $vuetify.breakpoint.smAndDown }"
+            :class="{ 'm-home--landing-main': smAndDown }"
           >
             <div
               class="home--landing-text d-flex flex-column justify-end"
               :class="{
-                'align-center text-center px-5': $vuetify.breakpoint.smAndDown
+                'align-center text-center px-5': smAndDown
               }"
             >
               <transition
@@ -185,7 +194,7 @@ export default {
                 <p
                   class="home--landing-subheading"
                   :class="{
-                    'm-home--landing-subheading': $vuetify.breakpoint.smAndDown
+                    'm-home--landing-subheading': smAndDown
                   }"
                 >
                   {{ kreoh_slogans[current_slogan] }}
@@ -194,7 +203,7 @@ export default {
               <p
                 class="home--landing-heading font-weight-bold"
                 :class="{
-                  'm-home--landing-heading': $vuetify.breakpoint.smAndDown
+                  'm-home--landing-heading': smAndDown
                 }"
               >
                 DESIGN YOUR ONLINE PORTFOLIO
@@ -203,20 +212,17 @@ export default {
             <div
               class="home--landing-actions d-flex flex-column"
               :class="{
-                'align-center justify-start pt-3':
-                  $vuetify.breakpoint.smAndDown,
-                'pt-8': !$vuetify.breakpoint.smAndDown
+                'align-center justify-start pt-3': smAndDown,
+                'pt-8': !smAndDown
               }"
             >
               <div class="d-flex">
                 <v-btn
-                  style="font-size: 16    px"
+                  style="font-size: 16px"
                   color="white"
-                  class="font-weight-bold mr-2"
-                  :class="{
-                    'pa-7': $vuetify.breakpoint.smAndDown,
-                    'pa-9': !$vuetify.breakpoint.smAndDown
-                  }"
+                  :class="
+                    `font-weight-bold mr-2 h-auto pa-${smAndDown ? '5' : '6'}`
+                  "
                   @click="beta_dialog = true"
                 >
                   Get Started
@@ -233,11 +239,11 @@ export default {
         </transition>
         <transition appear appear-active-class="animated fadeIn" mode="out-in">
           <v-col
-            :cols="$vuetify.breakpoint.smAndDown ? '12' : '7'"
+            :cols="smAndDown ? '12' : '7'"
             class="home--landing-container d-flex"
             :class="{
-              'm-home--landing-img-wrapper': $vuetify.breakpoint.smAndDown,
-              'align-center justify-center': !$vuetify.breakpoint.smAndDown
+              'm-home--landing-img-wrapper': smAndDown,
+              'align-center justify-center': !smAndDown
             }"
           >
             <v-col class="home--landing-img-container d-flex align-center">
@@ -257,7 +263,7 @@ export default {
       </v-row>
       <v-row
         class="content--value py-5"
-        :class="{ 'm-content--value': $vuetify.breakpoint.smAndDown }"
+        :class="{ 'm-content--value': smAndDown }"
       >
         <v-col
           :style="{ height: '10%' }"
@@ -269,14 +275,14 @@ export default {
         <v-col :style="{ height: '90%' }" cols="12" class="pa-0">
           <v-row :style="{ height: '100%' }">
             <v-col
-              :cols="$vuetify.breakpoint.smAndDown ? '12' : '4'"
+              :cols="smAndDown ? '12' : '4'"
               :class="{
-                'm-value--item-container': $vuetify.breakpoint.smAndDown
+                'm-value--item-container': smAndDown
               }"
             >
               <v-row
                 class="value--item"
-                :class="{ 'm-value--item': $vuetify.breakpoint.smAndDown }"
+                :class="{ 'm-value--item': smAndDown }"
               >
                 <v-col
                   cols="12"
@@ -294,7 +300,7 @@ export default {
                 >
                   <p
                     class="headline font-weight-bold text-center"
-                    :class="{ headline: $vuetify.breakpoint.smAndDown }"
+                    :class="{ headline: smAndDown }"
                   >
                     Claim Your Competitive Advantage
                   </p>
@@ -305,9 +311,9 @@ export default {
               </v-row>
             </v-col>
             <v-col
-              :cols="$vuetify.breakpoint.smAndDown ? '12' : '4'"
+              :cols="smAndDown ? '12' : '4'"
               :class="{
-                'm-value--item-container': $vuetify.breakpoint.smAndDown
+                'm-value--item-container': smAndDown
               }"
             >
               <v-row class="value--item">
@@ -327,7 +333,7 @@ export default {
                 >
                   <p
                     class="headline font-weight-bold"
-                    :class="{ headline: $vuetify.breakpoint.smAndDown }"
+                    :class="{ headline: smAndDown }"
                   >
                     Call-To-Action Button
                   </p>
@@ -340,9 +346,9 @@ export default {
               </v-row>
             </v-col>
             <v-col
-              :cols="$vuetify.breakpoint.smAndDown ? '12' : '4'"
+              :cols="smAndDown ? '12' : '4'"
               :class="{
-                'm-value--item-container': $vuetify.breakpoint.smAndDown
+                'm-value--item-container': smAndDown
               }"
             >
               <v-row class="value--item">
@@ -362,7 +368,7 @@ export default {
                 >
                   <p
                     class="headline font-weight-bold"
-                    :class="{ headline: $vuetify.breakpoint.smAndDown }"
+                    :class="{ headline: smAndDown }"
                   >
                     3-Page System
                   </p>
@@ -379,30 +385,26 @@ export default {
       </v-row>
       <v-row
         class="content--preview pt-7"
-        :class="{ 'm-content--preview': $vuetify.breakpoint.smAndDown }"
+        :class="{ 'm-content--preview': smAndDown }"
       >
         <v-col
           cols="12"
           class="home--preview-intro d-flex flex-column align-center"
           :class="{
-            'px-3 m-home--preview-intro': $vuetify.breakpoint.smAndDown
+            'px-3 m-home--preview-intro': smAndDown
           }"
         >
           <p
-            :style="
-              $vuetify.breakpoint.smAndDown
-                ? { fontSize: '30px' }
-                : { fontSize: '40px' }
-            "
+            :style="smAndDown ? { fontSize: '30px' } : { fontSize: '40px' }"
             class="py-1 font-weight-bold"
-            :class="{ 'text-center': $vuetify.breakpoint.smAndDown }"
+            :class="{ 'text-center': smAndDown }"
           >
             Clean and Minimalist designs
           </p>
           <p
             :style="{
-              fontSize: $vuetify.breakpoint.smAndDown ? '18px' : '20px',
-              padding: $vuetify.breakpoint.smAndDown ? '0 5%' : '0 20%'
+              fontSize: smAndDown ? '18px' : '20px',
+              padding: smAndDown ? '0 5%' : '0 20%'
             }"
             class="text-center"
           >
@@ -415,27 +417,26 @@ export default {
         <v-col
           cols="12"
           class="home--preview-content"
-          :class="{ 'm-home--preview-content': $vuetify.breakpoint.smAndDown }"
+          :class="{ 'm-home--preview-content': smAndDown }"
         >
           <v-row align="center" class="preview--content">
             <v-col
               cols="12"
               class="home--preview-item d-flex justify-space-around"
               :class="{
-                'flex-column m-home--preview-item px-0':
-                  $vuetify.breakpoint.smAndDown
+                'flex-column m-home--preview-item px-0': smAndDown
               }"
             >
               <div
                 class="home--preview-img-container elevation-1 d-flex flex-column align-center justify-center"
                 :class="{
-                  'm-home--preview-img-container': $vuetify.breakpoint.smAndDown
+                  'm-home--preview-img-container': smAndDown
                 }"
               >
                 <v-img
                   class="home--preview-img"
                   :class="{
-                    'm-home--preview-img': $vuetify.breakpoint.smAndDown
+                    'm-home--preview-img': smAndDown
                   }"
                   src="/layout_images/kreoh_layouts.png"
                 ></v-img>
@@ -443,7 +444,7 @@ export default {
               <div
                 class="home--preview-text text-center d-flex flex-column justify-center align-center"
                 :class="{
-                  'm-home--preview-text pt-4': $vuetify.breakpoint.smAndDown
+                  'm-home--preview-text pt-4': smAndDown
                 }"
               >
                 <p style="font-size: 26px" class="font-weight-bold">
@@ -459,21 +460,20 @@ export default {
               cols="12"
               class="home--preview-item-s d-flex justify-space-around"
               :class="{
-                'flex-column m-home--preview-item px-0':
-                  $vuetify.breakpoint.smAndDown
+                'flex-column m-home--preview-item px-0': smAndDown
               }"
             >
               <div
-                v-if="$vuetify.breakpoint.smAndDown"
+                v-if="smAndDown"
                 class="home--preview-img-container elevation-1 d-flex flex-column align-center justify-center"
                 :class="{
-                  'm-home--preview-img-container': $vuetify.breakpoint.smAndDown
+                  'm-home--preview-img-container': smAndDown
                 }"
               >
                 <v-img
                   class="home--preview-img border-white"
                   :class="{
-                    'm-home--preview-img': $vuetify.breakpoint.smAndDown
+                    'm-home--preview-img': smAndDown
                   }"
                   src="/kreoh_home/kreoh_form.png"
                 ></v-img>
@@ -481,7 +481,7 @@ export default {
               <div
                 class="home--preview-text text-center d-flex flex-column justify-center align-center"
                 :class="{
-                  'm-home--preview-text pt-4': $vuetify.breakpoint.smAndDown
+                  'm-home--preview-text pt-4': smAndDown
                 }"
               >
                 <p style="font-size: 26px" class="font-weight-bold">
@@ -494,7 +494,7 @@ export default {
                 </p>
               </div>
               <div
-                v-if="!$vuetify.breakpoint.smAndDown"
+                v-if="!smAndDown"
                 class="home--preview-img-container elevation-1 d-flex flex-column align-center justify-center"
               >
                 <v-img
@@ -507,20 +507,19 @@ export default {
               cols="12"
               class="home--preview-item d-flex justify-space-around"
               :class="{
-                'flex-column m-home--preview-item px-0':
-                  $vuetify.breakpoint.smAndDown
+                'flex-column m-home--preview-item px-0': smAndDown
               }"
             >
               <div
                 class="home--preview-img-container elevation-1 d-flex flex-column align-center justify-center"
                 :class="{
-                  'm-home--preview-img-container': $vuetify.breakpoint.smAndDown
+                  'm-home--preview-img-container': smAndDown
                 }"
               >
                 <v-img
                   class="home--preview-img"
                   :class="{
-                    'm-home--preview-img': $vuetify.breakpoint.smAndDown
+                    'm-home--preview-img': smAndDown
                   }"
                   src="/layout_images/kreoh_layout_1_slate.png"
                 ></v-img>
@@ -528,7 +527,7 @@ export default {
               <div
                 class="home--preview-text text-center d-flex flex-column justify-center align-center"
                 :class="{
-                  'm-home--preview-text pt-4': $vuetify.breakpoint.smAndDown
+                  'm-home--preview-text pt-4': smAndDown
                 }"
               >
                 <p style="font-size: 26px" class="font-weight-bold">Simple</p>
@@ -544,30 +543,20 @@ export default {
       </v-row>
       <v-row
         class="content--pricing"
-        :class="{ 'm-content--pricing': $vuetify.breakpoint.smAndDown }"
+        :class="{ 'm-content--pricing': smAndDown }"
       >
         <v-col
           cols="12"
           class="pricing--intro d-flex flex-column align-center justify-center text-center mb-3"
-          :class="{ 'm-pricing--intro': $vuetify.breakpoint.smAndDown }"
+          :class="{ 'm-pricing--intro': smAndDown }"
         >
           <p
-            :style="
-              $vuetify.breakpoint.smAndDown
-                ? { fontSize: '30px' }
-                : { fontSize: '40px' }
-            "
+            :style="smAndDown ? { fontSize: '30px' } : { fontSize: '40px' }"
             class="font-weight-bold"
           >
             Price Plans
           </p>
-          <p
-            :style="
-              $vuetify.breakpoint.smAndDown
-                ? { fontSize: '18px' }
-                : { fontSize: '20px' }
-            "
-          >
+          <p :style="smAndDown ? { fontSize: '18px' } : { fontSize: '20px' }">
             Kreoh offers different plans depending on your needs. Buy
             subscribing your supporting us in our mission to get all students of
             all disciplines their foot in the professional door.
@@ -578,8 +567,8 @@ export default {
           cols="12"
           class="pricing--action d-flex align-center flex-column pa-0"
           :class="{
-            'm-pricing--action justify-start': $vuetify.breakpoint.smAndDown,
-            'justify-center': !$vuetify.breakpoint.smAndDown
+            'm-pricing--action justify-start': smAndDown,
+            'justify-center': !smAndDown
           }"
         >
           <!-- <p style="font-size: 10px" class="font-weight-light my-2">
@@ -587,7 +576,7 @@ export default {
           </p> -->
           <v-btn
             color="info"
-            class="pa-7 font-weight-bold"
+            class="pa-6 h-auto font-weight-bold"
             tile
             @click="beta_dialog = true"
           >
@@ -595,14 +584,11 @@ export default {
           </v-btn>
         </v-col>
       </v-row>
-      <v-row
-        class="content--about"
-        :class="{ 'm-content--about': $vuetify.breakpoint.smAndDown }"
-      >
+      <v-row class="content--about" :class="{ 'm-content--about': smAndDown }">
         <v-col
-          :cols="$vuetify.breakpoint.smAndDown ? '12' : '6'"
+          :cols="smAndDown ? '12' : '6'"
           class="px-5 about--img-container d-flex justify-center align-center"
-          :class="{ 'm-about--img-container': $vuetify.breakpoint.smAndDown }"
+          :class="{ 'm-about--img-container': smAndDown }"
         >
           <v-img
             class="about--img elevation-2"
@@ -610,31 +596,30 @@ export default {
           ></v-img>
         </v-col>
         <v-col
-          :cols="$vuetify.breakpoint.smAndDown ? '12' : '6'"
+          :cols="smAndDown ? '12' : '6'"
           class="about--text pt-5 white--text d-flex flex-column justify-space-around"
-          :class="{ 'm-about--text': $vuetify.breakpoint.smAndDown }"
+          :class="{ 'm-about--text': smAndDown }"
         >
           <div
             class="about--text-wrapper d-flex pb-7"
             :class="{
-              'm-about--text-wrapper d-flex flex-column align-center justify-center':
-                $vuetify.breakpoint.smAndDown
+              'm-about--text-wrapper d-flex flex-column align-center justify-center': smAndDown
             }"
           >
             <p
               :style="{
-                fontSize: $vuetify.breakpoint.smAndDown ? '18px' : '22px'
+                fontSize: smAndDown ? '18px' : '22px'
               }"
-              :class="{ 'mx-3': !$vuetify.breakpoint.smAndDown }"
+              :class="{ 'mx-3': !smAndDown }"
             >
               Kreoh was built with the idea of providing every person the
               opportunity to promote themselves.
             </p>
             <p
               :style="{
-                fontSize: $vuetify.breakpoint.smAndDown ? '18px' : '22px'
+                fontSize: smAndDown ? '18px' : '22px'
               }"
-              :class="{ 'mx-3': !$vuetify.breakpoint.smAndDown }"
+              :class="{ 'mx-3': !smAndDown }"
             >
               Not everyone needs an online store or business. A simple website,
               where your work and interests are at the forefront offer the
@@ -644,7 +629,7 @@ export default {
           </div>
           <p
             :style="{
-              fontSize: $vuetify.breakpoint.smAndDown ? '28px' : '42px'
+              fontSize: smAndDown ? '28px' : '42px'
             }"
             class="font-weight-bold text-center"
           >
@@ -654,11 +639,9 @@ export default {
             depressed
             style="width: 40%"
             color="info"
-            class="align-self-center elevation-0"
-            :class="{
-              'pa-7': !$vuetify.breakpoint.smAndDown,
-              'pa-9': $vuetify.breakpoint.smAndDown
-            }"
+            :class="
+              `h-auto pa-${smAndDown ? '5' : '6'} align-self-center elevation-0`
+            "
             @click="beta_dialog = true"
           >
             Get Started
@@ -667,16 +650,16 @@ export default {
       </v-row>
       <v-row
         class="content--footer"
-        :class="{ 'm-content--footer': $vuetify.breakpoint.smAndDown }"
+        :class="{ 'm-content--footer': smAndDown }"
       >
         <v-col
-          :style="{ height: $vuetify.breakpoint.smAndDown ? '40%' : 'initial' }"
-          :cols="$vuetify.breakpoint.smAndDown ? '12' : '7'"
+          :style="{ height: smAndDown ? '40%' : 'initial' }"
+          :cols="smAndDown ? '12' : '7'"
         >
           <v-row
             class="footer--text-container white--text"
             :class="{
-              'm-footer--text-container': !$vuetify.breakpoint.smAndDown
+              'm-footer--text-container': !smAndDown
             }"
           >
             <v-col cols="4" class="d-flex flex-column align-center">
@@ -718,16 +701,16 @@ export default {
           </v-row>
         </v-col>
         <v-col
-          :style="{ height: $vuetify.breakpoint.smAndDown ? '60%' : 'initial' }"
-          :cols="$vuetify.breakpoint.smAndDown ? '12' : '5'"
-          :class="{ 'pr-9': !$vuetify.breakpoint.smAndDown }"
+          :style="{ height: smAndDown ? '60%' : 'initial' }"
+          :cols="smAndDown ? '12' : '5'"
+          :class="{ 'pr-9': !smAndDown }"
         >
           <v-row class="footer--logo-wrapper">
             <v-col
               cols="12"
               class="footer--logo-container pa-0"
               :class="{
-                'm-footer--logo-container': $vuetify.breakpoint.smAndDown
+                'm-footer--logo-container': smAndDown
               }"
             >
               <v-row class="footer--logo-wrapper">
@@ -745,11 +728,11 @@ export default {
             <v-col
               cols="12"
               class="footer--logo-text grey--text d-flex flex-column justify-space-around"
-              :class="{ 'm-footer--logo-text': $vuetify.breakpoint.smAndDown }"
+              :class="{ 'm-footer--logo-text': smAndDown }"
             >
               <p
                 :style="{
-                  fontSize: $vuetify.breakpoint.smAndDown ? '12px' : 'initial'
+                  fontSize: smAndDown ? '12px' : 'initial'
                 }"
                 class="text-center"
               >
@@ -759,7 +742,7 @@ export default {
               </p>
               <p
                 :style="{
-                  fontSize: $vuetify.breakpoint.smAndDown ? '12px' : 'initial'
+                  fontSize: smAndDown ? '12px' : 'initial'
                 }"
                 class="text-center"
               >
@@ -777,7 +760,7 @@ export default {
               </a>
               <p
                 :style="{
-                  fontSize: $vuetify.breakpoint.smAndDown ? '12px' : 'initial'
+                  fontSize: smAndDown ? '12px' : 'initial'
                 }"
                 class="text-center"
               >
@@ -793,7 +776,7 @@ export default {
     </v-row>
     <v-dialog
       v-model="beta_dialog"
-      :fullscreen="$vuetify.breakpoint.smAndDown"
+      :fullscreen="smAndDown"
       width="500"
       scrollable
     >

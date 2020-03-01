@@ -70,80 +70,75 @@ export default {
 </script>
 
 <template>
-  <v-row column align-center class="d-flex flex-column">
-    <v-form
-      v-if="!show_confirm"
-      ref="reg_form"
-      class="pa-2 d-flex flex-column align-center"
+  <v-form
+    v-if="!show_confirm"
+    ref="reg_form"
+    class="pa-2 d-flex flex-column align-center"
+  >
+    <span class="headline mb-4">Create Your Account</span>
+    <v-text-field
+      ref="f_name"
+      v-model="f_name"
+      label="First Name"
+      :rules="[rules.required]"
+      class="auth-input"
+      outlined
     >
-      <span class="headline mb-4">Create Your Account</span>
-      <v-text-field
-        ref="f_name"
-        v-model="f_name"
-        label="First Name"
-        :rules="[rules.required]"
-        class="auth-input"
-        outlined
-      >
-      </v-text-field>
-      <v-text-field
-        ref="s_name"
-        v-model="s_name"
-        label="Last Name"
-        :rules="[rules.required]"
-        class="auth-input"
-        outlined
-      >
-      </v-text-field>
-      <v-text-field
-        ref="email"
-        v-model="email"
-        label="Email"
-        type="email"
-        :rules="[rules.required, rules.email]"
-        class="auth-input"
-        outlined
-      >
-      </v-text-field>
-      <v-text-field
-        ref="password"
-        v-model="password"
-        label="Password"
-        :type="show_password ? 'text' : 'password'"
-        :append-icon="show_password ? 'mdi-eye' : 'visibilmdi-eye-offity_off'"
-        :rules="[
-          rules.required,
-          () => (!!password && password.length >= 8) || 'Min 8 characters',
-          () => (!!password && password.length <= 25) || 'Max 25 characters'
-        ]"
-        class="auth-input"
-        outlined
-        @click:append="show_password = !show_password"
-      >
-      </v-text-field>
-      <v-text-field
-        ref="domain"
-        v-model="domain"
-        label="Domain"
-        :rules="[
-          rules.required,
-          () => (!!domain && domain.length >= 3) || 'Min 3 characters',
-          () => (!!domain && domain.length <= 20) || 'Max 20 characters'
-        ]"
-        class="auth-input"
-        outlined
-        @keyup.enter="validateForm()"
-      >
-      </v-text-field>
-      <!-- <v-btn color="success" @click.stop="validateInfo()">Submit</v-btn> -->
-      <v-btn color="success" @click="validateForm()">
-        Next<v-icon>mdi-chevron-right</v-icon>
-      </v-btn>
-    </v-form>
-    <v-flex
-      v-if="!show_confirm"
-      class="d-flex flex-column align-center auth-link"
+    </v-text-field>
+    <v-text-field
+      ref="s_name"
+      v-model="s_name"
+      label="Last Name"
+      :rules="[rules.required]"
+      class="auth-input"
+      outlined
     >
+    </v-text-field>
+    <v-text-field
+      ref="email"
+      v-model="email"
+      label="Email"
+      type="email"
+      :rules="[rules.required, rules.email]"
+      class="auth-input"
+      outlined
+    >
+    </v-text-field>
+    <v-text-field
+      ref="password"
+      v-model="password"
+      label="Password"
+      :type="show_password ? 'text' : 'password'"
+      :append-icon="show_password ? 'mdi-eye' : 'visibilmdi-eye-offity_off'"
+      :rules="[
+        rules.required,
+        () => (!!password && password.length >= 8) || 'Min 8 characters',
+        () => (!!password && password.length <= 25) || 'Max 25 characters'
+      ]"
+      class="auth-input"
+      outlined
+      @click:append="show_password = !show_password"
+    >
+    </v-text-field>
+    <v-text-field
+      ref="domain"
+      v-model="domain"
+      label="Domain"
+      :rules="[
+        rules.required,
+        () => (!!domain && domain.length >= 3) || 'Min 3 characters',
+        () => (!!domain && domain.length <= 20) || 'Max 20 characters'
+      ]"
+      class="auth-input"
+      outlined
+      @keyup.enter="validateForm()"
+    >
+    </v-text-field>
+    <!-- <v-btn color="success" @click.stop="validateInfo()">Submit</v-btn> -->
+    <v-btn color="success" @click="validateForm()">
+      Next<v-icon>mdi-chevron-right</v-icon>
+    </v-btn>
+    <v-flex class="mt-2 auth-link d-flex flex-column align-center">
       <span class="caption">Already have an account?</span>
       <nuxt-link to="/auth/login" class="caption auth-link">Login</nuxt-link>
     </v-flex>
@@ -153,7 +148,7 @@ export default {
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-snackbar>
-  </v-row>
+  </v-form>
 </template>
 
 <style lang="scss" scoped>

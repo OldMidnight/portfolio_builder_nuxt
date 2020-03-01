@@ -1,18 +1,38 @@
 <script>
-export default {}
+export default {
+  computed: {
+    smAndDown() {
+      return this.$vuetify.breakpoint.smAndDown
+    }
+  }
+}
 </script>
 
 <template>
   <v-app>
     <v-container fluid fill-height>
-      <v-layout column justify-center align-center class="form-layout">
-        <div class="mb-2">
+      <v-row
+        justify="center"
+        align="center"
+        class="form-layout ma-0 h-100 w-100"
+      >
+        <v-col cols="12" :class="`h-${smAndDown ? '10' : '15 mb-2'} pt-0`">
           <!-- <span class="logo mb-7 font-weight-bold">
             Kreoh.com
           </span> -->
-          <v-img class="logo mx-auto" src="/Logo_beta_text.png"></v-img>
-        </div>
-        <v-flex pa-7 xs1 class="form elevation-1">
+          <v-img
+            :class="`logo mx-auto w-${smAndDown ? '50' : '20'}`"
+            src="/Logo_beta_text.png"
+          ></v-img>
+        </v-col>
+        <v-col
+          :cols="smAndDown ? '12' : '3'"
+          :class="
+            `form ${
+              smAndDown ? 'h-80' : 'elevation-1'
+            } d-flex align-center justify-center`
+          "
+        >
           <transition
             name="auth-transition"
             enter-active-class="animated fadeIn fast"
@@ -21,12 +41,17 @@ export default {}
           >
             <nuxt />
           </transition>
-        </v-flex>
-        <p class="text-center mt-2 terms">
-          By creating an account or signing in you agree to our
-          <a>Terms and Conditions</a> and <a>use of cookies.</a>
-        </p>
-      </v-layout>
+        </v-col>
+        <v-col
+          cols="12"
+          :class="`h-${smAndDown ? '10' : '5'} d-flex justify-center`"
+        >
+          <p :class="`text-center mt-2 terms w-${smAndDown ? '100' : '30'}`">
+            By creating an account or signing in you agree to our
+            <a>Terms and Conditions</a> and <a>use of cookies.</a>
+          </p>
+        </v-col>
+      </v-row>
     </v-container>
     <span class="caption footer mb-5">
       &#169; {{ new Date().getFullYear() }} — Kreoh.com
@@ -49,12 +74,6 @@ export default {}
 </template>
 
 <style lang="scss" scoped>
-.logo {
-  // font-size: 48px;
-  // color: #0066ff;
-  width: 20%;
-}
-
 .form {
   border-radius: 10px;
 }
@@ -65,7 +84,6 @@ export default {}
 }
 
 .terms {
-  width: 20%;
   color: #777;
   font-size: 10px;
 }

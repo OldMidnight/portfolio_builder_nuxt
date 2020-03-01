@@ -565,6 +565,12 @@ export default {
       } else {
         return {}
       }
+    },
+    nextStepState() {
+      if (this.$store.state.creator.show_next_step) {
+        this.editor.blur()
+      }
+      return this.$store.state.creator.show_next_step
     }
   },
   watch: {
@@ -751,6 +757,7 @@ export default {
       ],
       onFocus: () => {
         this.is_editing = true
+        this.hideNextStep()
       },
       onUpdate: (e) => {
         // console.log(e)
@@ -2449,7 +2456,7 @@ export default {
       leave-active-class="animated fadeOut faster"
       mode="out-in"
     >
-      <v-toolbar v-show="is_editing" class="editor-toolbar">
+      <v-toolbar v-show="is_editing && !nextStepState" class="editor-toolbar">
         <editor-menu-bar
           v-slot="{ commands, isActive, getMarkAttrs }"
           :editor="activeEditor"
