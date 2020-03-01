@@ -1,5 +1,5 @@
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapMutations } from 'vuex'
 export default {
   name: 'Registration',
   transitions: {
@@ -24,13 +24,24 @@ export default {
           return pattern.test(value) || 'Invalid e-mail.'
         }
       },
-      domainInvalid: false,
-      show_confirm: false
+      registration_error: false,
+      show_confirm: false,
+      response_msg: null
     }
   },
   computed: {
-    status() {
-      return this.$store.state.user_auth.status
+    auth_status_error_state: {
+      get() {
+        return this.$store.state.user_auth.status.error_state
+      },
+      set(value) {
+        this.resetErrorStatus({
+          value
+        })
+      }
+    },
+    auth_status_error_msg() {
+      return this.$store.state.user_auth.status.error.msg
     },
     user() {
       return {
@@ -43,22 +54,26 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      resetErrorStatus: 'user_auth/resetErrorStatus'
+    }),
     ...mapActions({
       register: 'user_auth/register'
     }),
     validateForm() {
-      // if (this.$refs.reg_form.validate(true)) {
-      //   this.$axios
-      //     .post('create/validate_domain', { domain: this.user.domain })
-      //     .then((response) => {
-      //       if (response.data.validated) {
-      //         this.register(this.user)
-      //       }
-      //     })
-      //     .catch(() => {
-      //       this.domainInvalid = true
-      //     })
-      // }
+      if (this.$refs.reg_form.validate(true)) {
+        this.$axios
+          .post('create/validate_domain', { domain: this.user.domain })
+          .then((response) => {
+            if (response.data.validated) {
+              this.register(this.user)
+            }
+          })
+          .catch((e) => {
+            this.response_msg = e.response.data.msg
+            this.registration_error = true
+          })
+      }
     }
   },
   head() {
@@ -136,15 +151,21 @@ export default {
     </v-text-field>
     <!-- <v-btn color="success" @click.stop="validateInfo()">Submit</v-btn> -->
     <v-btn color="success" @click="validateForm()">
-      Next<v-icon>mdi-chevron-right</v-icon>
+      Register<v-icon>mdi-chevron-right</v-icon>
     </v-btn>
     <v-flex class="mt-2 auth-link d-flex flex-column align-center">
       <span class="caption">Already have an account?</span>
       <nuxt-link to="/auth/login" class="caption auth-link">Login</nuxt-link>
     </v-flex>
-    <v-snackbar v-model="domainInvalid" color="error">
-      Domain is unavailable.
-      <v-btn icon @click="domainInvalid = false">
+    <v-snackbar v-model="registration_error" color="error">
+      {{ response_msg }}
+      <v-btn icon @click="registration_error = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
+    <v-snackbar v-model="auth_status_error_state" color="error">
+      {{ auth_status_error_msg }}
+      <v-btn icon @click="auth_status_error_state = false">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-snackbar>

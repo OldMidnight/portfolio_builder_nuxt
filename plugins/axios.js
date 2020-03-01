@@ -38,7 +38,7 @@ export default function(context) {
           // console.log('ERROR GETTING REFRESH')
           context.redirect(301, '/auth/login')
         })
-    } else {
+    } else if (response.status === 401) {
       // console.log('401 AND RETRIED')
       context.redirect(301, '/auth/login')
     }

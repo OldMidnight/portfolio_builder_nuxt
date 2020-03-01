@@ -25,6 +25,7 @@ export default {
       },
       email: null,
       mailing_add_pass: false,
+      mailing_add_msg: null,
       mailing_add_fail: false,
       loading: false
     }
@@ -62,9 +63,11 @@ export default {
         this.$axios
           .post('mail/mailing_list/add', { email: this.email })
           .then((response) => {
+            this.mailing_add_msg = response.data.msg
             this.mailing_add_pass = true
           })
-          .catch(() => {
+          .catch((e) => {
+            this.mailing_add_msg = e.response.data.msg
             this.mailing_add_fail = true
           })
       }
@@ -881,13 +884,13 @@ export default {
       </v-card>
     </v-dialog>
     <v-snackbar v-model="mailing_add_pass" color="success">
-      Successfully added to mailing list!
+      {{ mailing_add_msg }}
       <v-btn icon @click="mailing_add_pass = false">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-snackbar>
     <v-snackbar v-model="mailing_add_fail" color="error">
-      Email could not be added to mailing list.
+      {{ mailing_add_msg }}
       <v-btn icon @click="mailing_add_fail = false">
         <v-icon>mdi-close</v-icon>
       </v-btn>

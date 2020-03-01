@@ -1,6 +1,8 @@
 export const state = () => ({
   status: {
-    loggedIn: false
+    loggedIn: false,
+    error: { msg: null },
+    error_state: false
   },
   refresh_token: null,
   user: null
@@ -28,12 +30,12 @@ export const actions = {
     commit('logout')
     this.$router.push({ name: 'home' })
   },
-  register({ commit }, user) {
+  async register({ commit }, user) {
     commit('registerRequest', user)
-    this.$axios
-      .$post('/auth/register', user)
+    await this.$axios
+      .post('/auth/register', user)
       .then((response) => {
-        commit('registerSuccess', response.user)
+        commit('registerSuccess', response.data.user)
         this.$auth
           .loginWith('local', {
             data: {
@@ -49,7 +51,7 @@ export const actions = {
           })
       })
       .catch((error) => {
-        commit('registerFailure', error)
+        commit('registerFailure', error.response.data)
       })
   }
 }
@@ -75,12 +77,29 @@ export const mutations = {
     state.user = null
   },
   registerRequest(state, user) {
-    state.status = { registering: true }
+    state.status = {
+      loggedIn: false,
+      user,
+      error: { msg: null },
+      error_state: false
+    }
   },
   registerSuccess(state, user) {
-    state.status = {}
+    state.status = {
+      loggedIn: false,
+      user,
+      error: { msg: null },
+      error_state: false
+    }
   },
   registerFailure(state, error) {
-    state.status = {}
+    state.status = {
+      loggedIn: false,
+      error,
+      error_state: true
+    }
+  },
+  resetErrorStatus(state, payload) {
+    state.status.error_state = payload.value
   }
 }
