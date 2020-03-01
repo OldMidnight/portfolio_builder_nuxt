@@ -568,10 +568,9 @@ export default {
                 : { fontSize: '20px' }
             "
           >
-            SocialScholar offers different plans to individuals depending on
-            their needs. For school licensing, teachers and principles can
-            customise their package and be quoted a price depending on their
-            selections.
+            Kreoh offers different plans depending on your needs. Buy
+            subscribing your supporting us in our mission to get all students of
+            all disciplines their foot in the professional door.
           </p>
         </v-col>
         <Prices />
