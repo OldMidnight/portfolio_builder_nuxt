@@ -1,11 +1,5 @@
 <script>
-export default {
-  computed: {
-    smAndDown() {
-      return this.$vuetify.breakpoint.smAndDown
-    }
-  }
-}
+export default {}
 </script>
 
 <template>
@@ -16,20 +10,29 @@ export default {
         align="center"
         class="form-layout ma-0 h-100 w-100"
       >
-        <v-col cols="12" :class="`h-${smAndDown ? '10' : '15 mb-2'} pt-0`">
+        <v-col
+          cols="12"
+          :class="
+            `h-${this.$vuetify.breakpoint.smAndDown ? '10' : '15 mb-2'} pt-0`
+          "
+        >
           <!-- <span class="logo mb-7 font-weight-bold">
             Kreoh.com
           </span> -->
           <v-img
-            :class="`logo mx-auto w-${smAndDown ? '50' : '20'}`"
+            :class="
+              `logo mx-auto w-${
+                this.$vuetify.breakpoint.smAndDown ? '50' : '20'
+              }`
+            "
             src="/Logo_beta_text.png"
           ></v-img>
         </v-col>
         <v-col
-          :cols="smAndDown ? '12' : '3'"
+          :cols="this.$vuetify.breakpoint.smAndDown ? '12' : '3'"
           :class="
             `form ${
-              smAndDown ? 'h-80' : 'elevation-1'
+              this.$vuetify.breakpoint.smAndDown ? 'h-80' : 'elevation-1'
             } d-flex align-center justify-center`
           "
         >
@@ -44,9 +47,19 @@ export default {
         </v-col>
         <v-col
           cols="12"
-          :class="`h-${smAndDown ? '10' : '5'} d-flex justify-center`"
+          :class="
+            `h-${
+              this.$vuetify.breakpoint.smAndDown ? '10' : '5'
+            } d-flex justify-center`
+          "
         >
-          <p :class="`text-center mt-2 terms w-${smAndDown ? '100' : '30'}`">
+          <p
+            :class="
+              `text-center mt-2 terms w-${
+                this.$vuetify.breakpoint.smAndDown ? '100' : '30'
+              }`
+            "
+          >
             By creating an account or signing in you agree to our
             <a>Terms and Conditions</a> and <a>use of cookies.</a>
           </p>

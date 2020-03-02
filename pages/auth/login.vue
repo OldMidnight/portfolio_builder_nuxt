@@ -25,7 +25,8 @@ export default {
       formHasErrors: false,
       from_path: '/',
       login_fail: false,
-      loginFormValid: true
+      loginFormValid: true,
+      loading: false
     }
   },
   computed: {
@@ -41,8 +42,10 @@ export default {
     ...mapActions('user_auth', ['login']),
     validateInfo() {
       if (this.$refs.loginForm.validate()) {
+        this.loading = true
         this.login(this.user).then(() => {
           if (!this.$store.state.auth.loggedIn) {
+            this.loading = false
             this.login_fail = true
           }
         })
@@ -92,6 +95,8 @@ export default {
     </v-text-field>
     <v-btn
       color="success"
+      :loading="loading"
+      :disabled="loading"
       @keydown.enter="validateInfo()"
       @click.stop="validateInfo()"
     >

@@ -26,7 +26,8 @@ export default {
       },
       registration_error: false,
       show_confirm: false,
-      response_msg: null
+      response_msg: null,
+      loading: false
     }
   },
   computed: {
@@ -62,16 +63,20 @@ export default {
     }),
     validateForm() {
       if (this.$refs.reg_form.validate(true)) {
+        this.loading = true
         this.$axios
           .post('create/validate_domain', { domain: this.user.domain })
           .then((response) => {
             if (response.data.validated) {
-              this.register(this.user)
+              this.register(this.user).then(() => {
+                this.loading = false
+              })
             }
           })
           .catch((e) => {
             this.response_msg = e.response.data.msg
             this.registration_error = true
+            this.loading = false
           })
       }
     }
@@ -150,7 +155,12 @@ export default {
     >
     </v-text-field>
     <!-- <v-btn color="success" @click.stop="validateInfo()">Submit</v-btn> -->
-    <v-btn color="success" @click="validateForm()">
+    <v-btn
+      color="success"
+      :loading="loading"
+      :disabled="loading"
+      @click="validateForm()"
+    >
       Register<v-icon>mdi-chevron-right</v-icon>
     </v-btn>
     <v-flex class="mt-2 auth-link d-flex flex-column align-center">

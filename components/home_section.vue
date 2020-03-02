@@ -27,7 +27,8 @@ export default {
       mailing_add_pass: false,
       mailing_add_msg: null,
       mailing_add_fail: false,
-      loading: false
+      loading: false,
+      email_loading: false
     }
   },
   computed: {
@@ -60,15 +61,18 @@ export default {
     },
     notifyEmail() {
       if (this.$refs.mail_list_form.validate(true)) {
+        this.email_loading = true
         this.$axios
           .post('mail/mailing_list/add', { email: this.email })
           .then((response) => {
             this.mailing_add_msg = response.data.msg
             this.mailing_add_pass = true
+            this.email_loading = false
           })
           .catch((e) => {
             this.mailing_add_msg = e.response.data.msg
             this.mailing_add_fail = true
+            this.email_loading = false
           })
       }
     }
@@ -822,7 +826,12 @@ export default {
                   ></v-text-field>
                 </v-form>
                 <div>
-                  <v-btn color="success" @click="notifyEmail()">
+                  <v-btn
+                    color="success"
+                    :disabled="email_loading"
+                    :loading="email_loading"
+                    @click="notifyEmail()"
+                  >
                     Join
                   </v-btn>
                   <v-btn color="error" @click="beta_dialog = false">
