@@ -11,7 +11,9 @@ export default function(context) {
     if (
       response.status === 401 &&
       !originalRequest._retry &&
-      originalRequest.url !== '/helpers/refresh_token'
+      originalRequest.url !== '/helpers/refresh_token' &&
+      originalRequest.url !== '/auth/login' &&
+      originalRequest.url !== '/auth/register'
     ) {
       // console.log('CHECK RETRY 2:', originalRequest._retry)
       originalRequest._retry = true

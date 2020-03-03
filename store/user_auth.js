@@ -61,19 +61,37 @@ export const mutations = {
     state.refresh_token = payload.refresh_token
   },
   loginRequest(state, user) {
-    state.status = { loggingIn: true }
+    state.status = {
+      loggedIn: false,
+      user,
+      error: { msg: null },
+      error_state: false
+    }
     state.user = user
   },
   loginSuccess(state, user) {
-    state.status = { loggedIn: true }
+    state.status = {
+      loggedIn: true,
+      user,
+      error: { msg: null },
+      error_state: false
+    }
     state.user = user
   },
   loginFailure(state) {
-    state.status = { loggingIn: false }
+    state.status = {
+      loggedIn: false,
+      error: { msg: 'There was an error logging in.' },
+      error_state: true
+    }
     state.user = null
   },
   logout(state) {
-    state.status = {}
+    state.status = {
+      loggedIn: false,
+      error: { msg: null },
+      error_state: false
+    }
     state.user = null
   },
   registerRequest(state, user) {

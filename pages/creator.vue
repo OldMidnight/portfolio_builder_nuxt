@@ -1374,6 +1374,7 @@ export default {
     :class="{ 'extra-padding-site-name': checkStepCount(2) }"
   >
     <transition
+      appear
       enter-active-class="animated fadeIn faster"
       leave-active-class="animated fadeOut faster"
       mode="out-in"

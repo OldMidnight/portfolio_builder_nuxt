@@ -12,12 +12,17 @@ export default {
   data() {
     return {
       links: ['Home', 'About Us', 'Team', 'Services', 'Blog', 'Contact Us'],
-      site_screenshot: ''
+      site_screenshot: '',
+      menu_drawer: null,
+      isMobile: false
     }
   },
   created() {
     this.$auth.fetchUser()
     this.$vuetify.theme.dark = this.$auth.user.dark_mode
+  },
+  mounted() {
+    this.isMobile = this.$vuetify.breakpoint.smAndDown
   },
   methods: {
     logout() {
@@ -34,15 +39,37 @@ export default {
 
 <template>
   <v-app>
-    <v-container
-      :class="
-        `dashboard-wrapper ${$vuetify.theme.dark ? '' : 'dashboard--gradient'}`
-      "
-      fluid
-      fill-height
-    >
-      <v-layout class="dashboard-container d-flex flex-column">
-        <v-layout
+    <v-app-bar class="px-2" app inverted-scroll>
+      <v-app-bar-nav-icon
+        @click.stop="menu_drawer = !menu_drawer"
+      ></v-app-bar-nav-icon>
+      <v-toolbar-title class="h-100 w-100 d-flex align-center">
+        <v-img
+          class="logo w-25"
+          :src="
+            `${
+              $vuetify.theme.dark
+                ? '/Logo_beta_white.png'
+                : '/Logo_beta_text.png'
+            }`
+          "
+        ></v-img>
+      </v-toolbar-title>
+      <v-text-field
+        class="h-100 w-100 mt-2"
+        dense
+        outlined
+        label="Search..."
+        rounded
+        prepend-inner-icon="mdi-magnify"
+      ></v-text-field>
+    </v-app-bar>
+    <client-only placeholder="Loading Dashboard...">
+      <v-row
+        v-if="!isMobile"
+        class="w-100 h-100 pa-0 dashboard-container pos-rel flex-column"
+      >
+        <v-row
           :class="
             `dashboard-topnav ${
               $vuetify.theme.dark ? 'darkmode' : ''
@@ -95,8 +122,8 @@ export default {
               <span>Logout</span>
             </v-tooltip>
           </div>
-        </v-layout>
-        <v-layout
+        </v-row>
+        <v-row
           class="dashboard-content-wrapper d-flex flex-column align-center justify-center"
         >
           <nuxt
@@ -116,9 +143,142 @@ export default {
               </v-col>
             </v-footer>
           </div>
-        </v-layout>
-      </v-layout>
-    </v-container>
+        </v-row>
+      </v-row>
+      <v-row v-else>
+        <v-col cols="12" class="h-100 border px-0 pb-0">
+          <nuxt />
+        </v-col>
+      </v-row>
+    </client-only>
+    <v-navigation-drawer v-model="menu_drawer" app bottom temporary>
+      <v-list nav dense>
+        <v-list-item link nuxt to="/dashboard">
+          <v-list-item-icon>
+            <v-icon>mdi-home</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>Home</v-list-item-title>
+        </v-list-item>
+
+        <v-list-group prepend-icon="mdi-chart-timeline-variant">
+          <template v-slot:activator>
+            <v-list-item-title>Settings</v-list-item-title>
+          </template>
+
+          <v-list-group no-action sub-group>
+            <template v-slot:activator>
+              <v-list-item-content>
+                <v-list-item-title>Site Settings</v-list-item-title>
+              </v-list-item-content>
+            </template>
+
+            <v-list-item
+              link
+              nuxt
+              to="/dashboard/site-settings#metrics-section"
+            >
+              <v-list-item-title>Metrics</v-list-item-title>
+              <v-list-item-icon>
+                <v-icon>mdi-chart-timeline-variant</v-icon>
+              </v-list-item-icon>
+            </v-list-item>
+
+            <v-list-item
+              link
+              nuxt
+              to="/dashboard/site-settings#functionality-section"
+            >
+              <v-list-item-title>Functionality</v-list-item-title>
+              <v-list-item-icon>
+                <v-icon>mdi-cogs</v-icon>
+              </v-list-item-icon>
+            </v-list-item>
+          </v-list-group>
+
+          <v-list-group no-action sub-group>
+            <template v-slot:activator>
+              <v-list-item-content>
+                <v-list-item-title>User Settings</v-list-item-title>
+              </v-list-item-content>
+            </template>
+
+            <v-list-item
+              link
+              nuxt
+              to="/dashboard/user-settings#change_email_section"
+            >
+              <v-list-item-title>Email</v-list-item-title>
+              <v-list-item-icon>
+                <v-icon>mdi-email</v-icon>
+              </v-list-item-icon>
+            </v-list-item>
+
+            <v-list-item
+              link
+              nuxt
+              to="/dashboard/user-settings#change_password_section"
+            >
+              <v-list-item-title>Password</v-list-item-title>
+              <v-list-item-icon>
+                <v-icon>mdi-lock</v-icon>
+              </v-list-item-icon>
+            </v-list-item>
+
+            <v-list-item
+              link
+              nuxt
+              to="/dashboard/user-settings#uploads_section"
+            >
+              <v-list-item-title>Uploads</v-list-item-title>
+              <v-list-item-icon>
+                <v-icon>mdi-upload</v-icon>
+              </v-list-item-icon>
+            </v-list-item>
+
+            <v-list-item
+              link
+              nuxt
+              to="/dashboard/user-settings#del_acc_section"
+            >
+              <v-list-item-title>Manage Account</v-list-item-title>
+              <v-list-item-icon>
+                <v-icon color="info">mdi-account-cog</v-icon>
+              </v-list-item-icon>
+            </v-list-item>
+          </v-list-group>
+        </v-list-group>
+
+        <v-list-item link nuxt to="/dashboard/message-center">
+          <v-list-item-icon>
+            <v-icon>mdi-forum</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>Message Center</v-list-item-title>
+        </v-list-item>
+
+        <v-list-item @click="toggleDarkMode()">
+          <v-list-item-icon>
+            <v-icon>
+              mdi-brightness-{{ $auth.user.dark_mode ? '4' : '5' }}
+            </v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>Toggle Dark Mode</v-list-item-title>
+        </v-list-item>
+
+        <v-list-item disabled>
+          <v-list-item-icon>
+            <v-icon>mdi-star</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>Your Plan</v-list-item-title>
+        </v-list-item>
+
+        <v-list-item color="error" :input-value="true" @click.stop="logout()">
+          <v-list-item-icon>
+            <v-icon color="error">mdi-power</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>Logout</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
     <script type="text/javascript">
       var _paq = window._paq || []
       /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
@@ -227,14 +387,6 @@ export default {
 
 .dashboard-content-wrapper {
   height: 94%;
-}
-
-.dashboard-container {
-  padding: 0 !important;
-  width: 100%;
-  height: 100%;
-  position: relative;
-  perspective: 90%;
 }
 
 #dashboard {

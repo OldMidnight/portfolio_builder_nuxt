@@ -54,6 +54,11 @@ export default {
       }
     }
   },
+  mounted() {
+    this.resetErrorStatus({
+      value: false
+    })
+  },
   methods: {
     ...mapMutations({
       resetErrorStatus: 'user_auth/resetErrorStatus'
@@ -74,7 +79,11 @@ export default {
             }
           })
           .catch((e) => {
-            this.response_msg = e.response.data.msg
+            if (e.response) {
+              this.response_msg = e.response.data.msg
+            } else {
+              this.response_msg = 'There was an error processing the request'
+            }
             this.registration_error = true
             this.loading = false
           })

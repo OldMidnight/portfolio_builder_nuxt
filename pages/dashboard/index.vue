@@ -1,11 +1,10 @@
 <script>
 import { mapState, mapActions } from 'vuex'
-// import SiteSettings from '@/components/dashboard/site_settings'
-// import UserSettings from '@/components/dashboard/user_settings'
+import Feedback from '@/components/dashboard/common/feedback'
 export default {
   name: 'Dashboard',
   layout: 'dashboard_layout',
-  // components: { SiteSettings, UserSettings },
+  components: { Feedback },
   fetch({ store, $axios }) {
     return $axios.$get('/helpers/auth_site_config').then((response) => {
       if (!response.site_not_created) {
@@ -19,12 +18,8 @@ export default {
       delete_success: false,
       delete_msg: {},
       temp_messages: [],
-      preview_images: [
-        { src: '/layout_images/kreoh_layout_1_fresh.png' },
-        { src: '/layout_images/kreoh_layout_1_slate.png' },
-        { src: '/layout_images/kreoh_layout_1_matrix.png' }
-      ],
-      accout_types: {
+      default_images: ['Home', 'Projects', 'Resume'],
+      account_types: {
         0: { title: 'Free', price: '0.00' },
         1: { title: 'Premium', price: '5.00' },
         4: { title: 'Beta Tester', price: '0.00' }
@@ -34,7 +29,9 @@ export default {
       messages: [],
       prev_messages: [],
       activation_resent: false,
-      website_images: []
+      website_images: [],
+      slideshow_interval: null,
+      slideshow_index: 0
     }
   },
   computed: {
@@ -51,12 +48,26 @@ export default {
       } else {
         return 'http://' + this.user.domain + '.localhost:3001/'
       }
+    },
+    isMobile() {
+      return this.$vuetify.breakpoint.smAndDown
+    },
+    m_website_images() {
+      if (this.website_images.length === 3) {
+        return [this.website_images[this.slideshow_index]]
+      } else {
+        return []
+      }
     }
-    // weekly_stats() {
-    //   return this.$store.state.dashboard.stats.weekly
-    // }
   },
   created() {
+    this.slideshow_interval = setInterval(() => {
+      if (this.slideshow_index === 2) {
+        this.slideshow_index = 0
+      } else {
+        this.slideshow_index += 1
+      }
+    }, 4500)
     this.emailNotConfirmed = !this.user.email_confirmed
     this.$axios.$get('/u/status').then((response) => {
       if (!response.email_confirmed) {
@@ -125,242 +136,459 @@ export default {
 </script>
 
 <template>
-  <v-layout>
-    <div class="general-settings-container">
-      <div
-        :class="
-          `general-settings-wrapper ${
-            $vuetify.theme.dark ? 'darkmode' : ''
-          } d-flex flex-column align-center justify-center pl-3 pr-2 pt-3`
-        "
-      >
+  <v-row :class="`${isMobile ? 'h-100' : ''}`">
+    <v-col v-if="!isMobile" cols="12" class="pa-0 h-100 w-100 d-flex">
+      <div class="general-settings-container">
         <div
           :class="
-            `gen-setting-item ${
+            `general-settings-wrapper ${
               $vuetify.theme.dark ? 'darkmode' : ''
-            } gen-setting-settings ma-2 pa-4 d-flex flex-column align-center justify-center elevation-2 gen-setting--border`
+            } d-flex flex-column align-center justify-center pl-3 pr-2 pt-3`
           "
         >
-          <div>
-            <v-icon class="gen-setting--icon" color="success">
-              mdi-settings
-            </v-icon>
-            <span class="font-weight-bold">Settings</span>
-          </div>
-          <div class="d-flex flex-column justify-center align-center my-1">
-            <v-btn
-              class="my-1 gen-setting-btn--border"
-              color="info"
-              small
-              nuxt
-              to="/dashboard/site-settings"
-              outlined
-            >
-              Site Setings
-            </v-btn>
-            <v-btn
-              class="my-1 gen-setting-btn--border"
-              color="info"
-              outlined
-              small
-              nuxt
-              to="/dashboard/user-settings"
-            >
-              User Setings
-            </v-btn>
-          </div>
-        </div>
-        <div
-          :class="
-            `gen-setting-item ${
-              $vuetify.theme.dark ? 'darkmode' : ''
-            } gen-setting-messages messages ma-2 py-4 px-2 d-flex flex-column align-center elevation-2 gen-setting--border`
-          "
-        >
-          <div>
-            <v-icon class="gen-setting--icon" color="info">
-              mdi-message
-            </v-icon>
-            <span class="font-weight-bold">Messages</span>
-          </div>
           <div
-            v-if="messages"
-            class="messages-preview py-2 d-flex flex-column align-center"
+            :class="
+              `gen-setting-item ${
+                $vuetify.theme.dark ? 'darkmode' : ''
+              } gen-setting-settings ma-2 pa-4 d-flex flex-column align-center justify-center elevation-2 gen-setting--border`
+            "
           >
-            <nuxt-link
-              v-for="(message, index) in messages"
-              :key="index"
-              :class="
-                `messages-container my-1 ${
-                  user.dark_mode ? 'white' : 'black'
-                }--text`
-              "
-              :to="`/dashboard/message-center?id=${message.id}`"
-            >
-              <v-hover v-slot:default="{ hover }">
-                <div
-                  class="message pa-2 d-flex"
-                  :class="{ 'elevation-1': !hover, 'elevation-3': hover }"
-                >
-                  <div
-                    class="message-details d-flex flex-column justify-center"
-                  >
-                    <span :style="{ fontSize: '16px' }" class="text-truncate">
-                      {{ message.subject }}
-                    </span>
-                    <span :style="{ fontSize: '12px' }">
-                      {{ message.sender }}
-                    </span>
-                  </div>
-                  <div
-                    class="message-icon d-flex flex-column justify-center align-center"
-                  >
-                    <v-icon large color="info">
-                      mdi-{{ message.read ? 'email-open' : 'email' }}
-                    </v-icon>
-                  </div>
-                </div>
-              </v-hover>
-            </nuxt-link>
-            <v-btn
-              class="messages-container my-1"
-              color="info"
-              outlined
-              nuxt
-              to="/dashboard/message-center?support=true"
-            >
-              <span>
-                Send us a message!
-              </span>
-              <v-icon large class="ml-1">
-                mdi-face-agent
+            <div>
+              <v-icon class="gen-setting--icon" color="success">
+                mdi-settings
               </v-icon>
+              <span class="font-weight-bold">Settings</span>
+            </div>
+            <div class="d-flex flex-column justify-center align-center my-1">
+              <v-btn
+                class="my-1 gen-setting-btn--border"
+                color="info"
+                small
+                nuxt
+                to="/dashboard/site-settings"
+                outlined
+              >
+                Site Setings
+              </v-btn>
+              <v-btn
+                class="my-1 gen-setting-btn--border"
+                color="info"
+                outlined
+                small
+                nuxt
+                to="/dashboard/user-settings"
+              >
+                User Setings
+              </v-btn>
+            </div>
+          </div>
+          <div
+            :class="
+              `gen-setting-item ${
+                $vuetify.theme.dark ? 'darkmode' : ''
+              } gen-setting-messages messages ma-2 py-4 px-2 d-flex flex-column align-center elevation-2 gen-setting--border`
+            "
+          >
+            <div>
+              <v-icon class="gen-setting--icon" color="info">
+                mdi-message
+              </v-icon>
+              <span class="font-weight-bold">Messages</span>
+            </div>
+            <div
+              v-if="messages"
+              class="messages-preview py-2 d-flex flex-column align-center"
+            >
+              <nuxt-link
+                v-for="(message, index) in messages"
+                :key="index"
+                :class="
+                  `messages-container my-1 ${
+                    user.dark_mode ? 'white' : 'black'
+                  }--text`
+                "
+                :to="`/dashboard/message-center?id=${message.id}`"
+              >
+                <v-hover v-slot:default="{ hover }">
+                  <div
+                    class="message pa-2 d-flex"
+                    :class="{ 'elevation-1': !hover, 'elevation-3': hover }"
+                  >
+                    <div
+                      class="message-details d-flex flex-column justify-center"
+                    >
+                      <span :style="{ fontSize: '16px' }" class="text-truncate">
+                        {{ message.subject }}
+                      </span>
+                      <span :style="{ fontSize: '12px' }">
+                        {{ message.sender }}
+                      </span>
+                    </div>
+                    <div
+                      class="message-icon d-flex flex-column justify-center align-center"
+                    >
+                      <v-icon large color="info">
+                        mdi-{{ message.read ? 'email-open' : 'email' }}
+                      </v-icon>
+                    </div>
+                  </div>
+                </v-hover>
+              </nuxt-link>
+              <v-btn
+                class="messages-container my-1"
+                color="info"
+                outlined
+                nuxt
+                to="/dashboard/message-center?support=true"
+              >
+                <span>
+                  Send us a message!
+                </span>
+                <v-icon large class="ml-1">
+                  mdi-face-agent
+                </v-icon>
+              </v-btn>
+            </div>
+            <div
+              v-else
+              class=" d-flex flex-column align-center justify-center my-3"
+            >
+              <span class="text-center">No Unread Messages</span>
+            </div>
+            <v-btn
+              class="align-self-center gen-setting-btn--border mb-2"
+              color="info"
+              small
+              outlined
+              nuxt
+              to="/dashboard/message-center"
+            >
+              Messages
             </v-btn>
           </div>
           <div
-            v-else
-            class=" d-flex flex-column align-center justify-center my-3"
+            :class="
+              `gen-setting-item ${
+                $vuetify.theme.dark ? 'darkmode' : ''
+              } gen-setting-plan ma-2 pa-4 d-flex flex-column align-center justify-space-around elevation-2 gen-setting--border`
+            "
           >
-            <span class="text-center">No Unread Messages</span>
+            <div>
+              <v-icon class="gen-setting--icon" color="#FDD835">
+                mdi-star
+              </v-icon>
+              <span class="font-weight-bold">Your Plan</span>
+            </div>
+            <span class="font-weight-light text-center">
+              Account Type:
+            </span>
+            <span class="font-weight-bold mb-3">
+              {{ user ? account_types[user.account_type].title : '' }}
+            </span>
+            <span class="font-weight-light">
+              Monthly Cost:
+            </span>
+            <span class="mb-3 font-weight-bold">
+              &euro; {{ user ? account_types[user.account_type].price : '' }}
+            </span>
+            <v-btn
+              disabled
+              color="info"
+              small
+              outlined
+              class="gen-setting-btn--border"
+            >
+              {{ user.account_type === 0 ? 'Upgrade' : 'Manage' }}
+            </v-btn>
           </div>
-          <v-btn
-            class="align-self-center gen-setting-btn--border mb-2"
-            color="info"
-            small
-            outlined
-            nuxt
-            to="/dashboard/message-center"
-          >
-            Messages
-          </v-btn>
-        </div>
-        <div
-          :class="
-            `gen-setting-item ${
-              $vuetify.theme.dark ? 'darkmode' : ''
-            } gen-setting-plan ma-2 pa-4 d-flex flex-column align-center justify-space-around elevation-2 gen-setting--border`
-          "
-        >
-          <div>
-            <v-icon class="gen-setting--icon" color="#FDD835">
-              mdi-star
-            </v-icon>
-            <span class="font-weight-bold">Your Plan</span>
-          </div>
-          <span class="font-weight-light text-center">
-            Account Type:
-          </span>
-          <span class="font-weight-bold mb-3">
-            {{ accout_types[user.account_type].title }}
-          </span>
-          <span class="font-weight-light">
-            Monthly Cost:
-          </span>
-          <span class="mb-3 font-weight-bold">
-            &euro; {{ accout_types[user.account_type].price }}
-          </span>
-          <v-btn
-            disabled
-            color="info"
-            small
-            outlined
-            class="gen-setting-btn--border"
-          >
-            {{ user.account_type === 0 ? 'Upgrade' : 'Manage' }}
-          </v-btn>
         </div>
       </div>
-    </div>
-    <div
-      class="site-settings-container d-flex flex-column justify-center align-center pb-2"
-    >
       <div
-        class="site-setting-website-container d-flex flex-column pt-3 align-center"
+        class="site-settings-container d-flex flex-column justify-center align-center pb-2"
       >
-        <span class="site-name font-weight-bold pb-1 info--text">
-          {{ (user.domain + '.kreoh.com').toUpperCase() }}
-        </span>
         <div
-          :class="
-            `website-container ${
-              $vuetify.theme.dark ? 'darkmode' : ''
-            } d-flex flex-column justify-space-between align-center elevation-2 website-container--border pb-4`
-          "
+          class="site-setting-website-container d-flex flex-column pt-3 align-center"
         >
+          <span class="site-name font-weight-bold pb-1 info--text">
+            {{ (user.domain + '.kreoh.com').toUpperCase() }}
+          </span>
           <div
-            v-if="user.site_created"
-            class="website-preview-container d-flex align-center justify-center pt-2"
+            :class="
+              `website-container ${
+                $vuetify.theme.dark ? 'darkmode' : ''
+              } d-flex flex-column justify-space-between align-center elevation-2 website-container--border pb-4`
+            "
           >
-            <v-img
+            <div
+              v-if="user.site_created"
+              class="website-preview-container d-flex align-center justify-center pt-2"
+            >
+              <v-img
+                v-for="(img, index) in website_images"
+                :key="index"
+                :class="
+                  `website-img ${
+                    $vuetify.theme.dark ? 'darkmode--border' : ''
+                  } mx-1`
+                "
+                contain
+                :src="img"
+              ></v-img>
+            </div>
+            <div
+              v-else
+              class="website-preview-container d-flex align-center justify-center pt-2"
+            >
+              <div
+                :class="
+                  `${
+                    $vuetify.theme.dark ? 'darkmode' : ''
+                  } img-preview-text d-flex justify-center align-center mx-1`
+                "
+              >
+                <v-icon>mdi-image</v-icon>
+                <p class="font-weight-bold ml-3">Home</p>
+              </div>
+              <div
+                :class="
+                  `${
+                    $vuetify.theme.dark ? 'darkmode' : ''
+                  } img-preview-text d-flex justify-center align-center mx-1`
+                "
+              >
+                <v-icon>mdi-image</v-icon>
+                <p class="font-weight-bold ml-3">Projects</p>
+              </div>
+              <div
+                :class="
+                  `${
+                    $vuetify.theme.dark ? 'darkmode' : ''
+                  } img-preview-text d-flex justify-center align-center mx-1`
+                "
+              >
+                <v-icon>mdi-image</v-icon>
+                <p class="font-weight-bold ml-3">Resume</p>
+              </div>
+            </div>
+            <div
+              class="website-actions-container d-flex justify-space-around align-center"
+            >
+              <v-btn
+                v-if="user.site_created"
+                outlined
+                :class="`${$vuetify.theme.dark ? 'darkmode' : ''}`"
+                color="info"
+                to="/creator"
+                nuxt
+              >
+                <v-icon>mdi-pencil</v-icon> Edit
+              </v-btn>
+              <v-btn
+                :disabled="!user.site_active || !user.email_confirmed"
+                color="info"
+                outlined
+                :href="user_domain"
+                target="_blank"
+              >
+                <v-icon>mdi-open-in-new</v-icon> Visit
+              </v-btn>
+              <v-btn v-if="!user.site_created" color="info" nuxt to="/creator">
+                <v-icon>mdi-plus</v-icon> Create
+              </v-btn>
+              <v-btn
+                v-if="user.site_created"
+                color="error"
+                outlined
+                @click.stop="website_delete_dialog = true"
+              >
+                <v-icon>mdi-delete-forever</v-icon>
+              </v-btn>
+            </div>
+            <p
+              v-if="!user.site_active || !user.email_confirmed"
+              class="caption grey--text mt-4"
+            >
+              Your website is currently parked. To actiavte it, go to the site
+              settings page
+              <nuxt-link to="/dashboard/site-settings#functionality_section">
+                here
+              </nuxt-link>
+            </p>
+          </div>
+        </div>
+        <div
+          class="site-setting-stats-container d-flex justify-center align-center"
+        >
+          <v-card class="mx-3 stat-card--border" width="50%">
+            <v-sheet
+              class="v-sheet--offset mx-auto stat-sheet--border"
+              elevation="12"
+              max-width="calc(100% - 32px)"
+            >
+              <v-sparkline
+                v-if="weekly_stats.autodraw"
+                :labels="weekly_stats.labels"
+                :value="weekly_stats.data"
+                :auto-draw="weekly_stats.autodraw"
+                gradient-direction="top"
+                :gradient="['#f72047', '#ffd200', '#1feaea']"
+                line-width="2"
+                padding="16"
+                stroke-linecap="round"
+                smooth="4"
+              ></v-sparkline>
+            </v-sheet>
+            <v-card-text class="pt-0">
+              <div class="title font-weight-light mb-2">
+                Site Visitors
+              </div>
+              <div class="subheading font-weight-light grey--text">
+                Weekly Total - {{ weekly_stats.total }}
+                / visitors this week
+              </div>
+              <v-divider class="my-2"></v-divider>
+              <v-icon class="mr-2" small>
+                mdi-clock
+              </v-icon>
+              <span class="caption grey--text font-weight-light">
+                last visitor: {{ weekly_stats.last_visitor_time }}
+              </span>
+            </v-card-text>
+          </v-card>
+          <v-card class="mx-3 stat-card--border" width="50%">
+            <v-sheet
+              class="v-sheet--offset mx-auto stat-sheet--border"
+              elevation="12"
+              max-width="calc(100% - 32px)"
+            >
+              <v-sparkline
+                v-if="cta_inter_stats.autodraw"
+                :labels="cta_inter_stats.labels"
+                :value="cta_inter_stats.data"
+                :auto-draw="cta_inter_stats.autodraw"
+                gradient-direction="top"
+                :gradient="['#f72047', '#ffd200', '#1feaea']"
+                line-width="2"
+                padding="16"
+                stroke-linecap="round"
+                smooth="4"
+              ></v-sparkline>
+            </v-sheet>
+            <v-card-text class="pt-0">
+              <div class="title font-weight-light mb-2">
+                Call-To-Action Analytics
+              </div>
+              <div class="subheading font-weight-light grey--text">
+                Weekly Interactions - {{ cta_inter_stats.total }}
+                / interactions this week
+              </div>
+              <v-divider class="my-2"></v-divider>
+              <v-icon class="mr-2" small>
+                mdi-clock
+              </v-icon>
+              <span class="caption grey--text font-weight-light">
+                last interaction: {{ cta_inter_stats.last_visitor_time }}
+              </span>
+            </v-card-text>
+          </v-card>
+        </div>
+      </div>
+    </v-col>
+    <v-row v-else class="h-100 w-100">
+      <v-col cols="12" class="pt-0">
+        <v-row class="mx-9 h-100">
+          <v-col cols="12" class="pa-0 text-center">
+            <span class="site-name font-weight-bold pb-1 info--text">
+              {{ (user.domain + '.kreoh.com').toUpperCase() }}
+            </span>
+          </v-col>
+          <v-col v-if="user.site_created" cols="12" class="elevation-1">
+            <v-slide-group class="w-100" style="height: 30vh">
+              <transition
+                appear
+                enter-active-class="animated fadeIn fast"
+                leave-active-class="animated fadeOut fast"
+                mode="out-in"
+              >
+                <v-slide-item
+                  v-for="img in m_website_images"
+                  :key="img"
+                  class="pos-rel"
+                >
+                  <v-img
+                    :class="
+                      `pos-abs ${$vuetify.theme.dark ? 'darkmode--border' : ''}`
+                    "
+                    contain
+                    :src="img"
+                  ></v-img>
+                </v-slide-item>
+              </transition>
+            </v-slide-group>
+            <!-- <v-img
               v-for="(img, index) in website_images"
               :key="index"
               :class="
-                `website-img ${
-                  $vuetify.theme.dark ? 'darkmode--border' : ''
-                } mx-1`
+                `m-website-img ${$vuetify.theme.dark ? 'darkmode--border' : ''}`
               "
               contain
-              :src="img"
-            ></v-img>
-          </div>
-          <div
-            v-else
-            class="website-preview-container d-flex align-center justify-center pt-2"
-          >
-            <div
-              :class="
-                `${
-                  $vuetify.theme.dark ? 'darkmode' : ''
-                } img-preview-text d-flex justify-center align-center mx-1`
+              :src="
+                `http://api.kreoh.com/uploads/user-content/fareed/home.kreoh.com.png`
               "
-            >
-              <v-icon>mdi-image</v-icon>
-              <p class="font-weight-bold ml-3">Home</p>
-            </div>
-            <div
-              :class="
-                `${
-                  $vuetify.theme.dark ? 'darkmode' : ''
-                } img-preview-text d-flex justify-center align-center mx-1`
-              "
-            >
-              <v-icon>mdi-image</v-icon>
-              <p class="font-weight-bold ml-3">Projects</p>
-            </div>
-            <div
-              :class="
-                `${
-                  $vuetify.theme.dark ? 'darkmode' : ''
-                } img-preview-text d-flex justify-center align-center mx-1`
-              "
-            >
-              <v-icon>mdi-image</v-icon>
-              <p class="font-weight-bold ml-3">Resume</p>
-            </div>
-          </div>
-          <div
-            class="website-actions-container d-flex justify-space-around align-center"
-          >
+              style="height: 30vh"
+            ></v-img> -->
+          </v-col>
+          <v-col v-else cols="12">
+            <v-slide-group class="w-100">
+              <transition
+                appear
+                enter-active-class="animated fadeIn fast"
+                leave-active-class="animated fadeOut fast"
+                mode="out-in"
+              >
+                <v-slide-item
+                  v-if="slideshow_index === 0"
+                  key="0"
+                  class="border border-rounded w-100 d-flex justify-center align-center"
+                  style="height: 30vh"
+                >
+                  <div>
+                    <v-icon x-large>mdi-image</v-icon>
+                    <p class="font-weight-bold ml-3" style="font-size: 30px;">
+                      Home
+                    </p>
+                  </div>
+                </v-slide-item>
+                <v-slide-item
+                  v-if="slideshow_index === 1"
+                  key="1"
+                  class="border border-rounded w-100 d-flex justify-center align-center"
+                  style="height: 30vh"
+                >
+                  <div>
+                    <v-icon x-large>mdi-image</v-icon>
+                    <p class="font-weight-bold ml-3" style="font-size: 30px;">
+                      Projects
+                    </p>
+                  </div>
+                </v-slide-item>
+                <v-slide-item
+                  v-if="slideshow_index === 2"
+                  key="2"
+                  class="border border-rounded w-100 d-flex justify-center align-center"
+                  style="height: 30vh"
+                >
+                  <div>
+                    <v-icon x-large>mdi-image</v-icon>
+                    <p class="font-weight-bold ml-3" style="font-size: 30px;">
+                      Resume
+                    </p>
+                  </div>
+                </v-slide-item>
+              </transition>
+            </v-slide-group>
+          </v-col>
+          <v-col cols="12" class="d-flex justify-space-around">
             <v-btn
               v-if="user.site_created"
               outlined
@@ -368,6 +596,7 @@ export default {
               color="info"
               to="/creator"
               nuxt
+              large
             >
               <v-icon>mdi-pencil</v-icon> Edit
             </v-btn>
@@ -377,110 +606,173 @@ export default {
               outlined
               :href="user_domain"
               target="_blank"
+              large
             >
               <v-icon>mdi-open-in-new</v-icon> Visit
             </v-btn>
-            <v-btn v-if="!user.site_created" color="info" nuxt to="/creator">
+            <v-btn
+              v-if="!user.site_created"
+              color="info"
+              nuxt
+              to="/creator"
+              large
+            >
               <v-icon>mdi-plus</v-icon> Create
             </v-btn>
             <v-btn
               v-if="user.site_created"
               color="error"
               outlined
+              large
               @click.stop="website_delete_dialog = true"
             >
               <v-icon>mdi-delete-forever</v-icon>
             </v-btn>
-          </div>
-          <p
-            v-if="!user.site_active || !user.email_confirmed"
-            class="caption grey--text mt-4"
+          </v-col>
+          <Feedback />
+          <v-col cols="12" class="mt-12 pa-0">
+            <v-card width="100%">
+              <v-sheet
+                class="v-sheet--offset mx-auto"
+                elevation="12"
+                max-width="calc(100% - 32px)"
+              >
+                <v-sparkline
+                  v-if="weekly_stats.autodraw"
+                  :labels="weekly_stats.labels"
+                  :value="weekly_stats.data"
+                  :auto-draw="weekly_stats.autodraw"
+                  gradient-direction="top"
+                  :gradient="['#f72047', '#ffd200', '#1feaea']"
+                  line-width="2"
+                  padding="16"
+                  stroke-linecap="round"
+                  smooth="4"
+                ></v-sparkline>
+              </v-sheet>
+              <v-card-text class="pt-0">
+                <div class="title font-weight-light mb-2">
+                  Site Visitors
+                </div>
+                <div class="subheading font-weight-light grey--text">
+                  Weekly Total - {{ weekly_stats.total }}
+                  / visitors this week
+                </div>
+                <v-divider class="my-2"></v-divider>
+                <v-icon class="mr-2" small>
+                  mdi-clock
+                </v-icon>
+                <span class="caption grey--text font-weight-light">
+                  last visitor: {{ weekly_stats.last_visitor_time }}
+                </span>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="12" class="mt-12 pa-0">
+            <v-card width="100%">
+              <v-sheet
+                class="v-sheet--offset mx-auto"
+                elevation="12"
+                max-width="calc(100% - 32px)"
+              >
+                <v-sparkline
+                  v-if="cta_inter_stats.autodraw"
+                  :labels="cta_inter_stats.labels"
+                  :value="cta_inter_stats.data"
+                  :auto-draw="cta_inter_stats.autodraw"
+                  gradient-direction="top"
+                  :gradient="['#f72047', '#ffd200', '#1feaea']"
+                  line-width="2"
+                  padding="16"
+                  stroke-linecap="round"
+                  smooth="4"
+                ></v-sparkline>
+              </v-sheet>
+              <v-card-text class="pt-0">
+                <div class="title font-weight-light mb-2">
+                  Call-To-Action Analytics
+                </div>
+                <div class="subheading font-weight-light grey--text">
+                  Weekly Interactions - {{ cta_inter_stats.total }}
+                  / interactions this week
+                </div>
+                <v-divider class="my-2"></v-divider>
+                <v-icon class="mr-2" small>
+                  mdi-clock
+                </v-icon>
+                <span class="caption grey--text font-weight-light">
+                  last interaction: {{ cta_inter_stats.last_visitor_time }}
+                </span>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="12" class="pa-0 mt-3">
+            <p class="headline text-center">Messages</p>
+            <v-list two-line>
+              <v-list-item-group active-class="info--text">
+                <template v-for="(message, index) in messages">
+                  <v-list-item
+                    :key="message.id"
+                    class="elevation-1"
+                    nuxt
+                    :to="`/dashboard/message-center?id=${message.id}`"
+                  >
+                    <template v-slot:default>
+                      <v-list-item-content>
+                        <v-list-item-title
+                          v-text="message.sender"
+                        ></v-list-item-title>
+                        <v-list-item-subtitle
+                          class="text--primary"
+                          v-text="message.subject"
+                        ></v-list-item-subtitle>
+                        <v-list-item-subtitle
+                          v-text="message.body"
+                        ></v-list-item-subtitle>
+                      </v-list-item-content>
+                      <v-list-item-action>
+                        <v-list-item-action-text
+                          v-text="
+                            message.time_sent
+                              .split(' ')
+                              .splice(0, 4)
+                              .join(' ')
+                          "
+                        ></v-list-item-action-text>
+                        <v-icon color="info">
+                          mdi-{{ message.read ? 'email-open' : 'email' }}
+                        </v-icon>
+                      </v-list-item-action>
+                    </template>
+                  </v-list-item>
+                  <v-divider
+                    v-if="index + 1 < messages.length"
+                    :key="index"
+                  ></v-divider>
+                </template>
+              </v-list-item-group>
+            </v-list>
+          </v-col>
+          <v-col
+            cols="12"
+            class="d-flex flex-column align-center justify-center"
           >
-            Your website is currently parked. To actiavte it, go to the site
-            settings page
-            <nuxt-link to="/dashboard/site-settings#functionality_section">
-              here
-            </nuxt-link>
-          </p>
-        </div>
-      </div>
-      <div
-        class="site-setting-stats-container d-flex justify-center align-center"
-      >
-        <v-card class="mx-3 stat-card--border" width="50%">
-          <v-sheet
-            class="v-sheet--offset mx-auto stat-sheet--border"
-            elevation="12"
-            max-width="calc(100% - 32px)"
-          >
-            <v-sparkline
-              v-if="weekly_stats.autodraw"
-              :labels="weekly_stats.labels"
-              :value="weekly_stats.data"
-              :auto-draw="weekly_stats.autodraw"
-              gradient-direction="top"
-              :gradient="['#f72047', '#ffd200', '#1feaea']"
-              line-width="2"
-              padding="16"
-              stroke-linecap="round"
-              smooth="4"
-            ></v-sparkline>
-          </v-sheet>
-          <v-card-text class="pt-0">
-            <div class="title font-weight-light mb-2">
-              Site Visitors
-            </div>
-            <div class="subheading font-weight-light grey--text">
-              Weekly Total - {{ weekly_stats.total }}
-              / visitors this week
-            </div>
-            <v-divider class="my-2"></v-divider>
-            <v-icon class="mr-2" small>
-              mdi-clock
-            </v-icon>
-            <span class="caption grey--text font-weight-light">
-              last visitor: {{ weekly_stats.last_visitor_time }}
-            </span>
-          </v-card-text>
-        </v-card>
-        <v-card class="mx-3 stat-card--border" width="50%">
-          <v-sheet
-            class="v-sheet--offset mx-auto stat-sheet--border"
-            elevation="12"
-            max-width="calc(100% - 32px)"
-          >
-            <v-sparkline
-              v-if="cta_inter_stats.autodraw"
-              :labels="cta_inter_stats.labels"
-              :value="cta_inter_stats.data"
-              :auto-draw="cta_inter_stats.autodraw"
-              gradient-direction="top"
-              :gradient="['#f72047', '#ffd200', '#1feaea']"
-              line-width="2"
-              padding="16"
-              stroke-linecap="round"
-              smooth="4"
-            ></v-sparkline>
-          </v-sheet>
-          <v-card-text class="pt-0">
-            <div class="title font-weight-light mb-2">
-              Call-To-Action Analytics
-            </div>
-            <div class="subheading font-weight-light grey--text">
-              Weekly Interactions - {{ cta_inter_stats.total }}
-              / interactions this week
-            </div>
-            <v-divider class="my-2"></v-divider>
-            <v-icon class="mr-2" small>
-              mdi-clock
-            </v-icon>
-            <span class="caption grey--text font-weight-light">
-              last interaction: {{ cta_inter_stats.last_visitor_time }}
-            </span>
-          </v-card-text>
-        </v-card>
-      </div>
-    </div>
+            <v-text-field
+              class="h-100 w-100 mt-2"
+              dense
+              outlined
+              label="Search..."
+              rounded
+              prepend-inner-icon="mdi-magnify"
+            ></v-text-field>
+            <v-btn text nuxt to="/dashboard/message-center?support=true">
+              Support
+            </v-btn>
+            <v-btn text nuxt to="#">FAQ</v-btn>
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
     <v-dialog
       v-model="website_delete_dialog"
       width="500"
@@ -547,7 +839,7 @@ export default {
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-snackbar>
-  </v-layout>
+  </v-row>
 </template>
 
 <style lang="scss" scoped>
@@ -681,69 +973,4 @@ export default {
   width: 20%;
   height: 100%;
 }
-
-// .dashboard--border {
-//   border-radius: 0.5em !important;
-//   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-//   background-color: #eceff1 !important;
-//   box-shadow: -6px -6px 24px 0 rgba(255, 255, 255, 0.83),
-//     6px 6px 16px 0 rgba(217, 210, 200, 0.61) !important;
-// }
-
-// .gen-setting--border {
-//   border-radius: 0.5em !important;
-//   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-//   background-color: #eceff1 !important;
-//   box-shadow: -6px -6px 26px 0 rgba(255, 255, 255, 0.83),
-//     6px 6px 16px 0 rgba(217, 210, 200, 0.51) !important;
-//   margin: 5% 0 !important;
-//   transition: 0.3s;
-// }
-
-// .gen-setting-btn--border {
-//   border-radius: 0.5em !important;
-//   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-//   background-color: #eceff1 !important;
-//   box-shadow: -4px -4px 16px 0 rgba(255, 255, 255, 0.83),
-//     -6px -6px 20px 0 rgba(255, 255, 255, 0.93),
-//     4px 4px 16px 0 rgba(217, 210, 200, 0.51),
-//     6px 6px 20px 0 rgba(217, 210, 200, 0.59) !important;
-//   margin: 8% 0 !important;
-// }
-
-// .website-container--border {
-//   border-radius: 0.5em !important;
-//   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-//   background-color: #eceff1 !important;
-//   box-shadow: -6px -6px 26px 0 rgba(255, 255, 255, 0.83),
-//     6px 6px 16px 0 rgba(217, 210, 200, 0.51) !important;
-// }
-
-// .stat-card--border,
-// .stat-sheet--border {
-//   border-radius: 0.5em !important;
-//   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-//   background-color: #eceff1 !important;
-//   box-shadow: -6px -6px 26px 0 rgba(255, 255, 255, 0.83),
-//     6px 6px 16px 0 rgba(217, 210, 200, 0.51) !important;
-// }
-
-// .stat-sheet--border {
-//   background-color: #eceff1 !important;
-// }
-
-// .website-img--border {
-//   border-radius: 0.5em !important;
-//   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-//   background-color: #eceff1 !important;
-//   box-shadow: -6px -6px 26px 0 rgba(255, 255, 255, 0.83),
-//     6px 6px 16px 0 rgba(217, 210, 200, 0.51) !important;
-// }
-
-// .topnav--neumorph {
-//   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-//   background-color: #eceff1 !important;
-//   box-shadow: -6px -6px 20px 0 rgba(255, 255, 255, 1),
-//     6px 6px 16px 0 rgba(217, 210, 200, 0.51) !important;
-// }
 </style>

@@ -70,7 +70,11 @@ export default {
             this.email_loading = false
           })
           .catch((e) => {
-            this.mailing_add_msg = e.response.data.msg
+            if (e.response) {
+              this.mailing_add_msg = e.response.data.msg
+            } else {
+              this.mailing_add_msg = 'There was an error processing the request'
+            }
             this.mailing_add_fail = true
             this.email_loading = false
           })
