@@ -2644,11 +2644,6 @@ export default {
         </editor-menu-bar>
       </v-toolbar>
     </transition>
-    <!-- <v-overlay z-index="10" :value="show_tutorial" class="tutorial--container">
-      <v-btn v-if="tutorial_step === 1" color="info" class="tutorial--btn">
-        Continue
-      </v-btn>
-    </v-overlay> -->
   </div>
 </template>
 

@@ -32,7 +32,7 @@ export default {
     }
   },
   computed: {
-    smAndDown() {
+    isMobile() {
       return this.$vuetify.breakpoint.smAndDown
     }
   },
@@ -63,7 +63,7 @@ export default {
       if (this.$refs.mail_list_form.validate(true)) {
         this.email_loading = true
         this.$axios
-          .post('mail/mailing_list/add', { email: this.email })
+          .post('/mail/mailing_list/add', { email: this.email })
           .then((response) => {
             this.mailing_add_msg = response.data.msg
             this.mailing_add_pass = true
@@ -90,29 +90,25 @@ export default {
       class="top-nav d-flex"
       :class="{
         'top-nav-scrolled': nav_state,
-        'm-top-nav': smAndDown
+        'm-top-nav': isMobile
       }"
       no-gutters
     >
       <v-col
-        :cols="smAndDown ? '2' : '2'"
+        cols="2"
         class="d-flex align-center nav--item"
         :class="{
-          'nav--item': !smAndDown
+          'nav--item': !isMobile
         }"
       >
         <v-row class="item--container">
           <v-col
-            :cols="smAndDown ? '12' : '12'"
-            class="item--logo-container pa-0 d-flex align-center"
-            :class="{
-              'pl-9': !smAndDown,
-              'ml-4': smAndDown
-            }"
+            cols="12"
+            class="item--logo-container pa-0 d-flex align-center ml-4 ml-md-auto pl-1 pl-md-9"
           >
             <v-img
               class="item--logo"
-              :class="{ 'm-item--logo': smAndDown }"
+              :class="{ 'm-item--logo': isMobile }"
               :src="nav_state ? '/Logo_beta_white.png' : '/Logo_beta_black.png'"
               contain
             ></v-img>
@@ -155,11 +151,12 @@ export default {
         </v-btn>
       </v-col>
       <v-col
-        :cols="smAndDown ? '10' : '4'"
+        col="10"
+        md="4"
         class="d-flex align-center nav--item nav-btns justify-end pr-3"
       >
         <v-btn
-          :color="smAndDown || nav_state ? 'white' : ''"
+          :color="isMobile || nav_state ? 'white' : ''"
           text
           class="mx-2"
           @click="beta_dialog = true"
@@ -169,11 +166,7 @@ export default {
         <v-btn
           color="white"
           depressed
-          :class="
-            `mx-2 h-auto pa-${
-              smAndDown ? '5' : '5'
-            } elevation-0 d-none d-md-flex d-lg-flex d-xl-flex`
-          "
+          class="mx-2 h-auto pa-5 elevation-0 d-none d-md-flex d-lg-flex d-xl-flex"
           @click="beta_dialog = true"
         >
           Get Started
@@ -183,18 +176,19 @@ export default {
     <v-row class="home--content" no-gutters>
       <v-row
         class="content--landing"
-        :class="{ 'm-content--landing': smAndDown }"
+        :class="{ 'm-content--landing': isMobile }"
       >
         <transition appear appear-active-class="animated fadeIn" mode="out-in">
           <v-col
-            :cols="smAndDown ? '12' : '5'"
+            col="12"
+            md="5"
             class="home--landing-container home--landing-main d-flex flex-column align-end justify-center"
-            :class="{ 'm-home--landing-main': smAndDown }"
+            :class="{ 'm-home--landing-main': isMobile }"
           >
             <div
-              class="home--landing-text d-flex flex-column justify-end"
+              class="home--landing-text d-flex flex-column justify-end px-5 px-md-auto"
               :class="{
-                'align-center text-center px-5': smAndDown
+                'align-center text-center': isMobile
               }"
             >
               <transition
@@ -205,7 +199,7 @@ export default {
                 <p
                   class="home--landing-subheading"
                   :class="{
-                    'm-home--landing-subheading': smAndDown
+                    'm-home--landing-subheading': isMobile
                   }"
                 >
                   {{ kreoh_slogans[current_slogan] }}
@@ -214,26 +208,23 @@ export default {
               <p
                 class="home--landing-heading font-weight-bold"
                 :class="{
-                  'm-home--landing-heading': smAndDown
+                  'm-home--landing-heading': isMobile
                 }"
               >
                 DESIGN YOUR ONLINE PORTFOLIO
               </p>
             </div>
             <div
-              class="home--landing-actions d-flex flex-column"
+              class="home--landing-actions d-flex flex-column pt-3 pt-md-8"
               :class="{
-                'align-center justify-start pt-3': smAndDown,
-                'pt-8': !smAndDown
+                'align-center justify-start': isMobile
               }"
             >
               <div class="d-flex">
                 <v-btn
                   style="font-size: 16px"
                   color="white"
-                  :class="
-                    `font-weight-bold mr-2 h-auto pa-${smAndDown ? '5' : '6'}`
-                  "
+                  class="font-weight-bold mr-2 h-auto pa-5 pa-md-6"
                   @click="beta_dialog = true"
                 >
                   Get Started
@@ -250,11 +241,12 @@ export default {
         </transition>
         <transition appear appear-active-class="animated fadeIn" mode="out-in">
           <v-col
-            :cols="smAndDown ? '12' : '7'"
+            cols="12"
+            md="7"
             class="home--landing-container d-flex"
             :class="{
-              'm-home--landing-img-wrapper': smAndDown,
-              'align-center justify-center': !smAndDown
+              'm-home--landing-img-wrapper': isMobile,
+              'align-center justify-center': !isMobile
             }"
           >
             <v-col class="home--landing-img-container d-flex align-center">
@@ -274,27 +266,21 @@ export default {
       </v-row>
       <v-row
         class="content--value py-5"
-        :class="{ 'm-content--value': smAndDown }"
+        :class="{ 'm-content--value': isMobile }"
       >
-        <v-col
-          :style="{ height: '10%' }"
-          cols="12"
-          class="d-flex justify-center align-center pa-0"
-        >
+        <v-col cols="12" class="d-flex justify-center align-center pa-0 h-10">
           <p :style="{ fontSize: '40px' }" class="font-weight-bold">Features</p>
         </v-col>
-        <v-col :style="{ height: '90%' }" cols="12" class="pa-0">
-          <v-row :style="{ height: '100%' }">
+        <v-col cols="12" class="pa-0 h-90">
+          <v-row class="h-100">
             <v-col
-              :cols="smAndDown ? '12' : '4'"
+              cols="12"
+              md="4"
               :class="{
-                'm-value--item-container': smAndDown
+                'm-value--item-container': isMobile
               }"
             >
-              <v-row
-                class="value--item"
-                :class="{ 'm-value--item': smAndDown }"
-              >
+              <v-row class="value--item" :class="{ 'm-value--item': isMobile }">
                 <v-col
                   cols="12"
                   class="value--item-img-container pa-0 d-flex justify-center align-center"
@@ -309,10 +295,7 @@ export default {
                   cols="12"
                   class="value--item-text text-center d-flex flex-column justify-center align-center"
                 >
-                  <p
-                    class="headline font-weight-bold text-center"
-                    :class="{ headline: smAndDown }"
-                  >
+                  <p class="headline font-weight-bold text-center">
                     Claim Your Competitive Advantage
                   </p>
                   <p>
@@ -322,9 +305,10 @@ export default {
               </v-row>
             </v-col>
             <v-col
-              :cols="smAndDown ? '12' : '4'"
+              cols="12"
+              md="4"
               :class="{
-                'm-value--item-container': smAndDown
+                'm-value--item-container': isMobile
               }"
             >
               <v-row class="value--item">
@@ -342,10 +326,7 @@ export default {
                   cols="12"
                   class="value--item-text d-flex flex-column text-center justify-center align-center"
                 >
-                  <p
-                    class="headline font-weight-bold"
-                    :class="{ headline: smAndDown }"
-                  >
+                  <p class="headline font-weight-bold">
                     Call-To-Action Button
                   </p>
                   <p>
@@ -357,9 +338,10 @@ export default {
               </v-row>
             </v-col>
             <v-col
-              :cols="smAndDown ? '12' : '4'"
+              cols="12"
+              md="4"
               :class="{
-                'm-value--item-container': smAndDown
+                'm-value--item-container': isMobile
               }"
             >
               <v-row class="value--item">
@@ -377,10 +359,7 @@ export default {
                   cols="12"
                   class="value--item-text d-flex flex-column text-center justify-center align-center"
                 >
-                  <p
-                    class="headline font-weight-bold"
-                    :class="{ headline: smAndDown }"
-                  >
+                  <p class="headline font-weight-bold">
                     3-Page System
                   </p>
                   <p>
@@ -396,26 +375,26 @@ export default {
       </v-row>
       <v-row
         class="content--preview pt-7"
-        :class="{ 'm-content--preview': smAndDown }"
+        :class="{ 'm-content--preview': isMobile }"
       >
         <v-col
           cols="12"
-          class="home--preview-intro d-flex flex-column align-center"
+          class="home--preview-intro d-flex flex-column align-center px-3 px-md-auto"
           :class="{
-            'px-3 m-home--preview-intro': smAndDown
+            'm-home--preview-intro': isMobile
           }"
         >
           <p
-            :style="smAndDown ? { fontSize: '30px' } : { fontSize: '40px' }"
+            :style="{ fontSize: isMobile ? '30px' : '40px' }"
             class="py-1 font-weight-bold"
-            :class="{ 'text-center': smAndDown }"
+            :class="{ 'text-center': isMobile }"
           >
             Clean and Minimalist designs
           </p>
           <p
             :style="{
-              fontSize: smAndDown ? '18px' : '20px',
-              padding: smAndDown ? '0 5%' : '0 20%'
+              fontSize: isMobile ? '18px' : '20px',
+              padding: isMobile ? '0 5%' : '0 20%'
             }"
             class="text-center"
           >
@@ -428,34 +407,34 @@ export default {
         <v-col
           cols="12"
           class="home--preview-content"
-          :class="{ 'm-home--preview-content': smAndDown }"
+          :class="{ 'm-home--preview-content': isMobile }"
         >
           <v-row align="center" class="preview--content">
             <v-col
               cols="12"
-              class="home--preview-item d-flex justify-space-around"
+              class="home--preview-item d-flex justify-space-around px-0 px-md-auto flex-column flex-md-row"
               :class="{
-                'flex-column m-home--preview-item px-0': smAndDown
+                'm-home--preview-item': isMobile
               }"
             >
               <div
                 class="home--preview-img-container elevation-1 d-flex flex-column align-center justify-center"
                 :class="{
-                  'm-home--preview-img-container': smAndDown
+                  'm-home--preview-img-container': isMobile
                 }"
               >
                 <v-img
                   class="home--preview-img"
                   :class="{
-                    'm-home--preview-img': smAndDown
+                    'm-home--preview-img': isMobile
                   }"
                   src="/layout_images/kreoh_layouts.png"
                 ></v-img>
               </div>
               <div
-                class="home--preview-text text-center d-flex flex-column justify-center align-center"
+                class="home--preview-text text-center d-flex flex-column justify-center align-center pt-4 pt-md-auto"
                 :class="{
-                  'm-home--preview-text pt-4': smAndDown
+                  'm-home--preview-text': isMobile
                 }"
               >
                 <p style="font-size: 26px" class="font-weight-bold">
@@ -469,30 +448,30 @@ export default {
             </v-col>
             <v-col
               cols="12"
-              class="home--preview-item-s d-flex justify-space-around"
+              class="home--preview-item-s d-flex justify-space-around px-0 px-md-auto flex-column flex-md-row"
               :class="{
-                'flex-column m-home--preview-item px-0': smAndDown
+                'm-home--preview-item': isMobile
               }"
             >
               <div
-                v-if="smAndDown"
+                v-if="isMobile"
                 class="home--preview-img-container elevation-1 d-flex flex-column align-center justify-center"
                 :class="{
-                  'm-home--preview-img-container': smAndDown
+                  'm-home--preview-img-container': isMobile
                 }"
               >
                 <v-img
                   class="home--preview-img border-white"
                   :class="{
-                    'm-home--preview-img': smAndDown
+                    'm-home--preview-img': isMobile
                   }"
                   src="/kreoh_home/kreoh_form.png"
                 ></v-img>
               </div>
               <div
-                class="home--preview-text text-center d-flex flex-column justify-center align-center"
+                class="home--preview-text text-center d-flex flex-column justify-center align-center pt-4 pt-md-auto"
                 :class="{
-                  'm-home--preview-text pt-4': smAndDown
+                  'm-home--preview-text': isMobile
                 }"
               >
                 <p style="font-size: 26px" class="font-weight-bold">
@@ -505,7 +484,7 @@ export default {
                 </p>
               </div>
               <div
-                v-if="!smAndDown"
+                v-if="!isMobile"
                 class="home--preview-img-container elevation-1 d-flex flex-column align-center justify-center"
               >
                 <v-img
@@ -516,29 +495,29 @@ export default {
             </v-col>
             <v-col
               cols="12"
-              class="home--preview-item d-flex justify-space-around"
+              class="home--preview-item d-flex justify-space-around flex-column flex-md-row px-0 px-md-auto"
               :class="{
-                'flex-column m-home--preview-item px-0': smAndDown
+                'm-home--preview-item': isMobile
               }"
             >
               <div
                 class="home--preview-img-container elevation-1 d-flex flex-column align-center justify-center"
                 :class="{
-                  'm-home--preview-img-container': smAndDown
+                  'm-home--preview-img-container': isMobile
                 }"
               >
                 <v-img
                   class="home--preview-img"
                   :class="{
-                    'm-home--preview-img': smAndDown
+                    'm-home--preview-img': isMobile
                   }"
                   src="/layout_images/kreoh_layout_1_slate.png"
                 ></v-img>
               </div>
               <div
-                class="home--preview-text text-center d-flex flex-column justify-center align-center"
+                class="home--preview-text text-center d-flex flex-column justify-center align-center pt-4 pt-md-auto"
                 :class="{
-                  'm-home--preview-text pt-4': smAndDown
+                  'm-home--preview-text': isMobile
                 }"
               >
                 <p style="font-size: 26px" class="font-weight-bold">Simple</p>
@@ -554,37 +533,33 @@ export default {
       </v-row>
       <v-row
         class="content--pricing"
-        :class="{ 'm-content--pricing': smAndDown }"
+        :class="{ 'm-content--pricing': isMobile }"
       >
         <v-col
           cols="12"
           class="pricing--intro d-flex flex-column align-center justify-center text-center mb-3"
-          :class="{ 'm-pricing--intro': smAndDown }"
+          :class="{ 'm-pricing--intro': isMobile }"
         >
           <p
-            :style="smAndDown ? { fontSize: '30px' } : { fontSize: '40px' }"
+            :style="{ fontSize: isMobile ? '30px' : '40px' }"
             class="font-weight-bold"
           >
             Price Plans
           </p>
-          <p :style="smAndDown ? { fontSize: '18px' } : { fontSize: '20px' }">
-            Kreoh offers different plans depending on your needs. Buy
-            subscribing your supporting us in our mission to get all students of
-            all disciplines their foot in the professional door.
+          <p :style="{ fontSize: isMobile ? '18px' : '20px' }">
+            Get started with kreoh today for free! Our subscription plan offers
+            a wide myriad of extra functionality so if it suits your fancy,
+            check it out!
           </p>
         </v-col>
         <Prices />
         <v-col
           cols="12"
-          class="pricing--action d-flex align-center flex-column pa-0"
+          class="pricing--action d-flex align-center flex-column justify-start justify-md-center pa-0"
           :class="{
-            'm-pricing--action justify-start': smAndDown,
-            'justify-center': !smAndDown
+            'm-pricing--action': isMobile
           }"
         >
-          <!-- <p style="font-size: 10px" class="font-weight-light my-2">
-            * Pro accounts can request additional storage up to 1GB
-          </p> -->
           <v-btn
             color="info"
             class="pa-6 h-auto font-weight-bold"
@@ -595,11 +570,12 @@ export default {
           </v-btn>
         </v-col>
       </v-row>
-      <v-row class="content--about" :class="{ 'm-content--about': smAndDown }">
+      <v-row class="content--about" :class="{ 'm-content--about': isMobile }">
         <v-col
-          :cols="smAndDown ? '12' : '6'"
+          cols="12"
+          md="6"
           class="px-5 about--img-container d-flex justify-center align-center"
-          :class="{ 'm-about--img-container': smAndDown }"
+          :class="{ 'm-about--img-container': isMobile }"
         >
           <v-img
             class="about--img elevation-2"
@@ -607,40 +583,41 @@ export default {
           ></v-img>
         </v-col>
         <v-col
-          :cols="smAndDown ? '12' : '6'"
+          cols="12"
+          md="6"
           class="about--text pt-5 white--text d-flex flex-column justify-space-around"
-          :class="{ 'm-about--text': smAndDown }"
+          :class="{ 'm-about--text': isMobile }"
         >
           <div
             class="about--text-wrapper d-flex pb-7"
             :class="{
-              'm-about--text-wrapper d-flex flex-column align-center justify-center': smAndDown
+              'm-about--text-wrapper d-flex flex-column align-center justify-center': isMobile
             }"
           >
             <p
               :style="{
-                fontSize: smAndDown ? '18px' : '22px'
+                fontSize: isMobile ? '18px' : '22px'
               }"
-              :class="{ 'mx-3': !smAndDown }"
+              class="mx-md-3"
             >
               Kreoh was built with the idea of providing every person the
               opportunity to promote themselves.
             </p>
             <p
               :style="{
-                fontSize: smAndDown ? '18px' : '22px'
+                fontSize: isMobile ? '18px' : '22px'
               }"
-              :class="{ 'mx-3': !smAndDown }"
+              class="mx-md-3"
             >
               Not everyone needs an online store or business. A simple website,
               where your work and interests are at the forefront offer the
-              simplicity for both you and visitors of you website to understand
+              simplicity for both you and visitors of your website to understand
               you as a person.
             </p>
           </div>
           <p
             :style="{
-              fontSize: smAndDown ? '28px' : '42px'
+              fontSize: isMobile ? '28px' : '42px'
             }"
             class="font-weight-bold text-center"
           >
@@ -648,29 +625,24 @@ export default {
           </p>
           <v-btn
             depressed
-            style="width: 40%"
             color="info"
-            :class="
-              `h-auto pa-${smAndDown ? '5' : '6'} align-self-center elevation-0`
-            "
+            class="h-auto w-40 pa-5 pa-md-6 align-self-center elevation-0"
             @click="beta_dialog = true"
           >
             Get Started
           </v-btn>
         </v-col>
       </v-row>
-      <v-row
-        class="content--footer"
-        :class="{ 'm-content--footer': smAndDown }"
-      >
+      <v-row class="content--footer" :class="{ 'm-content--footer': isMobile }">
         <v-col
-          :style="{ height: smAndDown ? '40%' : 'initial' }"
-          :cols="smAndDown ? '12' : '7'"
+          cols="12"
+          md="7"
+          :style="{ height: isMobile ? '40%' : 'initial' }"
         >
           <v-row
             class="footer--text-container white--text"
             :class="{
-              'm-footer--text-container': !smAndDown
+              'm-footer--text-container': !isMobile
             }"
           >
             <v-col cols="4" class="d-flex flex-column align-center">
@@ -712,16 +684,17 @@ export default {
           </v-row>
         </v-col>
         <v-col
-          :style="{ height: smAndDown ? '60%' : 'initial' }"
-          :cols="smAndDown ? '12' : '5'"
-          :class="{ 'pr-9': !smAndDown }"
+          :style="{ height: isMobile ? '60%' : 'initial' }"
+          cols="12"
+          md="5"
+          class="pr-md-9"
         >
           <v-row class="footer--logo-wrapper">
             <v-col
               cols="12"
               class="footer--logo-container pa-0"
               :class="{
-                'm-footer--logo-container': smAndDown
+                'm-footer--logo-container': isMobile
               }"
             >
               <v-row class="footer--logo-wrapper">
@@ -739,11 +712,11 @@ export default {
             <v-col
               cols="12"
               class="footer--logo-text grey--text d-flex flex-column justify-space-around"
-              :class="{ 'm-footer--logo-text': smAndDown }"
+              :class="{ 'm-footer--logo-text': isMobile }"
             >
               <p
                 :style="{
-                  fontSize: smAndDown ? '12px' : 'initial'
+                  fontSize: isMobile ? '12px' : 'initial'
                 }"
                 class="text-center"
               >
@@ -753,7 +726,7 @@ export default {
               </p>
               <p
                 :style="{
-                  fontSize: smAndDown ? '12px' : 'initial'
+                  fontSize: isMobile ? '12px' : 'initial'
                 }"
                 class="text-center"
               >
@@ -771,7 +744,7 @@ export default {
               </a>
               <p
                 :style="{
-                  fontSize: smAndDown ? '12px' : 'initial'
+                  fontSize: isMobile ? '12px' : 'initial'
                 }"
                 class="text-center"
               >
@@ -787,7 +760,7 @@ export default {
     </v-row>
     <v-dialog
       v-model="beta_dialog"
-      :fullscreen="smAndDown"
+      :fullscreen="isMobile"
       width="500"
       scrollable
     >
@@ -866,7 +839,7 @@ export default {
                             As a beta tester you can:
                           </p>
                           <ul>
-                            <li>Early access to Kreoh</li>
+                            <li>Get early access to Kreoh</li>
                             <li>Ability to reserve a Kreoh subdomain</li>
                             <li>Test all features of Kreoh</li>
                             <li>Provide feedback on current features</li>
@@ -912,10 +885,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.test {
-  border: 1px solid red;
-}
-
 .logo {
   font-size: 30px;
 }
@@ -967,7 +936,7 @@ export default {
 }
 
 .content--pricing {
-  height: 115vh;
+  // height: 115vh;
   background-color: white;
   position: relative;
   z-index: 2;
@@ -979,7 +948,7 @@ export default {
 }
 
 .content--about {
-  height: 90vh;
+  // height: 90vh;
   position: relative;
   z-index: 2;
 }
@@ -1251,6 +1220,7 @@ export default {
   background-color: #0c6645;
   padding: 0 6%;
   height: 100%;
+  padding-bottom: 2%;
 }
 
 .m-about--text {

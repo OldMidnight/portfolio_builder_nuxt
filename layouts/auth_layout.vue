@@ -13,7 +13,7 @@ export default {}
         <v-col
           cols="12"
           :class="
-            `h-${this.$vuetify.breakpoint.smAndDown ? '10' : '15 mb-2'} pt-0`
+            `h-${this.$vuetify.breakpoint.smAndDown ? '10' : '15'} mb-md-2 pt-0`
           "
         >
           <!-- <span class="logo mb-7 font-weight-bold">
@@ -29,7 +29,8 @@ export default {}
           ></v-img>
         </v-col>
         <v-col
-          :cols="this.$vuetify.breakpoint.smAndDown ? '12' : '3'"
+          xs="12"
+          md="3"
           :class="
             `form ${
               this.$vuetify.breakpoint.smAndDown ? 'h-80' : 'elevation-1'

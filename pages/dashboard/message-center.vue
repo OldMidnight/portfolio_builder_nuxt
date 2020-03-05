@@ -205,13 +205,3 @@ export default {
     </v-snackbar>
   </v-row>
 </template>
-
-<style lang="scss" scoped>
-// .messages--top-nav {
-//   height: 10%;
-// }
-
-// .messages--content {
-//   height: 90%;
-// }
-</style>

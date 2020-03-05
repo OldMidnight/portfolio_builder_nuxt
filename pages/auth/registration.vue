@@ -70,7 +70,7 @@ export default {
       if (this.$refs.reg_form.validate(true)) {
         this.loading = true
         this.$axios
-          .post('create/validate_domain', { domain: this.user.domain })
+          .post('/create/validate_domain', { domain: this.user.domain })
           .then((response) => {
             if (response.data.validated) {
               this.register(this.user).then(() => {

@@ -43,11 +43,11 @@ export default {
       return this.$store.state.auth.user
     },
     user_domain() {
-      if (this.$axios.defaults.baseURL !== 'http://127.0.0.1:5000/') {
-        return 'http://' + this.user.domain + '.kreoh.com/'
-      } else {
-        return 'http://' + this.user.domain + '.localhost:3001/'
-      }
+      return `http://${this.user.domain}${
+        this.$axios.defaults.baseURL !== 'http://127.0.0.1:5000'
+          ? '.localhost:3001/'
+          : '.kreoh.com/'
+      }`
     },
     isMobile() {
       return this.$vuetify.breakpoint.smAndDown
@@ -86,10 +86,7 @@ export default {
   },
   mounted() {
     this.updateStats()
-    const url =
-      this.$axios.defaults.baseURL === 'http://127.0.0.1:5000/'
-        ? 'http://127.0.0.1:5000/uploads/user-content/'
-        : 'http://api.kreoh.com/uploads/user-content/'
+    const url = `${this.$axios.defaults.baseURL}/uploads/user-content/`
 
     for (const page of ['home', 'projects', 'resume']) {
       this.website_images.push(
@@ -101,30 +98,26 @@ export default {
     ...mapActions({
       updateStats: 'dashboard/updateStats'
     }),
-    deleteSite() {
-      this.$axios
+    async deleteSite() {
+      await this.$axios
         .$post('/helpers/delete_site', { domain: this.user.domain })
         .then((response) => {
           this.delete_msg = response.message
           this.delete_success = true
-          this.$auth.fetchUser()
         })
         .catch(() => {
           this.delete_msg = 'Website could not be deleted.'
           this.delete_error = true
         })
-        .then(() => {
-          this.website_delete_dialog = false
-          this.$auth.fetchUser()
-        })
+      this.website_delete_dialog = false
+      this.$auth.fetchUser()
     },
-    resendVerification() {
-      this.$axios.$post('/u/email_verify').then(() => {
-        this.activation_resent = true
-      })
+    async resendVerification() {
+      await this.$axios.$post('/u/email_verify')
+      this.activation_resent = true
     },
     openMessage(id) {
-      this.$router.push({ path: '/dashboard/message-center?id=' + id })
+      this.$router.push({ path: `/dashboard/message-center?id=${id}` })
     }
   },
   head() {
@@ -525,18 +518,6 @@ export default {
                 </v-slide-item>
               </transition>
             </v-slide-group>
-            <!-- <v-img
-              v-for="(img, index) in website_images"
-              :key="index"
-              :class="
-                `m-website-img ${$vuetify.theme.dark ? 'darkmode--border' : ''}`
-              "
-              contain
-              :src="
-                `http://api.kreoh.com/uploads/user-content/fareed/home.kreoh.com.png`
-              "
-              style="height: 30vh"
-            ></v-img> -->
           </v-col>
           <v-col v-else cols="12">
             <v-slide-group class="w-100">

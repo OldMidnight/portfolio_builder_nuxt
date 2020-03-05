@@ -39,7 +39,7 @@ export default {
 
 <template>
   <v-app>
-    <v-app-bar class="px-2" app inverted-scroll>
+    <v-app-bar v-if="isMobile" class="px-2" app inverted-scroll>
       <v-app-bar-nav-icon
         @click.stop="menu_drawer = !menu_drawer"
       ></v-app-bar-nav-icon>
@@ -67,13 +67,14 @@ export default {
     <client-only placeholder="Loading Dashboard...">
       <v-row
         v-if="!isMobile"
-        class="w-100 h-100 pa-0 dashboard-container pos-rel flex-column"
+        class="w-100 h-100 ma-0 dashboard-container pos-rel justify-center"
       >
-        <v-row
+        <v-col
+          cols="11"
           :class="
             `dashboard-topnav ${
               $vuetify.theme.dark ? 'darkmode' : ''
-            } elevation-1 px-5 d-flex`
+            } elevation-1 pa-0 px-5 d-flex`
           "
         >
           <div class="logo-container d-flex align-center">
@@ -122,9 +123,10 @@ export default {
               <span>Logout</span>
             </v-tooltip>
           </div>
-        </v-row>
-        <v-row
-          class="dashboard-content-wrapper d-flex flex-column align-center justify-center"
+        </v-col>
+        <v-col
+          cols="12"
+          class="dashboard-content-wrapper d-flex pa-0 flex-column align-center justify-center"
         >
           <nuxt
             id="dashboard"
@@ -143,7 +145,7 @@ export default {
               </v-col>
             </v-footer>
           </div>
-        </v-row>
+        </v-col>
       </v-row>
       <v-row v-else>
         <v-col cols="12" class="h-100 border px-0 pb-0">
@@ -151,7 +153,13 @@ export default {
         </v-col>
       </v-row>
     </client-only>
-    <v-navigation-drawer v-model="menu_drawer" app bottom temporary>
+    <v-navigation-drawer
+      v-if="isMobile"
+      v-model="menu_drawer"
+      app
+      bottom
+      temporary
+    >
       <v-list nav dense>
         <v-list-item link nuxt to="/dashboard">
           <v-list-item-icon>
@@ -352,17 +360,16 @@ export default {
 }
 
 .dashboard-topnav {
-  height: 6%;
   max-height: 6%;
-  min-height: 6%;
   background-color: #f5f5f5;
-  margin: 15px 2% 0 2% !important;
+  position: relative;
+  top: 1%;
   border-radius: 0.5em !important;
 }
 
 .logo-container {
   position: relative;
-  width: 60%;
+  width: 50%;
   height: 100%;
   padding-left: 2%;
   // span {
@@ -374,11 +381,11 @@ export default {
 
 .logo {
   position: absolute;
-  width: 13%;
+  width: 16%;
 }
 
 .links-container {
-  width: 40%;
+  width: 50%;
 }
 
 .dash-search {

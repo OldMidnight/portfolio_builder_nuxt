@@ -10,12 +10,9 @@ export const getters = {
 }
 
 export const actions = {
-  async deleteFile(context, payload) {
-    await this.$axios
-      .$delete('/uploads/user-content/' + payload.url)
-      .then(() => {
-        context.commit('creator/fetchUserUploads')
-      })
+  async deleteFile({ commit }, { url }) {
+    await this.$axios.$delete(`/uploads/user-content/${url}`)
+    commit('creator/fetchUserUploads')
   }
 }
 

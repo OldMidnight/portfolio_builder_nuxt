@@ -122,13 +122,13 @@ export default {
           })
       }
     },
-    validatePassword() {
+    async validatePassword() {
       if (
         this.$refs.passwordForm.validate() &&
         this.new_password_1 === this.new_password_2
       ) {
         this.password_validating = true
-        this.$axios
+        await this.$axios
           .post('/u/password_change', {
             new_password: this.new_password_1
           })
@@ -144,20 +144,17 @@ export default {
             this.password_message = 'An error occured.'
             this.password_error_snackbar = true
           })
-          .then(() => {
-            this.password_validating = false
-            this.current_password = ''
-            this.new_password_1 = ''
-            this.new_password_2 = ''
-            this.password_form_valid = true
-          })
+        this.password_validating = false
+        this.current_password = ''
+        this.new_password_1 = ''
+        this.new_password_2 = ''
+        this.password_form_valid = true
       }
     },
-    deleteAccount() {
+    async deleteAccount() {
       if (this.deletion_confirmation_text === this.user.domain) {
-        this.$axios.post('/u/delete_account').then((response) => {
-          this.$auth.logout()
-        })
+        await this.$axios.post('/u/delete_account')
+        this.$auth.logout()
       }
     }
   },

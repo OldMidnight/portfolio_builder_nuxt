@@ -134,11 +134,8 @@ export default {
     },
     async activateSite() {
       if (this.user.email_confirmed) {
-        await this.$axios
-          .$post('/helpers/site_config/site_activation')
-          .then(() => {
-            window.location.reload()
-          })
+        await this.$axios.$post('/helpers/site_config/site_activation')
+        window.location.reload()
       } else {
         this.show_email_dialog = true
       }
@@ -150,30 +147,26 @@ export default {
     async uploadFavicon() {
       const formData = new FormData()
       formData.append('upload', this.favicon_file)
-      const url = 'uploads/user-content/' + this.user.domain + '/favicon.ico'
+      const url = `uploads/user-content/${this.user.domain}/favicon.ico`
       const config = {
         headers: {
           'content-type': 'multipart/form-data'
         }
       }
-      await this.$axios({
-        method: 'post',
-        url,
-        data: formData,
-        config
-      }).then(() => {
-        this.favicon_dialog_upload = false
-        this.setFavicon({
-          use: true,
-          link:
-            this.$axios.defaults.baseURL +
-            'uploads/user-content/' +
-            this.user.domain +
-            '/favicon.ico'
-        })
-        this.updateWebsite(this.site_props)
-        this.favicon_file = null
+      await this.$axios.$post(url, formData, config)
+      // {
+      //   method: 'post',
+      //   url,
+      //   data: formData,
+      //   config
+      // })
+      this.favicon_dialog_upload = false
+      this.setFavicon({
+        use: true,
+        link: `${this.$axios.defaults.baseURL}uploads/user-content/${this.user.domain}/favicon.ico`
       })
+      this.updateWebsite(this.site_props)
+      this.favicon_file = null
     },
     resendVerification() {
       this.$axios.$post('/u/email_verify').then(() => {

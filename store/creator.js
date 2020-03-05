@@ -710,11 +710,10 @@ export const actions = {
     }
   },
   async fetchUserUploads(context) {
-    await this.$axios.$get('/uploads/').then((response) => {
-      context.commit('setUserUploads', {
-        uploads: response.uploads,
-        storage: response.storage
-      })
+    const { uploads, storage } = await this.$axios.$get('/uploads/')
+    context.commit('setUserUploads', {
+      uploads,
+      storage
     })
   }
 }
