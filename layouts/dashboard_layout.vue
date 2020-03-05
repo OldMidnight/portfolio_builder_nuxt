@@ -1,7 +1,6 @@
 <script>
 export default {
   name: 'DashboardLayout',
-  // middleware: ['toggle_dark_mode'],
   fetch({ store, $axios }) {
     return $axios.$get('/helpers/auth_site_config').then((response) => {
       if (!response.site_not_created) {
@@ -18,7 +17,6 @@ export default {
     }
   },
   created() {
-    this.$auth.fetchUser()
     this.$vuetify.theme.dark = this.$auth.user.dark_mode
   },
   mounted() {
@@ -372,11 +370,6 @@ export default {
   width: 50%;
   height: 100%;
   padding-left: 2%;
-  // span {
-  //   color: #0066ff;
-  //   text-align: center;
-  //   font-size: 32px;
-  // }
 }
 
 .logo {
@@ -399,9 +392,7 @@ export default {
 #dashboard {
   width: 85%;
   height: 83%;
-  // margin: 60px 130px;
   background-color: #f5f5f5;
-  // border-radius: 10px;
   position: absolute;
   transition: transform 1.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   transform-style: preserve-3d;

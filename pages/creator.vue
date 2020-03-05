@@ -775,7 +775,6 @@ export default {
         func()
       }
     })
-    this.fetchUserUploads()
     if (this.user.site_created) {
       this.customise_background_color = this.site_props.background.color
       this.customise_foreground_color = this.site_props.foreground.color
@@ -1051,7 +1050,6 @@ export default {
       registerWebsite: 'creator/registerWebsite',
       updateWebsite: 'creator/updateWebsite',
       uploadFiles: 'creator/uploadFiles',
-      fetchUserUploads: 'creator/fetchUserUploads',
       deleteFile: 'functions/deleteFile'
     }),
     formatBytes(bytes, decimals = 2) {

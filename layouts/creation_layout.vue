@@ -1,5 +1,5 @@
 <script>
-import { mapMutations, mapState } from 'vuex'
+import { mapMutations, mapState, mapActions } from 'vuex'
 export default {
   data() {
     return {
@@ -18,14 +18,17 @@ export default {
     this.$vuetify.theme.dark = this.$auth.user.dark_mode
   },
   mounted() {
-    this.$auth.fetchUser()
+    this.fetchUserUploads()
   },
   methods: {
-    ...mapMutations('creator', [
-      'setCreationStep',
-      'showNextStep',
-      'hideNextStep'
-    ]),
+    ...mapMutations({
+      setCreationStep: 'creator/setCreationStep',
+      showNextStep: 'creator/showNextStep',
+      hideNextStep: 'creator/hideNextStep'
+    }),
+    ...mapActions({
+      fetchUserUploads: 'creator/fetchUserUploads'
+    }),
     nextStep() {
       if (this.show_next_step) {
         this.setCreationStep('+')
@@ -157,24 +160,14 @@ export default {
   position: absolute;
   top: 0;
   width: 100%;
-  // background-color: #black;
 }
 
 .mini-logo {
-  // height: 40px;
   width: 8%;
   height: 100%;
   font-size: 24px;
   color: #0066ff;
   position: relative;
-  // display: flex;
-  // border: 1px solid #b6b6b6;
-  // border-radius: 50%;
-  // padding: 5px;
-  // img {
-  //     height: 100%;
-  //     width: 100%;
-  // }
 }
 
 .logo {
@@ -192,8 +185,6 @@ export default {
   position: absolute;
   top: 6%;
   width: 97%;
-  // border-top: 1px solid #777;
-  // background-color: #cccccc;
 }
 
 .creation-progress {
@@ -203,11 +194,8 @@ export default {
   width: 90%;
   position: absolute;
   top: 97%;
-  // background-color: #b3b3b3;
 }
 .next-creation-step {
-  // margin-bottom: 2%;
-  // margin-top: 2%;
   max-height: 10%;
   width: 100%;
   display: flex;
