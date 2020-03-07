@@ -1431,7 +1431,12 @@ export default {
         </v-carousel>
       </v-col>
 
-      <v-col v-else-if="checkStepCount(1)" key="1" cols="12" class="pa-0 h-100">
+      <v-col
+        v-else-if="checkStepCount(1)"
+        key="1"
+        cols="12"
+        class="pa-0 h-100 main-light-theme"
+      >
         <v-row align="center" class="ma-0 h-100">
           <v-col
             v-if="site_props.layout === layouts[0].component_name"

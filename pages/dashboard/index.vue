@@ -46,7 +46,7 @@ export default {
     },
     user_domain() {
       const url =
-        this.$axios.defaults.baseURL === 'http://127.0.0.1:5000'
+        this.$axios.defaults.baseURL === 'http://192.168.8.105:5000'
           ? '.localhost:3001/'
           : '.kreoh.com/'
       return `http://${this.user.domain}${url}`
