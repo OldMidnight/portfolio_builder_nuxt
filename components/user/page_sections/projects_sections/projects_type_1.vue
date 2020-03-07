@@ -294,21 +294,26 @@ export default {
 </script>
 
 <template>
-  <v-container fill-height class="projects-container pa-0">
-    <v-row class="justify-start projects-wrapper ma-0">
+  <v-container fill-height class="mt-4 pos-rel pa-0">
+    <v-row class="justify-start h-100 w-100 pos-abs ma-0">
       <v-col
         cols="12"
         :class="
-          `w-100 align-self-center pt-5 ${
-            site_props.selected_theme === 2
-              ? 'matrix'
-              : 'projects--html-content'
+          `align-self-center pt-5 ${
+            $vuetify.breakpoint.smAndDown ? 'w-90 mt-3' : 'w-100'
           }`
         "
       >
         <editor-content :editor="editor" />
       </v-col>
-      <v-col cols="12" class="projects--item-container">
+      <v-col
+        cols="12"
+        :class="
+          `w-100 ${
+            $vuetify.breakpoint.smAndDown ? 'mt-4' : 'mt-2'
+          } d-flex flex-column`
+        "
+      >
         <ProjectItem
           v-for="(project, index) in projects"
           :id="project.id"
@@ -333,7 +338,11 @@ export default {
         </v-flex>
       </v-col>
     </v-row>
-    <v-dialog v-model="delete_project_dialog" width="400">
+    <v-dialog
+      v-model="delete_project_dialog"
+      width="400"
+      :fullscreen="$vuetify.breakpoint.smAndDown"
+    >
       <v-card>
         <v-card-title>Delete {{ temp_project.title }}?</v-card-title>
         <v-card-text>
@@ -558,15 +567,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.projects-wrapper {
-  height: 100%;
-}
-
-.projects--html-content {
-  // height: 10%;
-  border-bottom: 1px solid #a5a5a5;
-}
-
 .project-item-add {
   border: 1px dashed;
   width: 50%;

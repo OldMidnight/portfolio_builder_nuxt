@@ -133,6 +133,7 @@ export default {
       width="700"
       persistent
       scrollable
+      :fullscreen="$vuetify.breakpoint.smAndDown"
     >
       <v-card>
         <v-card-title>Edit Social Media Bar</v-card-title>
@@ -219,7 +220,7 @@ export default {
 
 <style lang="scss" scoped>
 .home--social-bar {
-  width: 50%;
+  width: auto;
 }
 
 .social-bar--btn {

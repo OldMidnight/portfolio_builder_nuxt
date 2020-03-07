@@ -128,7 +128,7 @@ module.exports = {
     baseURL:
       process.env.NODE_ENV === 'production'
         ? 'http://api.kreoh.com'
-        : 'http://127.0.0.1:5000'
+        : 'http://192.168.8.105:5000'
   },
   /*
    ** vuetify module configuration

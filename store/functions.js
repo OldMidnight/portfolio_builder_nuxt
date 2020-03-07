@@ -1,13 +1,6 @@
 export const state = () => ({
-  redirect_path: null,
-  isMobile: false
+  redirect_path: null
 })
-
-export const getters = {
-  is_mobile: (state) => {
-    return state.isMobile
-  }
-}
 
 export const actions = {
   async deleteFile({ commit }, { url }) {
@@ -19,8 +12,5 @@ export const actions = {
 export const mutations = {
   redirectTo(state, payload) {
     state.redirect_path = payload.path
-  },
-  setMobile(state, payload) {
-    state.isMobile = payload.value
   }
 }

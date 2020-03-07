@@ -84,14 +84,14 @@ export default {
       return this.site_props[this.options.input_dict_name].img_props
     },
     avatar_size() {
-      if (this.$vuetify.breakpoint.xs) {
-        return '60'
+      if (this.$vuetify.breakpoint.smAndDown) {
+        return '190'
       } else if (this.$vuetify.breakpoint.sm) {
-        return '90'
+        return '190'
       } else if (this.$vuetify.breakpoint.md) {
-        return '130'
-      } else if (this.$vuetify.breakpoint.lg) {
         return '160'
+      } else if (this.$vuetify.breakpoint.lg) {
+        return '200'
       } else if (this.$vuetify.breakpoint.xl) {
         return '220'
       } else {
@@ -253,11 +253,11 @@ export default {
   <v-row
     :style="check_color_style"
     :class="{ slate: site_props.selected_theme === 1 && options.show_theme }"
-    class="template-container align-center justify-start"
+    class="ma-0 template-container align-center justify-start"
   >
     <v-col
       cols="12"
-      class="home--img-container d-flex flex-column align-center justify-end pb-0"
+      class="home--img-container mt-8 d-flex flex-column align-center justify-end"
     >
       <v-avatar :size="avatar_size">
         <v-img
@@ -267,7 +267,9 @@ export default {
             'user-hero-image-border':
               site_props.selected_theme === 2 && !options.preview,
             'has-border':
-              site_props.text_border_color && site_props.selected_theme === null
+              site_props.text_border_color &&
+              site_props.selected_theme === null,
+            'img-blur': $vuetify.breakpoint.smAndDown
           }"
           class="user-hero-image elevation-2 editable"
           :contain="img_props.contain"
@@ -277,6 +279,11 @@ export default {
           @mouseout="edit_img_tooltip = false"
         >
         </v-img>
+        <div v-if="$vuetify.breakpoint.smAndDown" class="pos-abs w-100">
+          <v-btn color="info" @click="img_dialog = true">
+            <v-icon class="mr-1">mdi-pencil</v-icon>Edit
+          </v-btn>
+        </div>
       </v-avatar>
       <v-tooltip v-model="edit_img_tooltip" attach=".home--img-container">
         <span>Insert Image</span>
@@ -284,7 +291,7 @@ export default {
     </v-col>
     <v-col
       cols="12"
-      class="home--content-container d-flex flex-column align-center mt-0 pt-0"
+      class="home--content-container d-flex flex-column align-center pt-4"
     >
       <div
         :style="check_color_style"
@@ -306,7 +313,11 @@ export default {
         </v-icon>
       </v-btn>
     </v-col>
-    <v-dialog v-model="img_dialog" width="500">
+    <v-dialog
+      v-model="img_dialog"
+      width="500"
+      :fullscreen="$vuetify.breakpoint.smAndDown"
+    >
       <v-card>
         <v-card-title>Edit Image</v-card-title>
         <v-divider></v-divider>
@@ -412,7 +423,7 @@ export default {
   // background-color: white !important;
   position: relative;
   z-index: 5;
-  // overflow: auto;
+  overflow: auto;
 }
 
 .img-preview-container {
@@ -435,6 +446,10 @@ export default {
   width: 100%;
 }
 
+.img-blur {
+  filter: blur(2px);
+}
+
 .user-hero-image-border {
   border: 1px solid;
 }
@@ -452,7 +467,7 @@ export default {
 
 .editable:hover {
   background-color: #bdbdbd;
-  opacity: 0.3;
+  filter: blur(2px);
   transition: 0.3s;
   cursor: pointer;
 }
@@ -465,9 +480,5 @@ export default {
 .home--content-container {
   // height: 50%;
   width: 100%;
-}
-
-.home--content-scroll {
-  height: 10%;
 }
 </style>

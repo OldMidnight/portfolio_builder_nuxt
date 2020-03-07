@@ -1,30 +1,27 @@
 <script>
-export default {}
+export default {
+  data() {
+    return {
+      isMobile: false
+    }
+  },
+  mounted() {
+    this.isMobile = this.$vuetify.breakpoint.smAndDown
+  }
+}
 </script>
 
 <template>
   <v-app>
-    <v-container fluid fill-height>
+    <client-only>
       <v-row
         justify="center"
         align="center"
         class="form-layout ma-0 h-100 w-100"
       >
-        <v-col
-          cols="12"
-          :class="
-            `h-${this.$vuetify.breakpoint.smAndDown ? '10' : '15'} mb-md-2 pt-0`
-          "
-        >
-          <!-- <span class="logo mb-7 font-weight-bold">
-            Kreoh.com
-          </span> -->
+        <v-col cols="12" :class="`h-${isMobile ? '10' : '15'} mb-md-2 pt-0`">
           <v-img
-            :class="
-              `logo mx-auto w-${
-                this.$vuetify.breakpoint.smAndDown ? '50' : '20'
-              }`
-            "
+            :class="`logo mx-auto w-${isMobile ? '50' : '20'}`"
             src="/Logo_beta_text.png"
           ></v-img>
         </v-col>
@@ -33,7 +30,7 @@ export default {}
           md="3"
           :class="
             `form ${
-              this.$vuetify.breakpoint.smAndDown ? 'h-80' : 'elevation-1'
+              isMobile ? 'h-80' : 'elevation-1'
             } d-flex align-center justify-center`
           "
         >
@@ -48,25 +45,15 @@ export default {}
         </v-col>
         <v-col
           cols="12"
-          :class="
-            `h-${
-              this.$vuetify.breakpoint.smAndDown ? '10' : '5'
-            } d-flex justify-center`
-          "
+          :class="`h-${isMobile ? '10' : '5'} d-flex justify-center`"
         >
-          <p
-            :class="
-              `text-center mt-2 terms w-${
-                this.$vuetify.breakpoint.smAndDown ? '100' : '30'
-              }`
-            "
-          >
+          <p :class="`text-center mt-2 terms w-${isMobile ? '100' : '30'}`">
             By creating an account or signing in you agree to our
             <a>Terms and Conditions</a> and <a>use of cookies.</a>
           </p>
         </v-col>
       </v-row>
-    </v-container>
+    </client-only>
     <span class="caption footer mb-5">
       &#169; {{ new Date().getFullYear() }} — Kreoh.com
     </span>

@@ -4,10 +4,6 @@
   width: 100%;
   height: 100%;
 }
-
-.creation-name-form-container {
-  // height: 90%;
-}
 .creation-name--form {
   width: 40%;
 }
@@ -551,21 +547,6 @@
   width: 100%;
 }
 
-// .tutorial--highlight {
-//   z-index: 11;
-//   position: relative;
-// }
-
-// .tutorial--btn {
-//   position: absolute;
-//   top: 90%;
-// }
-
-// .tutorial--container {
-//   height: 100%;
-//   width: 100%;
-// }
-
 .upload {
   border-radius: 5px;
 }
@@ -577,4 +558,19 @@
 
 .upload-content {
   border-bottom: 1px solid #c0c0c0;
+}
+
+.m-c--top-nav {
+  height: 12% !important;
+}
+
+.m-c--main-body {
+  // height: 90% !important;
+  max-height: 88% !important;
+  // overflow-y: auto;
+  // overflow-x: hidden;
+}
+
+.creator-tools-drawer {
+  max-height: 80% !important;
 }

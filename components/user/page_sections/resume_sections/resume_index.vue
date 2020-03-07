@@ -118,6 +118,9 @@ export default {
       return function(id) {
         return id === vm.wizard_layout_list[vm.wizard_layout_list.length - 1].id
       }
+    },
+    isMobile() {
+      return this.$vuetify.breakpoint.smAndDown
     }
   },
   created() {
@@ -254,7 +257,6 @@ export default {
           '_resume' +
           '.' +
           ext
-        // TODO TEST RESUME PDF UPLOAD
 
         this.updateResumeUpload({
           resume_upload: { use: true, url: this.temp_upload_url }
@@ -371,14 +373,21 @@ export default {
       scrollable
       transition="slide-x-transition"
       width="800"
+      :fullscreen="$vuetify.breakpoint.smAndDown"
     >
       <v-card height="600" class="wizard-dialog">
         <v-card-title class="d-flex flex-column">
-          <span class="display-1 align-self-center font-weight-thin">
+          <p
+            class="display-1 align-self-center text-center font-weight-thin ma-0"
+            style="
+              word-wrap: break-word;
+              word-break: break-word;
+            "
+          >
             Resume Creation Wizard
-          </span>
+          </p>
         </v-card-title>
-        <v-card-text class="dialog-card-text">
+        <v-card-text class="dialog-card-text pa-2 pa-md-auto">
           <v-container class="wizard-container">
             <transition
               enter-active-class="animated fadeInUp faster"
@@ -407,7 +416,11 @@ export default {
                   </span>
                   <div
                     v-if="resume_created && !upload_props.use"
-                    class="w-100 d-flex justify-center align-center mt-5"
+                    :class="
+                      `w-100 d-flex ${
+                        isMobile ? 'flex-column' : ''
+                      } justify-center align-center mt-5`
+                    "
                   >
                     <p class="mr-4">Or upload a pdf:</p>
                     <v-btn
@@ -467,12 +480,12 @@ export default {
                 </div>
                 <div
                   v-else
-                  class="wizard-timeline-container d-flex flex-column align-center"
+                  class="wizard-timeline-container d-flex flex-column align-center w-100"
                 >
-                  <span class="title font-weight-bold">
+                  <span class="title font-weight-bold text-center">
                     Select a section to begin editing at that point.
                   </span>
-                  <v-timeline dense>
+                  <v-timeline dense class="w-100">
                     <v-timeline-item color="purple lighten-2" fill-dot left>
                       <v-card>
                         <v-card-title

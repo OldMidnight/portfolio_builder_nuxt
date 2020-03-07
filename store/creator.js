@@ -644,28 +644,26 @@ export const mutations = {
 }
 
 export const actions = {
-  registerWebsite(context) {
-    this.$axios
+  async registerWebsite(context) {
+    await this.$axios
       .$post('/create/register_site', {
         site_props: JSON.stringify(context.state.site_props)
       })
-      .then(() => {
-        this.$axios.$get('/uploads/screenshot/grab').then(() => {
-          context.commit('resetCreationStep')
-          this.$router.push({ path: '/dashboard' })
-        })
+      .then(async () => {
+        await this.$axios.$get('/uploads/screenshot/grab')
+        context.commit('resetCreationStep')
+        this.$router.push({ path: '/dashboard' })
       })
   },
-  updateWebsite(context) {
-    this.$axios
+  async updateWebsite(context) {
+    await this.$axios
       .$post('/create/update_site', {
         site_props: JSON.stringify(context.state.site_props)
       })
-      .then(() => {
-        this.$axios.$get('/uploads/screenshot/grab').then(() => {
-          context.commit('resetCreationStep')
-          this.$router.push({ path: '/dashboard' })
-        })
+      .then(async () => {
+        await this.$axios.$get('/uploads/screenshot/grab')
+        context.commit('resetCreationStep')
+        this.$router.push({ path: '/dashboard' })
       })
   },
   async uploadFiles(context) {

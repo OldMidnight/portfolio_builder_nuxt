@@ -1,12 +1,14 @@
 <script>
 export default {
   name: 'DashboardLayout',
-  fetch({ store, $axios }) {
-    return $axios.$get('/helpers/auth_site_config').then((response) => {
-      if (!response.site_not_created) {
-        store.commit('creator/setSiteProps', response.site_config)
-      }
-    })
+  async fetch({ store, $axios }) {
+    const {
+      site_not_created: siteNotCreated,
+      site_config: siteConfig
+    } = await $axios.$get('/helpers/auth_site_config')
+    if (!siteNotCreated) {
+      store.commit('creator/setSiteProps', siteConfig)
+    }
   },
   data() {
     return {

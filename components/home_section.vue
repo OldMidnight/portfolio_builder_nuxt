@@ -406,10 +406,10 @@ export default {
         </v-col>
         <v-col
           cols="12"
-          class="home--preview-content"
+          class="home--preview-content pa-0"
           :class="{ 'm-home--preview-content': isMobile }"
         >
-          <v-row align="center" class="preview--content">
+          <v-row align="center" class="preview--content ma-0">
             <v-col
               cols="12"
               class="home--preview-item d-flex justify-space-around px-0 px-md-auto flex-column flex-md-row"
@@ -417,34 +417,41 @@ export default {
                 'm-home--preview-item': isMobile
               }"
             >
-              <div
-                class="home--preview-img-container elevation-1 d-flex flex-column align-center justify-center"
-                :class="{
-                  'm-home--preview-img-container': isMobile
-                }"
-              >
-                <v-img
-                  class="home--preview-img"
+              <v-row class="ma-0 h-100 w-100">
+                <v-col
+                  cols="12"
+                  md="6"
+                  class="pos-rel elevation-1 d-flex flex-column align-center px-4 justify-center"
                   :class="{
-                    'm-home--preview-img': isMobile
+                    'm-home--preview-img-container': isMobile
                   }"
-                  src="/layout_images/kreoh_layouts.png"
-                ></v-img>
-              </div>
-              <div
-                class="home--preview-text text-center d-flex flex-column justify-center align-center pt-4 pt-md-auto"
-                :class="{
-                  'm-home--preview-text': isMobile
-                }"
-              >
-                <p style="font-size: 26px" class="font-weight-bold">
-                  Pre-made Themes
-                </p>
-                <p class="font-weight-light mt-4">
-                  Choose from a selection of pre-configured templates and
-                  layouts. Let us worry about the colors.
-                </p>
-              </div>
+                >
+                  <v-img
+                    class="h-100 pos-abs"
+                    :class="{
+                      'm-home--preview-img': isMobile
+                    }"
+                    contain
+                    src="/layout_images/kreoh_layouts.png"
+                  ></v-img>
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="6"
+                  class="home--preview-text text-center d-flex flex-column justify-center align-center px-9"
+                  :class="{
+                    'm-home--preview-text': isMobile
+                  }"
+                >
+                  <p style="font-size: 26px" class="font-weight-bold">
+                    Pre-made Themes
+                  </p>
+                  <p class="font-weight-light mt-4">
+                    Choose from a selection of pre-configured templates and
+                    layouts. Let us worry about the colors.
+                  </p>
+                </v-col>
+              </v-row>
             </v-col>
             <v-col
               cols="12"
@@ -453,45 +460,54 @@ export default {
                 'm-home--preview-item': isMobile
               }"
             >
-              <div
-                v-if="isMobile"
-                class="home--preview-img-container elevation-1 d-flex flex-column align-center justify-center"
-                :class="{
-                  'm-home--preview-img-container': isMobile
-                }"
-              >
-                <v-img
-                  class="home--preview-img border-white"
+              <v-row class="ma-0 h-100 w-100">
+                <v-col
+                  v-if="isMobile"
+                  cols="12"
+                  class="pos-rel elevation-1 d-flex flex-column align-center justify-center"
                   :class="{
-                    'm-home--preview-img': isMobile
+                    'm-home--preview-img-container': isMobile
                   }"
-                  src="/kreoh_home/kreoh_form.png"
-                ></v-img>
-              </div>
-              <div
-                class="home--preview-text text-center d-flex flex-column justify-center align-center pt-4 pt-md-auto"
-                :class="{
-                  'm-home--preview-text': isMobile
-                }"
-              >
-                <p style="font-size: 26px" class="font-weight-bold">
-                  Functional & Accessible
-                </p>
-                <p class="font-weight-light mt-4">
-                  Kreoh websites are optimized for all form factors including
-                  mobile devices. Create, edit and deploy your website from your
-                  phone.
-                </p>
-              </div>
-              <div
-                v-if="!isMobile"
-                class="home--preview-img-container elevation-1 d-flex flex-column align-center justify-center"
-              >
-                <v-img
-                  class="home--preview-img border-white"
-                  src="/kreoh_home/kreoh_form.png"
-                ></v-img>
-              </div>
+                >
+                  <v-img
+                    class="h-100 pos-abs"
+                    :class="{
+                      'm-home--preview-img': isMobile
+                    }"
+                    contain
+                    src="/kreoh_home/kreoh_form.png"
+                  ></v-img>
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="6"
+                  class="home--preview-text text-center d-flex flex-column justify-center align-center px-9"
+                  :class="{
+                    'm-home--preview-text': isMobile
+                  }"
+                >
+                  <p style="font-size: 26px" class="font-weight-bold">
+                    Functional & Accessible
+                  </p>
+                  <p class="font-weight-light mt-4">
+                    Kreoh websites are optimized for all form factors including
+                    mobile devices. Create, edit and deploy your website from
+                    your phone.
+                  </p>
+                </v-col>
+                <v-col
+                  v-if="!isMobile"
+                  cols="12"
+                  md="6"
+                  class="pos-rel elevation-1 d-flex align-center justify-center"
+                >
+                  <v-img
+                    class="h-100 w-100 pos-abs"
+                    contain
+                    src="/kreoh_home/kreoh_form.png"
+                  ></v-img>
+                </v-col>
+              </v-row>
             </v-col>
             <v-col
               cols="12"
@@ -500,33 +516,40 @@ export default {
                 'm-home--preview-item': isMobile
               }"
             >
-              <div
-                class="home--preview-img-container elevation-1 d-flex flex-column align-center justify-center"
-                :class="{
-                  'm-home--preview-img-container': isMobile
-                }"
-              >
-                <v-img
-                  class="home--preview-img"
+              <v-row class="ma-0 h-100 w-100">
+                <v-col
+                  cols="12"
+                  md="6"
+                  class="pos-rel elevation-1 d-flex align-center justify-center"
                   :class="{
-                    'm-home--preview-img': isMobile
+                    'm-home--preview-img-container': isMobile
                   }"
-                  src="/layout_images/kreoh_layout_1_slate.png"
-                ></v-img>
-              </div>
-              <div
-                class="home--preview-text text-center d-flex flex-column justify-center align-center pt-4 pt-md-auto"
-                :class="{
-                  'm-home--preview-text': isMobile
-                }"
-              >
-                <p style="font-size: 26px" class="font-weight-bold">Simple</p>
-                <p class="font-weight-light mt-4">
-                  Register, deploy your pre-made website and you're ready to go.
-                  Kreoh websites have you up and running in under 5 minutes! No
-                  hassle, no crazy editor. Just you and your work.
-                </p>
-              </div>
+                >
+                  <v-img
+                    class="h-100 w-100 rounded pos-abs"
+                    :class="{
+                      'm-home--preview-img': isMobile
+                    }"
+                    contain
+                    src="/layout_images/kreoh_layout_1_slate.png"
+                  ></v-img>
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="6"
+                  class="home--preview-text text-center d-flex flex-column justify-center align-center px-9"
+                  :class="{
+                    'm-home--preview-text': isMobile
+                  }"
+                >
+                  <p style="font-size: 26px" class="font-weight-bold">Simple</p>
+                  <p class="font-weight-light mt-4">
+                    Register, deploy your pre-made website and you're ready to
+                    go. Kreoh websites have you up and running in under 5
+                    minutes! No hassle, no crazy editor. Just you and your work.
+                  </p>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
         </v-col>
@@ -579,6 +602,7 @@ export default {
         >
           <v-img
             class="about--img elevation-2"
+            contain
             src="/kreoh_home/about_img.svg"
           ></v-img>
         </v-col>
@@ -936,7 +960,7 @@ export default {
 }
 
 .content--pricing {
-  // height: 115vh;
+  height: 115vh;
   background-color: white;
   position: relative;
   z-index: 2;
@@ -965,7 +989,7 @@ export default {
 }
 
 .m-content--footer {
-  height: 80vh;
+  height: 90vh;
 }
 
 .content--value {
@@ -1156,8 +1180,8 @@ export default {
 }
 
 .home--preview-img-container {
-  width: 40%;
-  height: 100%;
+  // width: 40%;
+  // height: 100%;
   position: relative;
 }
 
@@ -1179,13 +1203,6 @@ export default {
 .m-home--preview-text {
   width: 100%;
   height: 50%;
-}
-
-.home--preview-img {
-  // height: 100px;
-  // width: 100%;
-  position: absolute;
-  border-radius: 15px;
 }
 
 .m-home--preview-img {

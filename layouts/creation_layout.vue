@@ -5,7 +5,8 @@ export default {
     return {
       creationProgress: 0,
       show_final_step: false,
-      resume_not_created: false
+      resume_not_created: false,
+      isMobile: false
     }
   },
   computed: {
@@ -16,9 +17,29 @@ export default {
   },
   created() {
     this.$vuetify.theme.dark = this.$auth.user.dark_mode
+    this.fetchUserUploads()
+  },
+  beforeMount() {
+    if (this.$route.name === 'creator' && this.$vuetify.breakpoint.smAndDown) {
+      this.$router.replace({ path: '/m-creator' })
+    } else if (
+      this.$route.name === 'm-creator' &&
+      !this.$vuetify.breakpoint.smAndDown
+    ) {
+      this.$router.replace({ path: '/creator' })
+    }
   },
   mounted() {
-    this.fetchUserUploads()
+    this.isMobile = this.$vuetify.breakpoint.smAndDown
+    this.$root.$on('onPrevStep', () => {
+      this.prevStep()
+    })
+    this.$root.$on('onSaveChanges', () => {
+      this.saveChanges()
+    })
+    this.$root.$on('onNextStep', () => {
+      this.nextStep()
+    })
   },
   methods: {
     ...mapMutations({
@@ -54,75 +75,180 @@ export default {
 
 <template>
   <v-app>
-    <v-container fill-height class="creator-container pa-0">
-      <v-layout column align-center class="creation-page-layout">
-        <v-flex class="top-nav">
-          <div class="mini-logo font-weight-bold">
-            <v-img
-              class="logo"
-              :src="
-                `${
-                  $vuetify.theme.dark
-                    ? '/Logo_beta_white.png'
-                    : '/Logo_beta_text.png'
-                }`
-              "
-            ></v-img>
-          </div>
-          <transition
-            enter-active-class="animated fadeInRight faster"
-            leave-active-class="animated fadeOutRight faster"
-            mode="out-in"
-          >
-            <div v-if="creation_step === 1" class="save-btn pt-2">
-              <v-btn color="success" @click="saveChanges()">Save Changes</v-btn>
+    <v-container fluid class="w-100 h-100 pa-0">
+      <client-only placeholder="Loading Kreoh Editor...">
+        <v-row
+          v-if="!isMobile"
+          column
+          align="center"
+          justify="center"
+          class="creation-page-layout ma-0 w-100 h-100"
+        >
+          <v-flex class="top-nav">
+            <div class="mini-logo font-weight-bold">
+              <v-img
+                class="logo"
+                :src="
+                  `${
+                    $vuetify.theme.dark
+                      ? '/Logo_beta_white.png'
+                      : '/Logo_beta_text.png'
+                  }`
+                "
+              ></v-img>
             </div>
-          </transition>
-        </v-flex>
-        <nuxt class="creation-wrapper" />
-        <v-flex class="next-creation-step">
-          <v-btn
-            color="error"
-            class="btn-left-margin"
-            :class="{ 'hide-previous': creation_step === 0 }"
-            large
-            @click="prevStep()"
-          >
-            Back
-          </v-btn>
-          <v-btn
-            color="info"
-            :class="{
-              'hide-next': show_next_step === false,
-              'btn-left-margin': creationProgress > 0
-            }"
-            large
-            @click="nextStep()"
-          >
-            Next
-          </v-btn>
-          <v-btn
-            v-if="show_final_step"
-            color="info"
-            large
-            @click="
-              setCreationStep('+')
-              creationProgress += 100 / 3
-              hideNextStep()
+            <transition
+              enter-active-class="animated fadeInRight faster"
+              leave-active-class="animated fadeOutRight faster"
+              mode="out-in"
+            >
+              <div v-if="creation_step === 1" class="save-btn pt-2">
+                <v-btn color="success" @click="saveChanges()">
+                  Save Changes
+                </v-btn>
+              </div>
+            </transition>
+          </v-flex>
+          <nuxt class="creation-wrapper" />
+          <v-flex class="next-creation-step">
+            <transition
+              enter-active-class="animated fadeIn faster"
+              leave-active-class="animated fadeOut faster"
+              mode="out-in"
+            >
+              <v-btn
+                v-show="creation_step !== 0"
+                color="error"
+                class="btn-left-margin"
+                large
+                @click="prevStep()"
+              >
+                Back
+              </v-btn>
+            </transition>
+            <transition
+              enter-active-class="animated fadeIn faster"
+              leave-active-class="animated fadeOut faster"
+              mode="out-in"
+            >
+              <v-btn
+                v-show="show_next_step"
+                color="info"
+                :class="{
+                  'btn-left-margin': creationProgress > 0
+                }"
+                large
+                @click="nextStep()"
+              >
+                Next
+              </v-btn>
+            </transition>
+            <transition
+              enter-active-class="animated fadeIn faster"
+              leave-active-class="animated fadeOut faster"
+              mode="out-in"
+            >
+              <v-btn
+                v-if="show_final_step"
+                color="info"
+                large
+                @click="
+                  setCreationStep('+')
+                  creationProgress += 100 / 3
+                  hideNextStep()
+                "
+              >
+                Next
+              </v-btn>
+            </transition>
+          </v-flex>
+          <v-flex class="creation-progress">
+            <v-progress-linear
+              rounded
+              :value="creationProgress"
+              :buffer-value="creationProgress + 100 / 3"
+              height="8"
+            ></v-progress-linear>
+          </v-flex>
+        </v-row>
+        <v-row v-else class="h-100">
+          <v-col
+            cols="12"
+            :class="
+              `${
+                creation_step !== 1 ? 'h-85' : 'h-100'
+              } pa-0 d-flex flex-column align-center`
             "
           >
-            Next
-          </v-btn>
-        </v-flex>
-        <v-flex class="creation-progress">
-          <v-progress-linear
-            rounded
-            :value="creationProgress"
-            :buffer-value="creationProgress + 100 / 3"
-            height="8"
-          ></v-progress-linear>
-        </v-flex>
-      </v-layout>
+            <div
+              v-if="creation_step !== 1"
+              class="h-10 w-100 d-flex justify-center"
+            >
+              <v-img
+                contain
+                :src="
+                  `${
+                    $vuetify.theme.dark
+                      ? '/Logo_beta_white.png'
+                      : '/Logo_beta_text.png'
+                  }`
+                "
+              ></v-img>
+            </div>
+            <nuxt />
+          </v-col>
+          <v-col
+            v-if="creation_step !== 1"
+            cols="12"
+            class="h-10 pa-0 d-flex align-center justify-space-around"
+          >
+            <v-btn
+              v-show="creation_step !== 0"
+              color="error"
+              large
+              @click="prevStep()"
+            >
+              Back
+            </v-btn>
+            <v-btn
+              v-show="show_next_step"
+              color="info"
+              :class="{
+                'btn-left-margin': creationProgress > 0
+              }"
+              large
+              @click="nextStep()"
+            >
+              Next
+            </v-btn>
+            <v-btn
+              v-if="show_final_step"
+              color="info"
+              large
+              @click="
+                setCreationStep('+')
+                creationProgress += 100 / 3
+                hideNextStep()
+              "
+            >
+              Next
+            </v-btn>
+          </v-col>
+          <v-col
+            v-if="creation_step !== 1"
+            cols="12"
+            class="h-5 d-flex justify-center pa-0 align-center"
+          >
+            <v-progress-linear
+              rounded
+              :value="creationProgress"
+              :buffer-value="creationProgress + 100 / 3"
+              height="8"
+              class="w-90"
+            ></v-progress-linear>
+          </v-col>
+        </v-row>
+      </client-only>
     </v-container>
     <v-snackbar v-model="resume_not_created" color="warning">
       Make sure to create your resume on the resume tab before saving!

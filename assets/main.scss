@@ -80,7 +80,7 @@ a {
 }
 
 .ProseMirror, .ProseMirror pre {
-  white-space: pre-wrap
+  white-space: pre-wrap;
 }
 
 .ProseMirror pre code {
@@ -212,6 +212,10 @@ pre {
   height: 80% !important;
 }
 
+.h-85 {
+  height: 85% !important;
+}
+
 .h-70 {
   height: 70% !important;
 }
@@ -230,6 +234,10 @@ pre {
 
 .h-30 {
   height: 30% !important;
+}
+
+.h-25 {
+  height: 25% !important;
 }
 
 .h-20 {
@@ -268,8 +276,20 @@ pre {
   border-right-color: 1px solid #777 !important;
 }
 
+.rounded {
+  border-radius: 5px;
+}
+
 .border-rounded {
   border-radius: 3px;
+}
+
+.border-primary {
+  border: 1px solid #1976D2;
+}
+
+.border-lg {
+  border-width: 4px;
 }
 
 .darkmode {
@@ -286,7 +306,7 @@ pre {
 }
 
 .pos-rel {
-  position:  !important;
+  position: relative !important;
 }
 
 .pos-abs {
@@ -307,4 +327,9 @@ pre {
 
 .bottom-0 {
   bottom: 0;
+}
+
+.ovfl-y {
+  overflow-y: scroll;
+  overflow-x: hidden;
 }

@@ -73,40 +73,62 @@ export default {
   <v-layout
     :style="[check_custom_style]"
     :class="{
-      'matrix-border': site_props.selected_theme === 2
+      'matrix-border': site_props.selected_theme === 2,
+      'd-flex flex-column justify-center align-center':
+        $vuetify.breakpoint.smAndDown
     }"
-    class="item-container mb-2 mx-auto"
+    class="pos-rel w-100 mb-2 mx-auto"
   >
-    <v-flex v-if="img.use" class="project-img-container pa-2">
+    <v-flex
+      v-if="img.use"
+      :class="`pa-2 ${$vuetify.breakpoint.smAndDown ? 'w-50' : 'w-25'}`"
+    >
       <v-img
         class="project-img"
+        :style="{ opacity: $vuetify.breakpoint.smAndDown ? '0.5' : '1' }"
         :src="img.url"
         :contain="img.contain"
         lazy-src="/img_lazy.jpeg"
       ></v-img>
     </v-flex>
-    <v-flex class="d-flex flex-column project-content-container my-3 pa-2">
-      <v-flex class="d-flex flex-column project-content">
-        <p class="project-title title">
+    <v-flex
+      class="d-flex flex-column project-content-container my-3 pa-2"
+      :class="{
+        'm-project-content-container text-center': $vuetify.breakpoint.smAndDown
+      }"
+    >
+      <v-flex
+        class="d-flex flex-column project-content ml-0 ml-md-3 align-center align-md-start"
+      >
+        <p class="project-title headline">
           {{ title }}
         </p>
-        <p class="body-1 project-desc pt-3 mb-2 text-center">
+        <p class="body-1 project-desc pt-3 mb-2">
           {{ description }}
         </p>
         <v-divider v-if="link.use"></v-divider>
+        <v-btn
+          v-if="link.use && $vuetify.breakpoint.smAndDown"
+          color="info"
+          class="caption mt-1 project-link-btn"
+          :href="link.url"
+        >
+          {{ link.link_text }}
+        </v-btn>
         <a
-          v-if="link.use"
-          :class="
-            `caption mt-1 primary--text ${
-              site_props.selected_theme === 1 ? 'white--text' : ''
-            }`
-          "
+          v-else-if="link.use"
+          class="caption mt-1 primary--text"
+          :href="link.url"
         >
           {{ link.link_text }}
         </a>
       </v-flex>
     </v-flex>
-    <v-btn class="px-3" color="info" @click.stop="editProject()">
+    <v-btn
+      :class="`px-3 ${$vuetify.breakpoint.smAndDown ? 'pos-abs top-0' : ''}`"
+      color="info"
+      @click.stop="editProject()"
+    >
       <v-icon class="pr-3">
         mdi-pencil
       </v-icon>
@@ -116,35 +138,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.edit-icon {
-  position: absolute;
-  right: 2%;
-  border: 1px solid;
-  // opacity: 0.4;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.edit-icon:hover {
-  opacity: 1;
-}
-
-.item-container {
-  // border-bottom: 1px solid #777;
-  position: relative;
-  width: 100%;
-  // border-radius: 20px;
-}
-
-.project-img-container {
-  width: 25%;
-  // border: 1px solid;
-}
-
 .project-img {
-  min-height: 200px;
-  max-height: 250px;
-  width: 250px;
   border-radius: 20px;
   background-color: black;
 }
@@ -154,19 +148,10 @@ export default {
   border-left: 1px solid #b6b6b6;
 }
 
-// .project-content {
-//   height: 80%;
-// }
-
-// .preview-title {
-//   font-size: 10px;
-// }
-
-// .project-title {
-//   // height: 20%;
-//   padding: 0 !important;
-//   margin: 0 !important;
-// }
+.m-project-content-container {
+  width: 100%;
+  border-left: none;
+}
 
 .project-desc {
   // height: 80%;
@@ -189,5 +174,9 @@ export default {
   height: 200px;
   width: 200px;
   background-color: rgba(0, 0, 0, 0.465);
+}
+
+.project-link-btn {
+  width: 40%;
 }
 </style>

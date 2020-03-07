@@ -1,10 +1,9 @@
 export default function(context) {
-  context.$axios.onRequest((config) => {
+  context.$axios.onRequest((_) => {
     const token = context.$auth.getToken('local')
     context.$axios.setHeader('Authorization', token)
   })
-  context.$axios.onResponseError((error) => {
-    const response = error.response
+  context.$axios.onResponseError(({ response }) => {
     const originalRequest = response.config
     if (
       response.status === 401 &&

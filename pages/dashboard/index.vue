@@ -5,12 +5,14 @@ export default {
   name: 'Dashboard',
   layout: 'dashboard_layout',
   components: { Feedback },
-  fetch({ store, $axios }) {
-    return $axios.$get('/helpers/auth_site_config').then((response) => {
-      if (!response.site_not_created) {
-        store.commit('creator/setSiteProps', response.site_config)
-      }
-    })
+  async fetch({ store, $axios }) {
+    const {
+      site_not_created: siteNotCreated,
+      site_config: siteConfig
+    } = await $axios.$get('/helpers/auth_site_config')
+    if (!siteNotCreated) {
+      store.commit('creator/setSiteProps', siteConfig)
+    }
   },
   data() {
     return {
@@ -43,11 +45,11 @@ export default {
       return this.$store.state.auth.user
     },
     user_domain() {
-      return `http://${this.user.domain}${
-        this.$axios.defaults.baseURL !== 'http://127.0.0.1:5000'
+      const url =
+        this.$axios.defaults.baseURL === 'http://127.0.0.1:5000'
           ? '.localhost:3001/'
           : '.kreoh.com/'
-      }`
+      return `http://${this.user.domain}${url}`
     },
     isMobile() {
       return this.$vuetify.breakpoint.smAndDown
@@ -575,7 +577,7 @@ export default {
               outlined
               :class="`${$vuetify.theme.dark ? 'darkmode' : ''}`"
               color="info"
-              to="/creator"
+              to="/m-creator"
               nuxt
               large
             >
@@ -595,7 +597,7 @@ export default {
               v-if="!user.site_created"
               color="info"
               nuxt
-              to="/creator"
+              to="/m-creator"
               large
             >
               <v-icon>mdi-plus</v-icon> Create

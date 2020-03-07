@@ -62,16 +62,16 @@ export default {
   <v-col
     cols="12"
     class="pricing--content"
-    :class="{ 'm-pricing--content': $vuetify.breakpoint.xs }"
+    :class="{ 'm-pricing--content': $vuetify.breakpoint.smAndDown }"
   >
     <v-row
-      v-if="!$vuetify.breakpoint.xs"
+      v-if="!$vuetify.breakpoint.smAndDown"
       class="pricing--wrapper justify-center"
     >
       <v-col
         v-for="(plan, index) in price_plans"
         :key="index"
-        cols="4"
+        cols="6"
         class="pricing--container d-flex flex-column align-center justify-center"
       >
         <div
@@ -81,10 +81,10 @@ export default {
         >
           <p class="font-weight-bold">Most Popular</p>
         </div>
-        <v-row align-content="start" class="pricing--item elevation-3 mx-1 ">
+        <v-row align-content="start" class="pricing--item elevation-3 mx-1">
           <v-col
             cols="12"
-            class="pricing--item-header d-flex flex-column align-center justify-center pa-0"
+            class="pricing--item-header d-flex flex-column align-center justify-center pa-0 my-5"
           >
             <p style="font-size: 20px" class="font-weight-bold info--text">
               {{ plan.name }}

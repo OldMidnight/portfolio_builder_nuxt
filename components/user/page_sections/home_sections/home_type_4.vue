@@ -226,10 +226,14 @@ export default {
 </script>
 
 <template>
-  <v-row id="call-to-action" class="component-layout py-3">
+  <v-row id="call-to-action" class="component-layout h-100 w-100 pos-abs py-3">
     <v-col
-      cols="6"
-      class="action--section action--img-container d-flex justify-center pa-12"
+      :cols="$vuetify.breakpoint.smAndDown ? '12' : '6'"
+      :class="
+        `border-right pos-rel d-flex justify-center pa-12 ${
+          $vuetify.breakpoint.smAndDown ? 'h-50' : 'h-100'
+        }`
+      "
     >
       <v-img
         class="elevation-5 action--img"
@@ -240,14 +244,17 @@ export default {
         Edit Call To Action
       </v-btn>
     </v-col>
-    <v-col cols="6" class="action--section">
-      <v-row class="d-flex flex-column action--content">
+    <v-col
+      :cols="$vuetify.breakpoint.smAndDown ? '12' : '6'"
+      :class="`action--section ${$vuetify.breakpoint.smAndDown ? 'h-50' : ''}`"
+    >
+      <v-row class="d-flex flex-column h-100">
         <v-col cols="9" class="content--section d-flex align-center">
           <editor-content :editor="editor" />
         </v-col>
         <v-col
           cols="3"
-          class="content--section d-flex justify-center align-center"
+          class="content--section w-100 d-flex justify-center align-center"
         >
           <v-btn
             :style="{ color: button_props.text_color }"
@@ -258,7 +265,12 @@ export default {
         </v-col>
       </v-row>
     </v-col>
-    <v-dialog v-model="edit_dialog" scrollable width="700">
+    <v-dialog
+      v-model="edit_dialog"
+      scrollable
+      width="700"
+      :fullscreen="$vuetify.breakpoint.smAndDown"
+    >
       <v-card>
         <v-card-title>Call-To-Action Page</v-card-title>
         <v-card-subtitle>Configure your call-to-action page</v-card-subtitle>
@@ -402,28 +414,6 @@ export default {
                   </v-row>
                 </v-expansion-panel-content>
               </v-expansion-panel>
-              <!-- <v-expansion-panel>
-                <v-expansion-panel-header>
-                  <span class="font-weight-bold">Page URL</span>
-                  <span class="caption">
-                    Visitors can type this into the search bar to be taken here
-                    directly
-                  </span>
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <v-row>
-                    <p style="line-height: 300%" class="mr-3 font-weight-bold">
-                      {{ user.domain }}.kreoh.com/
-                    </p>
-                    <v-text-field
-                      v-model="page_url"
-                      outlined
-                      dense
-                      label="Page URL"
-                    ></v-text-field>
-                  </v-row>
-                </v-expansion-panel-content>
-              </v-expansion-panel> -->
             </v-expansion-panels>
           </v-container>
         </v-card-text>
@@ -444,33 +434,12 @@ export default {
 </template>
 
 <style lang="scss">
-.component-layout {
-  height: 100%;
-  // overflow: auto;
-  max-width: 100%;
-}
-
-.action--section {
-  // border: 1px solid;
-  height: 100%;
-}
-
-.action--img-container {
-  border-right: 1px solid #777;
-  position: relative;
-}
-
-.action--content {
-  height: 100%;
-}
-
 .content--section {
-  width: 100%;
   max-width: 100% !important;
 }
 
 .action--img {
-  opacity: 0.5;
+  filter: blur(2px);
 }
 
 .action--edit-btn {

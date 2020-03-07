@@ -64,7 +64,7 @@ export default {
       return this.site_props[this.options.input_dict_name].img_props
     },
     avatar_size() {
-      if (this.$vuetify.breakpoint.xs) {
+      if (this.$vuetify.breakpoint.smAndDown) {
         return '60'
       } else if (this.$vuetify.breakpoint.sm) {
         return '90'
@@ -197,7 +197,11 @@ export default {
       </v-tooltip>
       <!-- </v-flex> -->
     </div>
-    <v-dialog v-model="img_dialog" width="500">
+    <v-dialog
+      v-model="img_dialog"
+      width="500"
+      :fullscreen="$vuetify.breakpoint.smAndDown"
+    >
       <v-card>
         <v-card-title>Edit Image</v-card-title>
         <v-card-text>
