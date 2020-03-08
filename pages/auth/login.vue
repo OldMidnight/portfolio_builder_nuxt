@@ -43,12 +43,7 @@ export default {
     validateInfo() {
       if (this.$refs.loginForm.validate()) {
         this.loading = true
-        this.login(this.user).then(() => {
-          if (!this.$store.state.auth.loggedIn) {
-            this.loading = false
-            this.login_fail = true
-          }
-        })
+        this.login(this.user)
       }
     }
   },

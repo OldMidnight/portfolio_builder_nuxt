@@ -28,26 +28,26 @@ module.exports = {
         href:
           'https://fonts.googleapis.com/css?family=Comfortaa:300,400,700&display=swap'
       }
-    ],
-    script: [
-      {
-        type: 'text/javascript',
-        innerHTML: `
-          var _paq = window._paq || [];
-          /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-          _paq.push(['trackPageView']);
-          _paq.push(['enableLinkTracking']);
-          (function() {
-            var u="https://kreoh.matomo.cloud/";
-            _paq.push(['setTrackerUrl', u+'matomo.php']);
-            _paq.push(['setSiteId', '1']);
-            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-            g.type='text/javascript'; g.async=true; g.defer=true; g.src='//cdn.matomo.cloud/kreoh.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
-          })();
-
-        `
-      }
     ]
+    // script: [
+    //   {
+    //     type: 'text/javascript',
+    //     innerHTML: `
+    //       var _paq = window._paq || [];
+    //       /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+    //       _paq.push(['trackPageView']);
+    //       _paq.push(['enableLinkTracking']);
+    //       (function() {
+    //         var u="https://kreoh.matomo.cloud/";
+    //         _paq.push(['setTrackerUrl', u+'matomo.php']);
+    //         _paq.push(['setSiteId', '1']);
+    //         var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    //         g.type='text/javascript'; g.async=true; g.defer=true; g.src='//cdn.matomo.cloud/kreoh.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
+    //       })();
+
+    //     `
+    //   }
+    // ]
   },
   /*
    ** Customize the progress-bar color
@@ -65,7 +65,7 @@ module.exports = {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ['~/plugins/axios'],
+  // plugins: ['~/plugins/axios'],
   /*
    ** Nuxt.js dev-modules
    */
@@ -84,40 +84,40 @@ module.exports = {
   ],
   // Router Config
   router: {
-    middleware: ['auth']
+    middleware: ['loggedIn']
   },
   // auth Config
   auth: {
-    plugins: ['~/plugins/auth'],
+    localStorage: false,
+    cookie: {
+      options: {
+        expires: 7
+      }
+    },
+    plugins: [
+      { src: '~/plugins/auth.js', mode: 'client' },
+      { src: '~/plugins/refAuth.js', mode: 'client' }
+    ],
     strategies: {
       local: {
-        _scheme: '~/plugins/jwtAuth.js',
         endpoints: {
           login: {
             url: '/auth/login',
             method: 'post',
             propertyName: false
           },
+          logout: false,
           user: {
             url: '/auth/user',
             method: 'get',
             propertyName: false
           }
-          // user: false
-        },
-        tokenRequired: true,
-        tokenType: 'Bearer',
-        tokenName: 'Authorization'
+        }
       }
     },
     redirect: {
       login: '/auth/login',
-      logout: '/',
       home: '/dashboard'
-    },
-    rewriteRedirects: true,
-    refresh_token: {
-      prefix: '_refesh_token.'
     }
   },
   /*
@@ -142,17 +142,6 @@ module.exports = {
     treeshake: true,
     theme: {
       dark: false
-      // themes: {
-      //   dark: {
-      //     primary: colors.blue.darken2,
-      //     accent: colors.grey.darken3,
-      //     secondary: colors.amber.darken3,
-      //     info: colors.teal.lighten1,
-      //     warning: colors.amber.base,
-      //     error: colors.deepOrange.accent4,
-      //     success: colors.green.accent3
-      //   }
-      // }
     }
   },
   /*

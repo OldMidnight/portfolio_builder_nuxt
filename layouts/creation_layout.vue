@@ -256,7 +256,7 @@ export default {
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-snackbar>
-    <script type="text/javascript">
+    <!-- <script type="text/javascript">
       var _paq = window._paq || []
       /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
       _paq.push(['trackPageView'])
@@ -268,7 +268,7 @@ export default {
         var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]
         g.type='text/javascript'; g.async=true; g.defer=true; g.src='//cdn.matomo.cloud/kreoh.matomo.cloud/matomo.js' s.parentNode.insertBefore(g,s);
       })()
-    </script>
+    </script> -->
     <!-- End Matomo Code -->
   </v-app>
 </template>

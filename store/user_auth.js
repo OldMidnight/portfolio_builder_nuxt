@@ -9,46 +9,58 @@ export const state = () => ({
 })
 
 export const actions = {
-  login({ commit }, { email, password }) {
-    commit('loginRequest', { email })
+  // login({ commit }, { email, password }) {
+  //   commit('loginRequest', { email })
 
-    return this.$auth
-      .loginWith('local', {
-        data: {
-          email,
-          password
-        }
-      })
-      .then(() => {
-        this.$router.push({ path: '/dashboard' })
-      })
-      .catch((error) => {
-        commit('loginFailure', error)
+  //   return this.$auth
+  //     .loginWith('local', {
+  //       data: {
+  //         email,
+  //         password
+  //       }
+  //     })
+  //     .then(() => {
+  //       this.$router.push({ path: '/dashboard' })
+  //     })
+  //     .catch((error) => {
+  //       commit('loginFailure', error)
+  //     })
+  // },
+  async login(_, { email, password, firstTime }) {
+    await this.$axios
+      .$post('/auth/login', { email, password })
+      .then((response) => {
+        this.$auth.setToken('local', 'Bearer ' + response.access_token)
+        this.$auth.setRefreshToken('local', response.refresh_token)
+        this.$axios.setHeader(
+          'Authorization',
+          'Bearer ' + response.access_token
+        )
+        this.$auth.ctx.app.$axios.setHeader(
+          'Authorization',
+          'Bearer ' + response.access_token
+        )
+        this.$axios.$get('/auth/user').then((response) => {
+          this.$auth.setUser(response)
+          if (firstTime) {
+            this.$router.push('/creator')
+          } else {
+            this.$router.push('/dashboard')
+          }
+        })
       })
   },
   logout({ commit }) {
     commit('logout')
     this.$router.push({ name: 'home' })
   },
-  async register({ commit }, user) {
+  async register({ commit, dispatch }, user) {
     commit('registerRequest', user)
     await this.$axios
-      .post('/auth/register', user)
+      .$post('/auth/register', user)
       .then((response) => {
-        commit('registerSuccess', response.data.user)
-        this.$auth
-          .loginWith('local', {
-            data: {
-              email: user.email,
-              password: user.password
-            }
-          })
-          .then(() => {
-            this.$router.push({ path: '/creator' })
-          })
-          .catch((error) => {
-            commit('loginFailure', error)
-          })
+        commit('registerSuccess', response.user)
+        dispatch('login', { ...user, firstTime: true })
       })
       .catch((error) => {
         commit('registerFailure', error.response.data)
