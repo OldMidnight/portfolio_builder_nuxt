@@ -16,10 +16,13 @@ export default {
     }
   },
   created() {
-    this.$vuetify.theme.dark = this.$auth.user.dark_mode
+    if (process.client) {
+      this.$vuetify.theme.dark = this.$auth.user.dark_mode
+    }
     this.fetchUserUploads()
   },
   beforeMount() {
+    this.$vuetify.theme.dark = this.$auth.user.dark_mode
     if (this.$route.name === 'creator' && this.$vuetify.breakpoint.smAndDown) {
       this.$router.replace({ path: '/m-creator' })
     } else if (

@@ -18,7 +18,7 @@ export default {
       isMobile: false
     }
   },
-  created() {
+  beforeMount() {
     this.$vuetify.theme.dark = this.$auth.user.dark_mode
   },
   mounted() {
@@ -104,7 +104,7 @@ export default {
             </v-btn>
             <v-btn icon @click="toggleDarkMode()">
               <v-icon>
-                mdi-brightness-{{ $auth.user.dark_mode ? '4' : '5' }}
+                mdi-brightness-{{ this.$vuetify.theme.dark ? '4' : '5' }}
               </v-icon>
             </v-btn>
             <v-tooltip bottom>
@@ -266,7 +266,7 @@ export default {
         <v-list-item @click="toggleDarkMode()">
           <v-list-item-icon>
             <v-icon>
-              mdi-brightness-{{ $auth.user.dark_mode ? '4' : '5' }}
+              mdi-brightness-{{ this.$vuetify.theme.dark ? '4' : '5' }}
             </v-icon>
           </v-list-item-icon>
           <v-list-item-title>Toggle Dark Mode</v-list-item-title>
