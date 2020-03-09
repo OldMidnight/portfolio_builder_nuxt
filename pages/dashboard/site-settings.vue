@@ -158,7 +158,7 @@ export default {
         this.favicon_dialog_upload = false
         this.setFavicon({
           use: true,
-          link: `${this.$axios.defaults.baseURL}uploads/user-content/${this.user.domain}/favicon.ico`
+          link: `${this.$axios.defaults.baseURL}/uploads/user-content/${this.user.domain}/favicon.ico`
         })
         this.updateWebsite(this.site_props)
         this.favicon_file = null

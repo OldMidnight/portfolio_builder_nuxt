@@ -251,7 +251,7 @@ export default {
             this.upload_file.name.split('.').length - 1
           ]
           const url =
-            'uploads/user-content/' +
+            '/uploads/user-content/' +
             this.user.domain +
             '/' +
             this.user.domain +

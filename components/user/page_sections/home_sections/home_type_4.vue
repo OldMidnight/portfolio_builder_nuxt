@@ -147,7 +147,7 @@ export default {
           ]
           formData.append('upload', this.upload_file)
           const url =
-            'uploads/user-content/' +
+            '/uploads/user-content/' +
             this.user.domain +
             '/' +
             this.options.input_dict_name +
