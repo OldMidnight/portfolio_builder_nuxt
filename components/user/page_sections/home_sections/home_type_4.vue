@@ -140,46 +140,48 @@ export default {
         )
       }
       if (this.upload_image) {
-        const formData = new FormData()
-        const ext = this.upload_file.name.split('.')[
-          this.upload_file.name.split('.').length - 1
-        ]
-        formData.append('upload', this.upload_file)
-        const url =
-          'uploads/user-content/' +
-          this.user.domain +
-          '/' +
-          this.options.input_dict_name +
-          '.' +
-          ext
-        this.updatePageDataObject({
-          page_label: this.options.input_dict_name,
-          type: 'img_props',
-          data: {
-            url: this.validated_img_url,
-            contain: this.img_contain,
-            link: this.link_image,
-            upload: this.upload_image
-          }
-        })
-        this.addImageToUpload({
-          img_data: {
-            page_img_props: {
-              page_label: this.options.input_dict_name,
-              img_props: 'img_props',
-              data: {
-                url: this.$axios.defaults.baseURL + url,
-                contain: this.img_contain,
-                link: this.link_image,
-                upload: this.upload_image
-              }
-            },
-            upload_form_data: formData,
-            url
-          }
-        })
-        this.upload_file = null
-        this.edit_dialog = false
+        if (this.$refs.cta_upload_form.validate(true)) {
+          const formData = new FormData()
+          const ext = this.upload_file.name.split('.')[
+            this.upload_file.name.split('.').length - 1
+          ]
+          formData.append('upload', this.upload_file)
+          const url =
+            'uploads/user-content/' +
+            this.user.domain +
+            '/' +
+            this.options.input_dict_name +
+            '.' +
+            ext
+          this.updatePageDataObject({
+            page_label: this.options.input_dict_name,
+            type: 'img_props',
+            data: {
+              url: this.validated_img_url,
+              contain: this.img_contain,
+              link: this.link_image,
+              upload: this.upload_image
+            }
+          })
+          this.addImageToUpload({
+            img_data: {
+              page_img_props: {
+                page_label: this.options.input_dict_name,
+                img_props: 'img_props',
+                data: {
+                  url: this.$axios.defaults.baseURL + url,
+                  contain: this.img_contain,
+                  link: this.link_image,
+                  upload: this.upload_image
+                }
+              },
+              upload_form_data: formData,
+              url
+            }
+          })
+          this.upload_file = null
+          this.edit_dialog = false
+        }
       } else {
         const currentImagesToUpload = this.imagesToUpload.filter((img) => {
           return img.page_img_props.page_label === this.options.input_dict_name
@@ -209,7 +211,7 @@ export default {
         data: {
           text: this.button_text,
           color: this.button_color,
-          text_color: this.text_color,
+          text_color: this.button_text_color,
           url: this.button_url
         }
       })
@@ -304,31 +306,32 @@ export default {
                     label="Upload Image"
                   ></v-switch>
                   <div v-if="upload_image">
-                    <!-- <span class="caption">Insert the url to your image</span> -->
-                    <v-file-input
-                      v-model="upload_file"
-                      :rules="upload_rules"
-                      :show-size="1000"
-                      color="info"
-                      counter
-                      chips
-                      accept="image/*"
-                      label="Click to upload an image"
-                      prepend-icon="mdi-image"
-                      outlined
-                      @change="previewUpload($event)"
-                    >
-                      <template v-slot:selection="{ index, text }">
-                        <v-chip
-                          v-if="index < 2"
-                          color="deep-purple accent-4"
-                          dark
-                          label
-                        >
-                          {{ text }}
-                        </v-chip>
-                      </template>
-                    </v-file-input>
+                    <v-form ref="cta_upload_form">
+                      <v-file-input
+                        v-model="upload_file"
+                        :rules="upload_rules"
+                        :show-size="1000"
+                        color="info"
+                        counter
+                        chips
+                        accept="image/*"
+                        label="Click to upload an image"
+                        prepend-icon="mdi-image"
+                        outlined
+                        @change="previewUpload($event)"
+                      >
+                        <template v-slot:selection="{ index, text }">
+                          <v-chip
+                            v-if="index < 2"
+                            color="deep-purple accent-4"
+                            dark
+                            label
+                          >
+                            {{ text }}
+                          </v-chip>
+                        </template>
+                      </v-file-input>
+                    </v-form>
                   </div>
                   <v-layout column justify-center align-center>
                     <span>Preview</span>

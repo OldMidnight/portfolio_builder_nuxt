@@ -94,13 +94,6 @@ export default {
           type: 2,
           component: 'projects_sections/projects_type_1',
           preview_img: '/preview_images/home_pg_1.png'
-        },
-        {
-          id: 4,
-          tab: 'projects',
-          type: 2,
-          component: 'projects_sections/projects_type_2',
-          preview_img: '/preview_images/home_pg_1.png'
         }
       ],
       page_customise_select: [
@@ -276,7 +269,8 @@ export default {
           enterActiveClass: 'zoomIn',
           leaveActiveClass: 'zoomOut'
         }
-      ]
+      ],
+      editorChanges: []
     }
   },
   computed: {
@@ -285,6 +279,9 @@ export default {
       userStorage: 'creator/userStorage',
       site_props: 'creator/site_props'
     }),
+    isMobile() {
+      return this.$vuetify.breakpoint.smAndDown
+    },
     activeEditor() {
       if (this.activeNav !== 'home') {
         return this.editor
@@ -298,9 +295,6 @@ export default {
           this.userStorage.max_storage_space) *
           100
       )
-    },
-    saving() {
-      return this.$store.state.creator.saving
     },
     creation_step() {
       return this.$store.state.creator.creation_step
@@ -751,18 +745,20 @@ export default {
         this.hideNextStep()
       },
       onUpdate: (e) => {
-        // console.log(e)
-        this.startSaving()
+        this.editorChanges.push({
+          page_label:
+            this.activeNav + '_page_' + this.activeNav_index + '_data',
+          content: e.getHTML()
+        })
         const func = _.debounce(() => {
-          this.updatePageHTML({
-            page_label:
-              this.activeNav + '_page_' + this.activeNav_index + '_data',
-            html: e.getHTML()
-          })
-          // this.test()
-          // console.log(e)
-          // console.log(this)
-        }, 4000)
+          for (const change of this.editorChanges) {
+            this.updatePageHTML({
+              page_label: change.page_label,
+              html: change.content
+            })
+          }
+          this.editorChanges = []
+        }, 500)
         func()
       }
     })
@@ -862,8 +858,7 @@ export default {
 
       this.setProjectsPages([
         // { id: #, component: () => import(COMPONENT_PATH) }
-        { id: 1, page_num: 1, component: 'projects_sections/projects_type_1' },
-        { id: 2, page_num: 2, component: 'projects_sections/projects_type_2' }
+        { id: 1, page_num: 1, component: 'projects_sections/projects_type_1' }
       ])
       inputDict = 'projects_page_1_data'
 
@@ -1034,7 +1029,6 @@ export default {
       updatePageData: 'creator/updatePageData',
       updatePageDataObject: 'creator/updatePageDataObject',
       updatePageHTML: 'creator/updatePageHTML',
-      startSaving: 'creator/startSaving',
       setPageTransition: 'creator/setPageTransition'
     }),
     ...mapActions({
@@ -1085,18 +1079,23 @@ export default {
             this.active_editor_index = i
           },
           onUpdate: (e) => {
-            // console.log(e)
-            this.startSaving()
+            this.editorChanges.push({
+              page_label:
+                this.activeNav +
+                '_page_' +
+                (this.active_editor_index + 1) +
+                '_data',
+              content: e.getHTML()
+            })
             const func = _.debounce(() => {
-              this.updatePageHTML({
-                page_label:
-                  this.activeNav + '_page_' + this.activeNav_index + '_data',
-                html: e.getHTML()
-              })
-              // this.test()
-              // console.log(e)
-              // console.log(this)
-            }, 4000)
+              for (const change of this.editorChanges) {
+                this.updatePageHTML({
+                  page_label: change.page_label,
+                  html: change.content
+                })
+              }
+              this.editorChanges = []
+            }, 500)
             func()
           }
         })
@@ -1264,7 +1263,7 @@ export default {
                 layout: Number(
                   this.site_props.layout[this.site_props.layout.length - 1]
                 ),
-                component: 'home_sections/projects_type_2'
+                component: 'home_sections/projects_type_1'
               }
             })
             this.activeNav_index = this.site_props.projectsPages.length + 1

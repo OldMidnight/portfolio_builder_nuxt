@@ -1,6 +1,5 @@
 export const state = () => ({
   creation_step: 0,
-  saving: false,
   site_props: {
     transition: {
       name: 'Fade',
@@ -331,9 +330,6 @@ export const mutations = {
     */
     state.site_props[payload.page_label].html = payload.html
     state.saving = false
-  },
-  startSaving(state) {
-    state.saving = true
   },
   updatePageImg(state, payload) {
     state.site_props[payload.page_label][payload.img_props] = payload.data

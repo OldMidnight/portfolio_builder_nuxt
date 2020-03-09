@@ -244,36 +244,38 @@ export default {
     },
     saveUpload() {
       if (this.upload_file) {
-        const formData = new FormData()
-        formData.append('upload', this.upload_file)
-        const ext = this.upload_file.name.split('.')[
-          this.upload_file.name.split('.').length - 1
-        ]
-        const url =
-          'uploads/user-content/' +
-          this.user.domain +
-          '/' +
-          this.user.domain +
-          '_resume' +
-          '.' +
-          ext
+        if (this.$refs.resume_upload_form.validate(true)) {
+          const formData = new FormData()
+          formData.append('upload', this.upload_file)
+          const ext = this.upload_file.name.split('.')[
+            this.upload_file.name.split('.').length - 1
+          ]
+          const url =
+            'uploads/user-content/' +
+            this.user.domain +
+            '/' +
+            this.user.domain +
+            '_resume' +
+            '.' +
+            ext
 
-        this.updateResumeUpload({
-          resume_upload: { use: true, url: this.temp_upload_url }
-        })
+          this.updateResumeUpload({
+            resume_upload: { use: true, url: this.temp_upload_url }
+          })
 
-        this.addFileToUpload({
-          file: {
-            type: 'resume_pdf',
-            url: this.$axios.defaults.baseURL + url,
-            upload_data: formData
-          }
-        })
-        this.upload_resume_dialog = false
-        this.resume_wizard_dialog = false
-        this.resume_wizard_step = 0
-        this.progress = 0
-        this.use_regular_creator_when_upload = false
+          this.addFileToUpload({
+            file: {
+              type: 'resume_pdf',
+              url: this.$axios.defaults.baseURL + url,
+              upload_data: formData
+            }
+          })
+          this.upload_resume_dialog = false
+          this.resume_wizard_dialog = false
+          this.resume_wizard_step = 0
+          this.progress = 0
+          this.use_regular_creator_when_upload = false
+        }
       } else {
         const currentResumeToUpload = this.filesToUpload.filter((file) => {
           return file.type === 'resume_pdf'
@@ -871,30 +873,32 @@ export default {
               </p>
             </v-col>
             <v-col cols="12">
-              <v-file-input
-                v-model="upload_file"
-                :rules="upload_rules"
-                :show-size="1000"
-                color="info"
-                counter
-                chips
-                accept="application/pdf"
-                label="Click to upload a document"
-                prepend-icon="mdi-image"
-                outlined
-                @change="previewUpload($event)"
-              >
-                <template v-slot:selection="{ index, text }">
-                  <v-chip
-                    v-if="index < 2"
-                    color="deep-purple accent-4"
-                    dark
-                    label
-                  >
-                    {{ text }}
-                  </v-chip>
-                </template>
-              </v-file-input>
+              <v-form ref="resume_upload_form">
+                <v-file-input
+                  v-model="upload_file"
+                  :rules="upload_rules"
+                  :show-size="1000"
+                  color="info"
+                  counter
+                  chips
+                  accept="application/pdf"
+                  label="Click to upload a document"
+                  prepend-icon="mdi-image"
+                  outlined
+                  @change="previewUpload($event)"
+                >
+                  <template v-slot:selection="{ index, text }">
+                    <v-chip
+                      v-if="index < 2"
+                      color="deep-purple accent-4"
+                      dark
+                      label
+                    >
+                      {{ text }}
+                    </v-chip>
+                  </template>
+                </v-file-input>
+              </v-form>
             </v-col>
           </v-row>
         </v-card-text>

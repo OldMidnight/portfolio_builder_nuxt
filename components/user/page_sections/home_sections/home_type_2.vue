@@ -1,5 +1,5 @@
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 import { EditorContent } from 'tiptap'
 import SocialBar1 from '@/components/user/social_media_bar/bar_1'
 export default {
@@ -12,6 +12,14 @@ export default {
     tagline: {
       type: String,
       default: 'Insert Your Epic Tagline Here!'
+    },
+    height: {
+      type: String,
+      default: '150'
+    },
+    width: {
+      type: String,
+      default: '150'
     },
     options: {
       type: Object,
@@ -33,16 +41,28 @@ export default {
     return {
       img_dialog: false,
       img_url: '',
+      upload_img_url: '',
       img_contain: false,
       edit_img_tooltip: false,
       validated_img_url: '',
-      name_model: this.name,
-      tagline_model: this.tagline
+      link_image: false,
+      upload_image: false,
+      upload_rules: [
+        (value) =>
+          !value ||
+          value.size < 2000000 ||
+          'File size should be less than 2 MB!'
+      ],
+      upload_file: null
     }
   },
   computed: {
-    site_props() {
-      return this.$store.state.creator.site_props
+    ...mapGetters({
+      site_props: 'creator/site_props',
+      imagesToUpload: 'creator/imagesToUpload'
+    }),
+    user() {
+      return this.$store.state.auth.user
     },
     check_color_style() {
       if (
@@ -65,15 +85,13 @@ export default {
     },
     avatar_size() {
       if (this.$vuetify.breakpoint.smAndDown) {
-        return '60'
-      } else if (this.$vuetify.breakpoint.sm) {
-        return '90'
+        return '190'
       } else if (this.$vuetify.breakpoint.md) {
-        return '130'
+        return '160'
       } else if (this.$vuetify.breakpoint.lg) {
         return '160'
       } else if (this.$vuetify.breakpoint.xl) {
-        return '220'
+        return '200'
       } else {
         return '0'
       }
@@ -81,13 +99,32 @@ export default {
   },
   watch: {
     img_dialog(value) {
-      if (value === false) {
+      if (!value) {
         if (!this.img_props.url) {
           this.img_url = ''
         } else {
+          // eslint-disable-next-line prettier/prettier
           this.img_url = this.img_props.url
         }
+        // eslint-disable-next-line prettier/prettier
         this.img_contain = this.img_props.contain
+      }
+    },
+    link_image(value) {
+      if (value && this.upload_image) {
+        this.upload_image = false
+        this.validated_img_url = this.img_props.url
+      } else if (!value && !this.upload_image) {
+        this.upload_image = true
+      }
+    },
+    upload_image(value) {
+      if (value && this.link_image) {
+        this.link_image = false
+        this.validated_img_url = this.upload_img_url
+      } else if (!value && !this.link_image) {
+        this.link_image = true
+        this.validated_img_url = this.img_props.url
       }
     }
   },
@@ -98,10 +135,14 @@ export default {
     this.img_url = this.img_props.url
     this.validated_img_url = this.img_props.url
     this.img_contain = this.img_props.contain
+    this.link_image = this.img_props.link
+    this.upload_image = this.img_props.upload
   },
   methods: {
     ...mapMutations({
-      updatePageImg: 'creator/updatePageImg'
+      updatePageImg: 'creator/updatePageImg',
+      addImageToUpload: 'creator/addImageToUpload',
+      removeImagesToUpload: 'creator/removeImagesToUpload'
     }),
     validateURL() {
       this.getValidatedURL().then((result) => {
@@ -115,88 +156,171 @@ export default {
           if (response.headers['content-type'].split('/')[0] === 'image') {
             return this.img_url
           } else {
-            return 'Inavlid Image URL.'
+            return 'Invalid Image URL.'
           }
         })
         .catch((error) => {
-          return error ? 'Inavlid Image URL.' : ''
+          return error ? 'Invalid Image URL.' : ''
         })
       return validation
     },
     updateImgURL() {
-      this.updatePageImg({
-        page_label: this.options.input_dict_name,
-        img_props: 'img_props',
-        data: {
-          url: this.validated_img_url,
-          contain: this.img_contain
+      if (this.upload_image) {
+        if (this.$refs.home_2_upload_form.validate(true)) {
+          const formData = new FormData()
+          const ext = this.upload_file.name.split('.')[
+            this.upload_file.name.split('.').length - 1
+          ]
+          formData.append('upload', this.upload_file)
+          const url =
+            'uploads/user-content/' +
+            this.user.domain +
+            '/' +
+            this.options.input_dict_name +
+            '.' +
+            ext
+          this.updatePageImg({
+            page_label: this.options.input_dict_name,
+            img_props: 'img_props',
+            data: {
+              url: this.validated_img_url,
+              contain: this.img_contain,
+              link: this.link_image,
+              upload: this.upload_image
+            }
+          })
+          this.addImageToUpload({
+            img_data: {
+              page_img_props: {
+                page_label: this.options.input_dict_name,
+                img_props: 'img_props',
+                data: {
+                  url: this.$axios.defaults.baseURL + url,
+                  contain: this.img_contain,
+                  link: this.link_image,
+                  upload: this.upload_image
+                }
+              },
+              upload_form_data: formData,
+              url
+            }
+          })
+          this.upload_file = null
+          this.img_dialog = false
         }
-      })
+      } else {
+        const currentImagesToUpload = this.imagesToUpload.filter((img) => {
+          return img.page_img_props.page_label === this.options.input_dict_name
+        })
+
+        if (currentImagesToUpload.length > 0) {
+          this.removeImagesToUpload({
+            images_to_remove: currentImagesToUpload
+          })
+        }
+
+        this.updatePageImg({
+          page_label: this.options.input_dict_name,
+          img_props: 'img_props',
+          data: {
+            url: this.validated_img_url,
+            contain: this.img_contain,
+            link: this.link_image,
+            upload: this.upload_image
+          }
+        })
+        this.upload_file = null
+        this.img_dialog = false
+      }
+    },
+    previewUpload(e) {
+      const reader = new FileReader()
+      reader.onload = () => {
+        this.validated_img_url = reader.result
+        this.upload_img_url = reader.result
+      }
+      reader.readAsDataURL(e)
+    },
+    scrollDown() {
+      const el = document.getElementById('call-to-action')
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }
 }
 </script>
 
 <template>
-  <v-layout
-    column
+  <v-row
+    :style="check_color_style"
     :class="{ slate: site_props.selected_theme === 1 && options.show_theme }"
-    class="template-container d-flex flex-column align-center justify-start"
+    class="ma-0 template-container align-center justify-start"
   >
-    <!-- <v-flex
-      class="user-landing-text d-flex flex-column pa-0 pb-2 px-4 align-center justify-end"
+    <v-col
+      cols="12"
+      class="home--content-container d-flex flex-column align-center pt-4"
     >
-      <client-only>
-        <editor-content :editor="editor" />
-      </client-only>
-    </v-flex> -->
-    <div class="home--content-container d-flex flex-column align-center">
       <div
         :style="check_color_style"
         class="user-landing-text d-flex flex-column pa-0 px-4 align-center"
       >
         <editor-content :editor="editor" />
       </div>
-      <SocialBar1 :live="options.live" />
-    </div>
-    <div class="home--img-container d-flex flex-column align-center mt-8">
-      <v-tooltip v-model="edit_img_tooltip" right>
-        <template v-slot:activator="{ on }">
-          <v-avatar :size="avatar_size">
-            <v-img
-              alt="User Profile Picture"
-              :src="
-                !options.preview
-                  ? img_props.url
-                  : 'https://images.unsplash.com/photo-1542103749-8ef59b94f47e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80   '
-              "
-              :class="{
-                'user-hero-image-border':
-                  site_props.selected_theme === 2 && !options.preview,
-                'has-border':
-                  site_props.text_border_color &&
-                  site_props.selected_theme === null,
-                editable: !options.preview && !options.live
-              }"
-              class="user-hero-image elevation-2"
-              :contain="img_props.contain"
-              lazy-src="/img_lazy.jpeg"
-              @click.stop="
-                !options.preview && !options.live
-                  ? (img_dialog = true)
-                  : (img_dialog = false)
-              "
-              v-on="on"
-              @mouseover="edit_img_tooltip = !options.preview && !options.live"
-              @mouseout="edit_img_tooltip = false"
-            >
-            </v-img>
-          </v-avatar>
-        </template>
-        <span v-if="!options.preview && !options.live">Insert Image</span>
+      <SocialBar1 />
+    </v-col>
+    <v-col
+      cols="12"
+      class="home--img-container d-flex flex-column align-center justify-end"
+    >
+      <v-avatar :size="avatar_size">
+        <v-img
+          alt="User Profile Picture"
+          :src="img_props.url"
+          :class="{
+            'user-hero-image-border':
+              site_props.selected_theme === 2 && !options.preview,
+            'has-border':
+              site_props.text_border_color &&
+              site_props.selected_theme === null,
+            'img-blur': $vuetify.breakpoint.smAndDown
+          }"
+          class="user-hero-image elevation-2 editable"
+          :contain="img_props.contain"
+          lazy-src="/img_lazy.jpeg"
+          @click.stop="img_dialog = true"
+          @mouseover="edit_img_tooltip = true"
+          @mouseout="edit_img_tooltip = false"
+        >
+        </v-img>
+        <div v-if="$vuetify.breakpoint.smAndDown" class="pos-abs w-100">
+          <v-btn color="info" @click="img_dialog = true">
+            <v-icon class="mr-1">mdi-pencil</v-icon>Edit
+          </v-btn>
+        </div>
+      </v-avatar>
+      <v-tooltip v-model="edit_img_tooltip" attach=".home--img-container">
+        <span>Insert Image</span>
       </v-tooltip>
-      <!-- </v-flex> -->
-    </div>
+    </v-col>
+    <v-col cols="12" class="home--content-scroll d-flex justify-center">
+      <v-btn
+        :color="
+          `${
+            site_props.selected_theme === 2
+              ? 'white'
+              : user.dark_mode
+              ? 'black'
+              : ''
+          }`
+        "
+        icon
+        x-large
+        @click="scrollDown()"
+      >
+        <v-icon>
+          mdi-chevron-down
+        </v-icon>
+      </v-btn>
+    </v-col>
     <v-dialog
       v-model="img_dialog"
       width="500"
@@ -204,20 +328,58 @@ export default {
     >
       <v-card>
         <v-card-title>Edit Image</v-card-title>
+        <v-divider></v-divider>
         <v-card-text>
           <v-container>
-            <span class="caption">Insert the url to your image</span>
-            <v-text-field
-              v-model="img_url"
-              label="Image URL..."
-              outlined
-              @input="validateURL()"
-            >
-            </v-text-field>
+            <v-switch v-model="link_image" inset label="Link Image"></v-switch>
+            <div v-if="link_image">
+              <span class="caption">Insert the url to your image</span>
+              <v-text-field
+                v-model="img_url"
+                label="Image URL..."
+                outlined
+                @input="validateURL()"
+              >
+              </v-text-field>
+            </div>
+            <v-switch
+              v-model="upload_image"
+              inset
+              label="Upload Image"
+            ></v-switch>
+            <div v-if="upload_image">
+              <v-form refs="home_2_upload_form">
+                <v-file-input
+                  v-model="upload_file"
+                  :rules="upload_rules"
+                  :show-size="1000"
+                  color="info"
+                  counter
+                  chips
+                  accept="image/*"
+                  label="Click to upload an image"
+                  prepend-icon="mdi-image"
+                  outlined
+                  @change="previewUpload($event)"
+                >
+                  <template v-slot:selection="{ index, text }">
+                    <v-chip
+                      v-if="index < 2"
+                      color="deep-purple accent-4"
+                      dark
+                      label
+                    >
+                      {{ text }}
+                    </v-chip>
+                  </template>
+                </v-file-input>
+              </v-form>
+            </div>
             <v-layout column justify-center align-center>
               <span>Preview</span>
               <v-flex class="img-preview-container">
                 <v-img
+                  id="img-preview"
                   :src="validated_img_url"
                   class="img-preview elevation-2"
                   :contain="img_contain"
@@ -247,25 +409,20 @@ export default {
             </v-switch>
           </v-container>
         </v-card-text>
+        <v-divider></v-divider>
         <v-card-actions>
           <v-flex>
-            <v-btn color="blue darken-1" text @click="img_dialog = false"
-              >Close</v-btn
-            >
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="
-                img_dialog = false
-                updateImgURL()
-              "
-              >Save</v-btn
-            >
+            <v-btn color="error" @click="img_dialog = false">
+              Close
+            </v-btn>
+            <v-btn color="success" @click="updateImgURL()">
+              Save
+            </v-btn>
           </v-flex>
         </v-card-actions>
       </v-card>
     </v-dialog>
-  </v-layout>
+  </v-row>
 </template>
 
 <style lang="scss" scoped>
@@ -275,7 +432,7 @@ export default {
   // background-color: white !important;
   position: relative;
   z-index: 5;
-  overflow: auto;
+  // overflow: auto;
 }
 
 .img-preview-container {
@@ -298,6 +455,10 @@ export default {
   width: 100%;
 }
 
+.img-blur {
+  filter: blur(2px);
+}
+
 .user-hero-image-border {
   border: 1px solid;
 }
@@ -315,18 +476,18 @@ export default {
 
 .editable:hover {
   background-color: #bdbdbd;
-  opacity: 0.2;
-  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  filter: blur(2px);
+  transition: 0.3s;
   cursor: pointer;
 }
 
 .home--img-container {
-  height: 40%;
+  // height: 40%;
   width: 100%;
 }
 
 .home--content-container {
-  // height: 60%;
+  // height: 50%;
   width: 100%;
 }
 </style>

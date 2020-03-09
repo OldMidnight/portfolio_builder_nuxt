@@ -81,7 +81,11 @@ export default {
   >
     <v-flex
       v-if="img.use"
-      :class="`pa-2 ${$vuetify.breakpoint.smAndDown ? 'w-50' : 'w-25'}`"
+      :class="
+        `pa-2 ${
+          $vuetify.breakpoint.smAndDown ? 'w-50' : 'd-flex align-center w-25'
+        }`
+      "
     >
       <v-img
         class="project-img"

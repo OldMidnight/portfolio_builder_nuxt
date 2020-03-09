@@ -176,31 +176,33 @@ export default {
     },
     saveProject() {
       if (this.temp_project.img.upload) {
-        const formData = new FormData()
-        const ext = this.upload_file.name.split('.')[
-          this.upload_file.name.split('.').length - 1
-        ]
-        formData.append('upload', this.upload_file)
-        const url =
-          'uploads/user-content/' +
-          this.user.domain +
-          '/' +
-          this.options.input_dict_name +
-          '_' +
-          this.temp_project.id +
-          '.' +
-          ext
-        this.addProjectImageToUpload({
-          img_data: {
-            page_img_props: {
-              page_label: this.options.input_dict_name,
-              index: this.editing_index,
-              project: this.temp_project
-            },
-            upload_form_data: formData,
-            url
-          }
-        })
+        if (this.$refs.project_1_upload_form.validate(true)) {
+          const formData = new FormData()
+          const ext = this.upload_file.name.split('.')[
+            this.upload_file.name.split('.').length - 1
+          ]
+          formData.append('upload', this.upload_file)
+          const url =
+            'uploads/user-content/' +
+            this.user.domain +
+            '/' +
+            this.options.input_dict_name +
+            '_' +
+            this.temp_project.id +
+            '.' +
+            ext
+          this.addProjectImageToUpload({
+            img_data: {
+              page_img_props: {
+                page_label: this.options.input_dict_name,
+                index: this.editing_index,
+                project: this.temp_project
+              },
+              upload_form_data: formData,
+              url
+            }
+          })
+        }
       } else {
         const currentImagesToUpload = this.projectImagesToUpload.filter(
           (img) => {
@@ -415,31 +417,32 @@ export default {
                       label="Upload Image"
                     ></v-switch>
                     <div v-if="temp_project.img.upload">
-                      <!-- <span class="caption">Insert the url to your image</span> -->
-                      <v-file-input
-                        v-model="upload_file"
-                        :rules="upload_rules"
-                        :show-size="1000"
-                        color="info"
-                        counter
-                        chips
-                        accept="image/*"
-                        label="Click to upload an image"
-                        prepend-icon="mdi-image"
-                        outlined
-                        @change="previewUpload($event)"
-                      >
-                        <template v-slot:selection="{ index, text }">
-                          <v-chip
-                            v-if="index < 2"
-                            color="deep-purple accent-4"
-                            dark
-                            label
-                          >
-                            {{ text }}
-                          </v-chip>
-                        </template>
-                      </v-file-input>
+                      <v-form refs="project_1_upload_form">
+                        <v-file-input
+                          v-model="upload_file"
+                          :rules="upload_rules"
+                          :show-size="1000"
+                          color="info"
+                          counter
+                          chips
+                          accept="image/*"
+                          label="Click to upload an image"
+                          prepend-icon="mdi-image"
+                          outlined
+                          @change="previewUpload($event)"
+                        >
+                          <template v-slot:selection="{ index, text }">
+                            <v-chip
+                              v-if="index < 2"
+                              color="deep-purple accent-4"
+                              dark
+                              label
+                            >
+                              {{ text }}
+                            </v-chip>
+                          </template>
+                        </v-file-input>
+                      </v-form>
                     </div>
                     <v-layout column justify-center align-center>
                       <span>Preview</span>

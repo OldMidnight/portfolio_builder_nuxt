@@ -16,21 +16,18 @@ export default {
     }
   },
   created() {
-    if (process.client) {
-      this.$vuetify.theme.dark = this.$auth.user.dark_mode
-    }
     this.fetchUserUploads()
   },
   beforeMount() {
     this.$vuetify.theme.dark = this.$auth.user.dark_mode
-    if (this.$route.name === 'creator' && this.$vuetify.breakpoint.smAndDown) {
-      this.$router.replace({ path: '/m-creator' })
-    } else if (
-      this.$route.name === 'm-creator' &&
-      !this.$vuetify.breakpoint.smAndDown
-    ) {
-      this.$router.replace({ path: '/creator' })
-    }
+    // if (this.$route.name === 'creator' && this.$vuetify.breakpoint.smAndDown) {
+    //   this.$router.replace({ path: '/m-creator' })
+    // } else if (
+    //   this.$route.name === 'm-creator' &&
+    //   !this.$vuetify.breakpoint.smAndDown
+    // ) {
+    //   this.$router.replace({ path: '/creator' })
+    // }
   },
   mounted() {
     this.isMobile = this.$vuetify.breakpoint.smAndDown
@@ -85,10 +82,10 @@ export default {
           column
           align="center"
           justify="center"
-          class="creation-page-layout ma-0 w-100 h-100"
+          class="ma-0 w-100 h-100"
         >
-          <v-flex class="top-nav">
-            <div class="mini-logo font-weight-bold">
+          <v-col cols="12" class="h-5 pa-0 d-flex justify-space-between pt-2">
+            <div class="mini-logo font-weight-bold ml-3">
               <v-img
                 class="logo"
                 :src="
@@ -105,15 +102,17 @@ export default {
               leave-active-class="animated fadeOutRight faster"
               mode="out-in"
             >
-              <div v-if="creation_step === 1" class="save-btn pt-2">
+              <div v-if="creation_step === 1" class="mr-3">
                 <v-btn color="success" @click="saveChanges()">
                   Save Changes
                 </v-btn>
               </div>
             </transition>
-          </v-flex>
-          <nuxt class="creation-wrapper" />
-          <v-flex class="next-creation-step">
+          </v-col>
+          <v-col cols="12" class="h-85 pa-0">
+            <nuxt />
+          </v-col>
+          <v-col cols="12" class="h-5 d-flex justify-center pa-0">
             <transition
               enter-active-class="animated fadeIn faster"
               leave-active-class="animated fadeOut faster"
@@ -122,7 +121,7 @@ export default {
               <v-btn
                 v-show="creation_step !== 0"
                 color="error"
-                class="btn-left-margin"
+                class="mr-5"
                 large
                 @click="prevStep()"
               >
@@ -137,9 +136,7 @@ export default {
               <v-btn
                 v-show="show_next_step"
                 color="info"
-                :class="{
-                  'btn-left-margin': creationProgress > 0
-                }"
+                class="ml-5"
                 large
                 @click="nextStep()"
               >
@@ -164,15 +161,16 @@ export default {
                 Next
               </v-btn>
             </transition>
-          </v-flex>
-          <v-flex class="creation-progress">
+          </v-col>
+          <v-col cols="12" class="h-5 d-flex justify-center">
             <v-progress-linear
               rounded
               :value="creationProgress"
               :buffer-value="creationProgress + 100 / 3"
               height="8"
+              class="w-50"
             ></v-progress-linear>
-          </v-flex>
+          </v-col>
         </v-row>
         <v-row v-else class="h-100">
           <v-col
@@ -283,14 +281,6 @@ export default {
   min-width: 100%;
 }
 
-.top-nav {
-  max-height: 5%;
-  align-self: baseline;
-  position: absolute;
-  top: 0;
-  width: 100%;
-}
-
 .mini-logo {
   width: 8%;
   height: 100%;
@@ -299,19 +289,10 @@ export default {
   position: relative;
 }
 
-.logo {
-  position: absolute;
-  left: 10%;
-}
-
-.mini-logo:hover {
-  cursor: pointer;
-}
-
 .creation-wrapper {
   max-height: 82%;
-  overflow: auto;
-  position: absolute;
+  // overflow: auto;
+  // position: absolute;
   top: 6%;
   width: 97%;
 }
@@ -336,36 +317,5 @@ export default {
     margin-right: 5%;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
-}
-
-.btn-left-margin {
-  margin-left: 5%;
-}
-
-.hide-next {
-  height: 0px;
-  width: 0px !important;
-  opacity: 0;
-  margin: 0;
-  padding: 0;
-}
-
-.hide-previous {
-  height: 0px;
-  width: 0px;
-  opacity: 0;
-  margin: 0;
-  padding: 0;
-  min-width: 0px;
-}
-
-.creation-page-layout {
-  position: relative;
-  height: 100%;
-}
-
-.save-btn {
-  position: absolute;
-  right: 2%;
 }
 </style>

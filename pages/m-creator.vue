@@ -315,13 +315,7 @@ export default {
         </v-row>
       </v-col>
 
-      <v-col
-        v-else-if="checkStepCount(2)"
-        key="2"
-        cols="12"
-        class="h-100 pa-0"
-        align-center
-      >
+      <v-col v-else-if="checkStepCount(2)" key="2" cols="12" class="h-100 pa-0">
         <v-row class="ma-0 h-100 w-100">
           <v-col
             cols="12"
@@ -654,14 +648,6 @@ export default {
         </editor-menu-bar>
       </v-toolbar>
     </transition>
-    <!-- <div
-      v-if="checkStepCount(1)"
-      class="pos-abs bottom-0 w-100 d-flex justify-center"
-    >
-      <v-btn color="success" @click="show_tools_drawer = true">
-        <v-icon class="mr-2">mdi-cogs</v-icon>Tools
-      </v-btn>
-    </div> -->
     <v-btn
       v-if="checkStepCount(1)"
       color="success"

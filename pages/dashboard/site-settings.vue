@@ -145,28 +145,24 @@ export default {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' })
     },
     async uploadFavicon() {
-      const formData = new FormData()
-      formData.append('upload', this.favicon_file)
-      const url = `uploads/user-content/${this.user.domain}/favicon.ico`
-      const config = {
-        headers: {
-          'content-type': 'multipart/form-data'
+      if (this.$refs.favicon_upload_form.validate(true)) {
+        const formData = new FormData()
+        formData.append('upload', this.favicon_file)
+        const url = `uploads/user-content/${this.user.domain}/favicon.ico`
+        const config = {
+          headers: {
+            'content-type': 'multipart/form-data'
+          }
         }
+        await this.$axios.$post(url, formData, config)
+        this.favicon_dialog_upload = false
+        this.setFavicon({
+          use: true,
+          link: `${this.$axios.defaults.baseURL}uploads/user-content/${this.user.domain}/favicon.ico`
+        })
+        this.updateWebsite(this.site_props)
+        this.favicon_file = null
       }
-      await this.$axios.$post(url, formData, config)
-      // {
-      //   method: 'post',
-      //   url,
-      //   data: formData,
-      //   config
-      // })
-      this.favicon_dialog_upload = false
-      this.setFavicon({
-        use: true,
-        link: `${this.$axios.defaults.baseURL}uploads/user-content/${this.user.domain}/favicon.ico`
-      })
-      this.updateWebsite(this.site_props)
-      this.favicon_file = null
     },
     resendVerification() {
       this.$axios.$post('/u/email_verify').then(() => {
@@ -479,35 +475,37 @@ export default {
         <v-card-text>
           <v-container>
             <v-layout>
-              <v-file-input
-                v-model="favicon_file"
-                label="Favicon file..."
-                color="deep-purple accent-4"
-                chips
-                prepend-icon="mdi-paperclip"
-                placeholder="Select file"
-                outlined
-                accept="image/vnd.microsoft.icon, image/x-icon"
-                :show-size="1000"
-                :rules="[
-                  (value) =>
-                    !value ||
-                    value.size < 50000 ||
-                    'File should be less than 50 KB!'
-                ]"
-              >
-                <template v-slot:selection="{ index, text }">
-                  <v-chip
-                    v-if="index < 2"
-                    color="deep-purple accent-4"
-                    dark
-                    label
-                    small
-                  >
-                    {{ text }}
-                  </v-chip>
-                </template>
-              </v-file-input>
+              <v-form ref="favicon_upload_form">
+                <v-file-input
+                  v-model="favicon_file"
+                  label="Favicon file..."
+                  color="deep-purple accent-4"
+                  chips
+                  prepend-icon="mdi-paperclip"
+                  placeholder="Select file"
+                  outlined
+                  accept="image/vnd.microsoft.icon, image/x-icon"
+                  :show-size="1000"
+                  :rules="[
+                    (value) =>
+                      !value ||
+                      value.size < 50000 ||
+                      'File should be less than 50 KB!'
+                  ]"
+                >
+                  <template v-slot:selection="{ index, text }">
+                    <v-chip
+                      v-if="index < 2"
+                      color="deep-purple accent-4"
+                      dark
+                      label
+                      small
+                    >
+                      {{ text }}
+                    </v-chip>
+                  </template>
+                </v-file-input>
+              </v-form>
             </v-layout>
           </v-container>
         </v-card-text>
