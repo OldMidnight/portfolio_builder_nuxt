@@ -1288,7 +1288,10 @@ export default {
                   Submit
                 </v-btn>
               </v-form>
-              <v-flex v-else class="creation-name--form">
+              <v-flex
+                v-else
+                class="w-40 d-flex flex-column align-center justify-center"
+              >
                 <v-flex>
                   <p class="title font-weight-light">
                     Your Kreoh Site is being generated!
