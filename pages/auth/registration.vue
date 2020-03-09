@@ -102,7 +102,7 @@ export default {
   <v-form
     v-if="!show_confirm"
     ref="reg_form"
-    class="pa-2 d-flex flex-column align-center"
+    class="pa-2 d-flex flex-column align-center text-center"
   >
     <span class="headline mb-4">Create Your Account</span>
     <v-text-field

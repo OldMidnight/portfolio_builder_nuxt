@@ -417,7 +417,7 @@ export default {
                       label="Upload Image"
                     ></v-switch>
                     <div v-if="temp_project.img.upload">
-                      <v-form refs="project_1_upload_form">
+                      <v-form ref="project_1_upload_form">
                         <v-file-input
                           v-model="upload_file"
                           :rules="upload_rules"

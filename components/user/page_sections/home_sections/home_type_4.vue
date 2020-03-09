@@ -179,7 +179,7 @@ export default {
               url
             }
           })
-          this.upload_file = null
+          // this.upload_file = null
           this.edit_dialog = false
         }
       } else {

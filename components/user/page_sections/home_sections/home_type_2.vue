@@ -205,7 +205,7 @@ export default {
               url
             }
           })
-          this.upload_file = null
+          // this.upload_file = null
           this.img_dialog = false
         }
       } else {
@@ -348,7 +348,7 @@ export default {
               label="Upload Image"
             ></v-switch>
             <div v-if="upload_image">
-              <v-form refs="home_2_upload_form">
+              <v-form ref="home_2_upload_form">
                 <v-file-input
                   v-model="upload_file"
                   :rules="upload_rules"
