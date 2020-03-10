@@ -24,19 +24,16 @@ import FontSize from '@/components/tiptap-custom-nodes/FontSize'
 import Span from '@/components/tiptap-custom-nodes/Span'
 export default {
   async fetch({ store, $axios }) {
-    if (process.client) {
-      const {
-        site_not_created: siteNotCreated,
-        site_config: siteConfig
-      } = await $axios.$get('/helpers/auth_site_config')
-      if (!siteNotCreated) {
-        store.commit('creator/setSiteProps', siteConfig)
-      }
+    const {
+      site_not_created: siteNotCreated,
+      site_config: siteConfig
+    } = await $axios.$get('/helpers/auth_site_config')
+    if (!siteNotCreated) {
+      store.commit('creator/setSiteProps', siteConfig)
     }
   },
   data() {
     return {
-      selectedLayout: null,
       currentLayout: 0,
       show_tools_drawer: false,
       rules: {
@@ -776,6 +773,12 @@ export default {
       this.tab_text_colors.resume = this.site_props.tab_text_colors.resume
       this.showNextStep()
       this.temp_site_props = JSON.stringify(this.site_props)
+      const selectedLayout = this.layouts.filter((layout) => {
+        return layout.component_name === this.site_props.layout
+      })
+      if (selectedLayout.length === 1) {
+        this.currentLayout = selectedLayout[0].id - 1
+      }
     } else {
       this.setHomePages([
         // { id: #, component: () => import(COMPONENT_PATH) }

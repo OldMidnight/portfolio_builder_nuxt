@@ -2,14 +2,12 @@
 export default {
   name: 'DashboardLayout',
   async fetch({ store, $axios }) {
-    if (process.client) {
-      const {
-        site_not_created: siteNotCreated,
-        site_config: siteConfig
-      } = await $axios.$get('/helpers/auth_site_config')
-      if (!siteNotCreated) {
-        store.commit('creator/setSiteProps', siteConfig)
-      }
+    const {
+      site_not_created: siteNotCreated,
+      site_config: siteConfig
+    } = await $axios.$get('/helpers/auth_site_config')
+    if (!siteNotCreated) {
+      store.commit('creator/setSiteProps', siteConfig)
     }
   },
   data() {
@@ -295,7 +293,7 @@ export default {
           <v-list-item-title>Your Plan</v-list-item-title>
         </v-list-item>
 
-        <v-list-item color="error" :input-value="true" @click.stop="logout()">
+        <v-list-item color="error" :input-value="true" @click="logout()">
           <v-list-item-icon>
             <v-icon color="error">mdi-power</v-icon>
           </v-list-item-icon>

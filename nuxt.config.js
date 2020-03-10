@@ -95,7 +95,7 @@ module.exports = {
       }
     },
     plugins: [
-      { src: '~/plugins/auth.js' }
+      { src: '~/plugins/auth.js', mode: 'client' }
       // { src: '~/plugins/refAuth.js', mode: 'client' }
     ],
     strategies: {
@@ -118,7 +118,6 @@ module.exports = {
     redirect: {
       login: '/auth/login',
       home: '/dashboard',
-      logout: '/auth/logout',
       register: '/auth/register'
     }
   },

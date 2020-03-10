@@ -115,15 +115,10 @@ export default {
           v-if="link.use && $vuetify.breakpoint.smAndDown"
           color="info"
           class="caption mt-1 project-link-btn"
-          :href="link.url"
         >
           {{ link.link_text }}
         </v-btn>
-        <a
-          v-else-if="link.use"
-          class="caption mt-1 primary--text"
-          :href="link.url"
-        >
+        <a v-else-if="link.use" class="caption mt-1 primary--text">
           {{ link.link_text }}
         </a>
       </v-flex>

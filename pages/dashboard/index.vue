@@ -5,17 +5,6 @@ export default {
   name: 'Dashboard',
   layout: 'dashboard_layout',
   components: { Feedback },
-  async fetch({ store, $axios }) {
-    if (process.client) {
-      const {
-        site_not_created: siteNotCreated,
-        site_config: siteConfig
-      } = await $axios.$get('/helpers/auth_site_config')
-      if (!siteNotCreated) {
-        store.commit('creator/setSiteProps', siteConfig)
-      }
-    }
-  },
   data() {
     return {
       delete_error: false,
@@ -198,7 +187,7 @@ export default {
             >
               <nuxt-link
                 v-for="(message, index) in messages"
-                :key="index"
+                :key="`msg-${index}`"
                 :class="
                   `messages-container my-1 ${
                     user.dark_mode ? 'white' : 'black'
@@ -323,7 +312,7 @@ export default {
             >
               <v-img
                 v-for="(img, index) in website_images"
-                :key="index"
+                :key="`w-i-${index}`"
                 :class="
                   `website-img ${
                     $vuetify.theme.dark ? 'darkmode--border' : ''
@@ -509,8 +498,8 @@ export default {
                 mode="out-in"
               >
                 <v-slide-item
-                  v-for="img in m_website_images"
-                  :key="img"
+                  v-for="(img, index) in m_website_images"
+                  :key="`m-img-${index}`"
                   class="pos-rel"
                 >
                   <v-img
@@ -534,7 +523,7 @@ export default {
               >
                 <v-slide-item
                   v-if="slideshow_index === 0"
-                  key="m_0"
+                  key="slide_0"
                   class="border border-rounded w-100 d-flex justify-center align-center"
                   style="height: 30vh"
                 >
@@ -547,7 +536,7 @@ export default {
                 </v-slide-item>
                 <v-slide-item
                   v-if="slideshow_index === 1"
-                  key="m_1"
+                  key="slide_1"
                   class="border border-rounded w-100 d-flex justify-center align-center"
                   style="height: 30vh"
                 >
@@ -560,7 +549,7 @@ export default {
                 </v-slide-item>
                 <v-slide-item
                   v-if="slideshow_index === 2"
-                  key="m_2"
+                  key="slide_2"
                   class="border border-rounded w-100 d-flex justify-center align-center"
                   style="height: 30vh"
                 >
@@ -698,7 +687,7 @@ export default {
               <v-list-item-group active-class="info--text">
                 <template v-for="(message, index) in messages">
                   <v-list-item
-                    :key="message.id"
+                    :key="`msg-body-${message.id}`"
                     class="elevation-1"
                     nuxt
                     :to="`/dashboard/message-center?id=${message.id}`"
@@ -733,7 +722,7 @@ export default {
                   </v-list-item>
                   <v-divider
                     v-if="index + 1 < messages.length"
-                    :key="index"
+                    :key="`div-${index}`"
                   ></v-divider>
                 </template>
               </v-list-item-group>
