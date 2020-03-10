@@ -7,6 +7,7 @@ export default {
     leaveActiveClass: 'animated fadeOutRight'
   },
   layout: 'auth_layout',
+  auth: false,
   asyncData({ $auth }) {
     return { from_path: $auth.$storage.getUniversal('redirect-path') }
   },

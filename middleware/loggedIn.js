@@ -41,9 +41,9 @@ export function normalizePath(path = '') {
 }
 
 export default function(ctx) {
-  if (!process.client) {
-    return
-  }
+  // if (!process.client) {
+  //   return
+  // }
   // Disable middleware if options: { auth: false } is set on the route
   if (routeOption(ctx.route, 'auth', false)) {
     return

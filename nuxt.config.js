@@ -95,8 +95,8 @@ module.exports = {
       }
     },
     plugins: [
-      { src: '~/plugins/auth.js', mode: 'client' },
-      { src: '~/plugins/refAuth.js', mode: 'client' }
+      { src: '~/plugins/auth.js' }
+      // { src: '~/plugins/refAuth.js', mode: 'client' }
     ],
     strategies: {
       local: {

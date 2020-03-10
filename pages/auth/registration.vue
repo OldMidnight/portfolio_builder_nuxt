@@ -7,7 +7,7 @@ export default {
     leaveActiveClass: 'animated fadeOutRight fast'
   },
   auth: false,
-  middleware: 'isLoggedIn',
+  // middleware: 'isLoggedIn',
   layout: 'auth_layout',
   data() {
     return {

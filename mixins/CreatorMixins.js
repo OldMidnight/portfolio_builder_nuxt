@@ -24,12 +24,14 @@ import FontSize from '@/components/tiptap-custom-nodes/FontSize'
 import Span from '@/components/tiptap-custom-nodes/Span'
 export default {
   async fetch({ store, $axios }) {
-    const {
-      site_not_created: siteNotCreated,
-      site_config: siteConfig
-    } = await $axios.$get('/helpers/auth_site_config')
-    if (!siteNotCreated) {
-      store.commit('creator/setSiteProps', siteConfig)
+    if (process.client) {
+      const {
+        site_not_created: siteNotCreated,
+        site_config: siteConfig
+      } = await $axios.$get('/helpers/auth_site_config')
+      if (!siteNotCreated) {
+        store.commit('creator/setSiteProps', siteConfig)
+      }
     }
   },
   data() {

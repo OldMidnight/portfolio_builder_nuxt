@@ -6,12 +6,14 @@ export default {
   layout: 'dashboard_layout',
   components: { Feedback },
   async fetch({ store, $axios }) {
-    const {
-      site_not_created: siteNotCreated,
-      site_config: siteConfig
-    } = await $axios.$get('/helpers/auth_site_config')
-    if (!siteNotCreated) {
-      store.commit('creator/setSiteProps', siteConfig)
+    if (process.client) {
+      const {
+        site_not_created: siteNotCreated,
+        site_config: siteConfig
+      } = await $axios.$get('/helpers/auth_site_config')
+      if (!siteNotCreated) {
+        store.commit('creator/setSiteProps', siteConfig)
+      }
     }
   },
   data() {
@@ -531,7 +533,7 @@ export default {
               >
                 <v-slide-item
                   v-if="slideshow_index === 0"
-                  key="0"
+                  key="m_0"
                   class="border border-rounded w-100 d-flex justify-center align-center"
                   style="height: 30vh"
                 >
@@ -544,7 +546,7 @@ export default {
                 </v-slide-item>
                 <v-slide-item
                   v-if="slideshow_index === 1"
-                  key="1"
+                  key="m_1"
                   class="border border-rounded w-100 d-flex justify-center align-center"
                   style="height: 30vh"
                 >
@@ -557,7 +559,7 @@ export default {
                 </v-slide-item>
                 <v-slide-item
                   v-if="slideshow_index === 2"
-                  key="2"
+                  key="m_2"
                   class="border border-rounded w-100 d-flex justify-center align-center"
                   style="height: 30vh"
                 >
