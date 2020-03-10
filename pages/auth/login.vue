@@ -7,7 +7,7 @@ export default {
     leaveActiveClass: 'animated fadeOutRight'
   },
   layout: 'auth_layout',
-  auth: false,
+  // auth: false,
   asyncData({ $auth }) {
     return { from_path: $auth.$storage.getUniversal('redirect-path') }
   },
@@ -87,20 +87,21 @@ export default {
       class="auth-input"
       outlined
       @click:append="show_password = !show_password"
+      @keyup.enter="validateInfo()"
     >
     </v-text-field>
     <v-btn
       color="success"
       :loading="loading"
       :disabled="loading"
-      @keydown.enter="validateInfo()"
+      @keyup.enter="validateInfo()"
       @click.stop="validateInfo()"
     >
       Submit
     </v-btn>
     <v-flex class="mt-2 auth-link d-flex flex-column align-center">
       <span class="caption">New to Kreoh?</span>
-      <nuxt-link to="/auth/registration" class="auth-link caption">
+      <nuxt-link to="/auth/register" class="auth-link caption">
         Create an account
       </nuxt-link>
     </v-flex>

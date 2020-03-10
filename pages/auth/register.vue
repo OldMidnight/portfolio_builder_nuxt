@@ -1,12 +1,12 @@
 <script>
 import { mapActions, mapMutations } from 'vuex'
 export default {
-  name: 'Registration',
+  name: 'Register',
   transitions: {
     enterActiveClass: 'animated fadeInLeft fast',
     leaveActiveClass: 'animated fadeOutRight fast'
   },
-  auth: false,
+  // auth: false,
   // middleware: 'isLoggedIn',
   layout: 'auth_layout',
   data() {
@@ -92,7 +92,7 @@ export default {
   },
   head() {
     return {
-      title: 'Registration - Kreoh.com'
+      title: 'Create an Account - Kreoh.com'
     }
   }
 }

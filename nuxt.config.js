@@ -117,7 +117,9 @@ module.exports = {
     },
     redirect: {
       login: '/auth/login',
-      home: '/dashboard'
+      home: '/dashboard',
+      logout: '/auth/logout',
+      register: '/auth/register'
     }
   },
   /*

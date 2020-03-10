@@ -69,7 +69,7 @@ export default {
     <client-only placeholder="Loading Dashboard...">
       <v-row
         v-if="!isMobile"
-        class="w-100 h-100 ma-0 dashboard-container pos-rel justify-center"
+        class="w-100 h-100 ma-0 dashboard-container pos-rel justify-center dashboard--gradient"
       >
         <v-col
           cols="11"
@@ -149,9 +149,16 @@ export default {
           </div>
         </v-col>
       </v-row>
-      <v-row v-else>
-        <v-col cols="12" class="h-100 border px-0 pb-0">
+      <v-row v-else class="ma-0 dashboard--gradient">
+        <v-col cols="12" class="border px-0 pb-0">
           <nuxt />
+        </v-col>
+        <v-col cols="12" class="pa-0" style="height: 2% !important">
+          <v-footer height="30" class="dashboard--footer" padless>
+            <v-col class="text-center caption pa-0" cols="12">
+              &#169; {{ new Date().getFullYear() }} — <strong>Kreoh</strong>
+            </v-col>
+          </v-footer>
         </v-col>
       </v-row>
     </client-only>

@@ -52,7 +52,7 @@ export const actions = {
   },
   logout({ commit }) {
     commit('logout')
-    this.$router.push({ name: 'home' })
+    this.$router.push('/')
   },
   async register({ commit, dispatch }, user) {
     commit('registerRequest', user)

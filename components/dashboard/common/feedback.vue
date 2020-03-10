@@ -3,7 +3,7 @@ export default {}
 </script>
 
 <template>
-  <v-row class="w-100 border-rounded elevation-1 mx-1">
+  <v-row class="w-100 border-rounded elevation-1 mx-1 white">
     <v-col cols="12">
       <p class="title">Leave us some feedback!</p>
       <p class="caption text-center">

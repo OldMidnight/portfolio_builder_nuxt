@@ -878,7 +878,7 @@ export default {
                             color="info"
                             class="mt-3"
                             nuxt
-                            to="/auth/registration"
+                            to="/auth/register"
                           >
                             Become a tester
                           </v-btn>

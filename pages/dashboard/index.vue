@@ -194,7 +194,7 @@ export default {
             </div>
             <div
               v-if="messages"
-              class="messages-preview py-2 d-flex flex-column align-center"
+              class="messages-preview py-2 d-flex flex-column align-center justify-center"
             >
               <nuxt-link
                 v-for="(message, index) in messages"
@@ -232,16 +232,17 @@ export default {
                 </v-hover>
               </nuxt-link>
               <v-btn
-                class="messages-container my-1"
+                class="messages-container my-1 w-auto"
                 color="info"
                 outlined
                 nuxt
+                small
                 to="/dashboard/message-center?support=true"
               >
                 <span>
-                  Send us a message!
+                  Contact Us!
                 </span>
-                <v-icon large class="ml-1">
+                <v-icon class="ml-1">
                   mdi-face-agent
                 </v-icon>
               </v-btn>
@@ -253,7 +254,7 @@ export default {
               <span class="text-center">No Unread Messages</span>
             </div>
             <v-btn
-              class="align-self-center gen-setting-btn--border mb-2"
+              class="align-self-center gen-setting-btn--border my-2"
               color="info"
               small
               outlined
@@ -499,7 +500,7 @@ export default {
               {{ (user.domain + '.kreoh.com').toUpperCase() }}
             </span>
           </v-col>
-          <v-col v-if="user.site_created" cols="12" class="elevation-1">
+          <v-col v-if="user.site_created" cols="12" class="elevation-1 white">
             <v-slide-group class="w-100" style="height: 30vh">
               <transition
                 appear
