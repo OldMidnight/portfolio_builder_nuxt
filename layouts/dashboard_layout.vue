@@ -69,7 +69,11 @@ export default {
     <client-only placeholder="Loading Dashboard...">
       <v-row
         v-if="!isMobile"
-        class="w-100 h-100 ma-0 dashboard-container pos-rel justify-center dashboard--gradient"
+        :class="
+          `w-100 h-100 ma-0 dashboard-container pos-rel justify-center ${
+            $vuetify.theme.dark ? '' : 'dashboard--gradient'
+          }`
+        "
       >
         <v-col
           cols="11"
@@ -149,7 +153,10 @@ export default {
           </div>
         </v-col>
       </v-row>
-      <v-row v-else class="ma-0 dashboard--gradient">
+      <v-row
+        v-else
+        :class="`ma-0 ${$vuetify.theme.dark ? '' : 'dashboard--gradient'}`"
+      >
         <v-col cols="12" class="border px-0 pb-0">
           <nuxt />
         </v-col>
