@@ -51,6 +51,9 @@ export default {
     }
     this.loading = false
   },
+  beforeDestroy() {
+    clearInterval(this.slogan_interval)
+  },
   methods: {
     changeNav() {
       if (window.scrollY > 5) {

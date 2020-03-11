@@ -87,6 +87,9 @@ export default {
       )
     }
   },
+  beforeDestroy() {
+    clearInterval(this.slideshow_interval)
+  },
   methods: {
     ...mapActions({
       updateStats: 'dashboard/updateStats'

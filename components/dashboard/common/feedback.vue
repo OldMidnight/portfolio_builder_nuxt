@@ -3,7 +3,7 @@ export default {}
 </script>
 
 <template>
-  <v-row class="w-100 border-rounded elevation-1 mx-1 white">
+  <v-card class="w-100 border-rounded elevation-1 mx-1">
     <v-col cols="12">
       <p class="title">Leave us some feedback!</p>
       <p class="caption text-center">
@@ -18,5 +18,5 @@ export default {}
         <v-icon large class="mr-3">mdi-face-agent</v-icon> Send me a message!
       </v-btn>
     </v-col>
-  </v-row>
+  </v-card>
 </template>

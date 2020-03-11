@@ -315,6 +315,7 @@ export default {
                         counter
                         chips
                         accept="image/*"
+                        :clearable="false"
                         label="Click to upload an image"
                         prepend-icon="mdi-image"
                         outlined

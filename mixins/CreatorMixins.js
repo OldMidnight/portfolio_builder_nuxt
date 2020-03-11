@@ -156,7 +156,6 @@ export default {
       show_page_delete_success: false,
       current_page_type: 1,
       loader: null,
-      preview_images_interval: '',
       current_preview_img: 0,
       editor: null,
       is_editing: false,
@@ -994,6 +993,7 @@ export default {
   },
   beforeDestroy() {
     this.editor.destroy()
+    clearInterval(this.api_waiting_lines_interval)
   },
   methods: {
     ...mapMutations({

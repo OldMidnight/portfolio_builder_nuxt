@@ -354,6 +354,7 @@ export default {
                   :rules="upload_rules"
                   :show-size="1000"
                   color="info"
+                  :clearable="false"
                   counter
                   chips
                   accept="image/*"
