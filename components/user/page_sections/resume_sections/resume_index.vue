@@ -243,7 +243,7 @@ export default {
       this.use_regular_creator_when_upload = false
     },
     saveUpload() {
-      if (this.upload_file) {
+      if (this.upload_file && this.upload_file !== null) {
         if (this.$refs.resume_upload_form.validate(true)) {
           const formData = new FormData()
           formData.append('upload', this.upload_file)

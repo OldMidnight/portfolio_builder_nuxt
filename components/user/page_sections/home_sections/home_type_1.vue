@@ -165,7 +165,7 @@ export default {
       return validation
     },
     updateImgURL() {
-      if (this.upload_image) {
+      if (this.upload_image && this.upload_file !== null) {
         if (this.$refs.home_1_upload_form.validate(true)) {
           const formData = new FormData()
           const ext = this.upload_file.name.split('.')[

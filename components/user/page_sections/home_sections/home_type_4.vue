@@ -139,7 +139,7 @@ export default {
           '/uploads/user-content/' + this.options.input_dict_name
         )
       }
-      if (this.upload_image) {
+      if (this.upload_image && this.upload_file !== null) {
         if (this.$refs.cta_upload_form.validate(true)) {
           const formData = new FormData()
           const ext = this.upload_file.name.split('.')[

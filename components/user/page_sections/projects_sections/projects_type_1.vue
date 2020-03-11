@@ -175,7 +175,7 @@ export default {
       }
     },
     saveProject() {
-      if (this.temp_project.img.upload) {
+      if (this.temp_project.img.upload && this.upload_file !== null) {
         if (this.$refs.project_1_upload_form.validate(true)) {
           const formData = new FormData()
           const ext = this.upload_file.name.split('.')[
