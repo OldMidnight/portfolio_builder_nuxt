@@ -25,7 +25,7 @@ export default {
       leave-active-class="animated fadeOut faster"
       mode="out-in"
     >
-      <v-col v-if="checkStepCount(0)" key="0" cols="12" class="py-0 h-100 px-9">
+      <v-col v-if="checkStepCount(0)" key="0" cols="12" class="py-0 h-100 px-3">
         <div :class="`${isMobile ? 'w-100 h-5' : 'creation-step-header'}`">
           <p
             class="text-center ma-0"
@@ -35,7 +35,7 @@ export default {
           </p>
         </div>
 
-        <v-row v-if="!isMobile" align="center" class="h-90 w-100">
+        <v-row v-if="!isMobile" align="center" class="ma-0 h-90 w-100">
           <v-col
             v-for="(layout, index) in layouts"
             :id="'layout-' + index"

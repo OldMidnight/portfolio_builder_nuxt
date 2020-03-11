@@ -125,7 +125,7 @@ export default {
 </script>
 
 <template>
-  <v-row :class="`${isMobile ? 'h-100' : ''}`">
+  <v-row :class="`ma-0 ${isMobile ? 'h-100' : ''}`">
     <v-col v-if="!isMobile" cols="12" class="pa-0 h-100 w-100 d-flex">
       <div class="general-settings-container">
         <div
@@ -484,9 +484,9 @@ export default {
         </div>
       </div>
     </v-col>
-    <v-row v-else class="h-100 w-100">
+    <v-row v-else class="ma-0 h-100 w-100">
       <v-col cols="12" class="pt-0">
-        <v-row class="mx-9 h-100">
+        <v-row class="ma-0 mx-3 h-100">
           <v-col cols="12" class="pa-0 text-center">
             <span class="site-name font-weight-bold pb-1 info--text">
               {{ (user.domain + '.kreoh.com').toUpperCase() }}
@@ -503,7 +503,7 @@ export default {
                 <v-slide-item
                   v-for="(img, index) in m_website_images"
                   :key="`m-img-${index}`"
-                  class="pos-rel"
+                  class="pos-rel d-flex align-center justify-center"
                 >
                   <v-img
                     :class="
@@ -569,7 +569,6 @@ export default {
           <v-col cols="12" class="d-flex justify-space-around">
             <v-btn
               v-if="user.site_created"
-              outlined
               :class="`${$vuetify.theme.dark ? 'darkmode' : ''}`"
               color="info"
               to="/creator"
@@ -581,7 +580,6 @@ export default {
             <v-btn
               :disabled="!user.site_active || !user.email_confirmed"
               color="info"
-              outlined
               :href="user_domain"
               target="_blank"
               large
@@ -600,7 +598,6 @@ export default {
             <v-btn
               v-if="user.site_created"
               color="error"
-              outlined
               large
               @click.stop="website_delete_dialog = true"
             >

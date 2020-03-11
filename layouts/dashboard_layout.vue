@@ -155,7 +155,7 @@ export default {
         v-else
         :class="`ma-0 ${$vuetify.theme.dark ? '' : 'dashboard--gradient'}`"
       >
-        <v-col cols="12" class="border px-0 pb-0">
+        <v-col cols="12" class="px-0 pb-0">
           <nuxt />
         </v-col>
         <v-col cols="12" class="pa-0" style="height: 2% !important">

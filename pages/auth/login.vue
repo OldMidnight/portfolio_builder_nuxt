@@ -69,7 +69,7 @@ export default {
       label="Email"
       type="email"
       :rules="[rules.required, rules.email]"
-      class="auth-input"
+      class="w-90"
       outlined
     >
     </v-text-field>
@@ -84,7 +84,7 @@ export default {
         () => (!!password && password.length >= 8) || 'Min 8 characters',
         () => (!!password && password.length <= 25) || 'Max 25 characters'
       ]"
-      class="auth-input"
+      class="w-90"
       outlined
       @click:append="show_password = !show_password"
       @keyup.enter="validateInfo()"
@@ -101,7 +101,7 @@ export default {
     </v-btn>
     <v-flex class="mt-2 auth-link d-flex flex-column align-center">
       <span class="caption">New to Kreoh?</span>
-      <nuxt-link to="/auth/register" class="auth-link caption">
+      <nuxt-link to="/auth/register" class="caption">
         Create an account
       </nuxt-link>
     </v-flex>
@@ -113,13 +113,3 @@ export default {
     </v-snackbar>
   </v-form>
 </template>
-
-<style lang="scss" scoped>
-.auth-input {
-  width: 90%;
-}
-
-.auth-link {
-  color: #777;
-}
-</style>

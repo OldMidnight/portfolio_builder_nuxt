@@ -172,7 +172,7 @@ export default {
             ></v-progress-linear>
           </v-col>
         </v-row>
-        <v-row v-else class="h-100">
+        <v-row v-else class="ma-0 h-100">
           <v-col
             cols="12"
             :class="

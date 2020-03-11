@@ -284,12 +284,14 @@ export default {
       })
     },
     previewUpload(e) {
-      const reader = new FileReader()
-      reader.onload = () => {
-        this.validated_img_url = reader.result
-        this.temp_project.img.url = reader.result
+      if (e !== null && e !== undefined) {
+        const reader = new FileReader()
+        reader.onload = () => {
+          this.validated_img_url = reader.result
+          this.temp_project.img.url = reader.result
+        }
+        reader.readAsDataURL(e)
       }
-      reader.readAsDataURL(e)
     }
   }
 }

@@ -66,7 +66,7 @@ export default {
   >
     <v-row
       v-if="!$vuetify.breakpoint.smAndDown"
-      class="pricing--wrapper justify-center"
+      class="pricing--wrapper justify-center ma-0"
     >
       <v-col
         v-for="(plan, index) in price_plans"
@@ -81,7 +81,10 @@ export default {
         >
           <p class="font-weight-bold">Most Popular</p>
         </div>
-        <v-row align-content="start" class="pricing--item elevation-3 mx-1">
+        <v-row
+          align-content="start"
+          class="pricing--item elevation-3 ma-0 mx-1"
+        >
           <v-col
             cols="12"
             class="pricing--item-header d-flex flex-column align-center justify-center pa-0 my-5"
@@ -110,7 +113,7 @@ export default {
         </v-row>
       </v-col>
     </v-row>
-    <v-row v-else class="m-pricing--wrapper">
+    <v-row v-else class="m-pricing--wrapper ma-0">
       <v-col
         v-for="(plan, index) in price_plans"
         :key="index"

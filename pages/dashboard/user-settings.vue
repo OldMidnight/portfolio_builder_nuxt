@@ -320,7 +320,7 @@ export default {
           >
             Manage Uploads
           </span>
-          <v-row class="w-100 border-rounded elevation-2">
+          <v-row class="ma-0 w-100 rounded elevation-2">
             <v-col cols="12" class="">
               <v-progress-linear
                 background-color="error"
@@ -339,14 +339,14 @@ export default {
               </v-progress-linear>
             </v-col>
             <v-col cols="12" class="">
-              <v-row justify="center" align="center">
+              <v-row justify="center" align="center" class="ma-0">
                 <v-col
                   v-for="(upload, index) in userUploads"
                   :key="index"
                   cols="6"
                   class="border-rounded elevation-1"
                 >
-                  <v-row>
+                  <v-row class="ma-0">
                     <v-col cols="2" class="d-flex justify-center align-center">
                       <v-icon
                         v-if="upload_image_types.includes(upload.type)"
@@ -360,7 +360,7 @@ export default {
                       </v-icon>
                     </v-col>
                     <v-col cols="8">
-                      <v-row class="text-center">
+                      <v-row class="text-center ma-0">
                         <v-col cols="12" class="px-0 py-1">
                           <p><strong>File name:</strong> {{ upload.name }}</p>
                         </v-col>

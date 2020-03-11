@@ -217,18 +217,25 @@ export default {
       })
     },
     previewUpload(e) {
-      const reader = new FileReader()
-      reader.onload = () => {
-        this.validated_img_url = reader.result
+      console.log(e)
+      console.log(this.upload_file)
+      if (e !== null && e !== undefined) {
+        const reader = new FileReader()
+        reader.onload = () => {
+          this.validated_img_url = reader.result
+        }
+        reader.readAsDataURL(e)
       }
-      reader.readAsDataURL(e)
     }
   }
 }
 </script>
 
 <template>
-  <v-row id="call-to-action" class="component-layout h-100 w-100 pos-abs py-3">
+  <v-row
+    id="call-to-action"
+    class="ma-0 component-layout h-100 w-100 pos-abs py-3"
+  >
     <v-col
       :cols="$vuetify.breakpoint.smAndDown ? '12' : '6'"
       :class="
@@ -250,7 +257,7 @@ export default {
       :cols="$vuetify.breakpoint.smAndDown ? '12' : '6'"
       :class="`action--section ${$vuetify.breakpoint.smAndDown ? 'h-50' : ''}`"
     >
-      <v-row class="d-flex flex-column h-100">
+      <v-row class="ma-0 d-flex flex-column h-100">
         <v-col cols="9" class="content--section d-flex align-center">
           <editor-content :editor="editor" />
         </v-col>
@@ -381,7 +388,7 @@ export default {
                     placeholder="Learn More..."
                     outlined
                   ></v-text-field>
-                  <v-row class="d-flex">
+                  <v-row class="ma-0 d-flex">
                     <v-col
                       cols="7"
                       class="d-flex flex-column align-center justify-center"

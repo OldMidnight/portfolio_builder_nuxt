@@ -68,9 +68,9 @@ export default {
 </script>
 
 <template>
-  <v-row class="px-2">
+  <v-row class="ma-0 px-2">
     <v-col cols="12" class="messages--top-nav h-10 border-bottom">
-      <v-row class="h-100">
+      <v-row class="ma-0 h-100">
         <v-col cols="4" class="pa-0 d-flex align-center">
           <v-btn color="info" rounded class="mr-3" nuxt to="/dashboard">
             Back
@@ -85,7 +85,7 @@ export default {
       </v-row>
     </v-col>
     <v-col cols="12" class="messages--content h-90">
-      <v-row class="h-100">
+      <v-row class="ma-0 h-100">
         <v-col cols="3" class="">
           <p class="title mb-4">Your Messages</p>
           <div
@@ -151,7 +151,7 @@ export default {
               </p>
               <p style="white-space: pre-wrap">{{ selected_message.body }}</p>
             </div>
-            <v-row v-else>
+            <v-row v-else class="ma-0">
               <v-col cols="12" class="text-center">
                 <p class="font-weight-bold" style="font-size: 30px">
                   Send us a message!

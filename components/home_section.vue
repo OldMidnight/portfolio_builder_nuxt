@@ -90,7 +90,7 @@ export default {
 <template>
   <v-container v-scroll="changeNav" class="view-wrapper pa-0 ma-0">
     <v-row
-      class="top-nav d-flex"
+      class="top-nav d-flex ma-0"
       :class="{
         'top-nav-scrolled': nav_state,
         'm-top-nav': isMobile
@@ -104,7 +104,7 @@ export default {
           'nav--item': !isMobile
         }"
       >
-        <v-row class="item--container">
+        <v-row class="item--container ma-0">
           <v-col
             cols="12"
             class="item--logo-container pa-0 d-flex align-center ml-4 ml-md-auto pl-1 pl-md-9"
@@ -176,9 +176,9 @@ export default {
         </v-btn>
       </v-col>
     </v-row>
-    <v-row class="home--content" no-gutters>
+    <v-row class="home--content ma-0" no-gutters>
       <v-row
-        class="content--landing"
+        class="content--landing ma-0"
         :class="{ 'm-content--landing': isMobile }"
       >
         <transition appear appear-active-class="animated fadeIn" mode="out-in">
@@ -268,14 +268,14 @@ export default {
         </transition>
       </v-row>
       <v-row
-        class="content--value py-5"
+        class="content--value ma-0 py-5"
         :class="{ 'm-content--value': isMobile }"
       >
         <v-col cols="12" class="d-flex justify-center align-center pa-0 h-10">
           <p :style="{ fontSize: '40px' }" class="font-weight-bold">Features</p>
         </v-col>
         <v-col cols="12" class="pa-0 h-90">
-          <v-row class="h-100">
+          <v-row class="h-100 ma-0">
             <v-col
               cols="12"
               md="4"
@@ -314,7 +314,7 @@ export default {
                 'm-value--item-container': isMobile
               }"
             >
-              <v-row class="value--item">
+              <v-row class="value--item ma-0">
                 <v-col
                   cols="12"
                   class="value--item-img-container pa-0 d-flex justify-center align-center"
@@ -347,7 +347,7 @@ export default {
                 'm-value--item-container': isMobile
               }"
             >
-              <v-row class="value--item">
+              <v-row class="value--item ma-0">
                 <v-col
                   cols="12"
                   class="value--item-img-container pa-0 d-flex justify-center align-center"
@@ -377,7 +377,7 @@ export default {
         </v-col>
       </v-row>
       <v-row
-        class="content--preview pt-7"
+        class="content--preview pt-7 ma-0"
         :class="{ 'm-content--preview': isMobile }"
       >
         <v-col
@@ -558,7 +558,7 @@ export default {
         </v-col>
       </v-row>
       <v-row
-        class="content--pricing"
+        class="content--pricing ma-0"
         :class="{ 'm-content--pricing': isMobile }"
       >
         <v-col
@@ -596,7 +596,10 @@ export default {
           </v-btn>
         </v-col>
       </v-row>
-      <v-row class="content--about" :class="{ 'm-content--about': isMobile }">
+      <v-row
+        class="content--about ma-0"
+        :class="{ 'm-content--about': isMobile }"
+      >
         <v-col
           cols="12"
           md="6"
@@ -660,14 +663,17 @@ export default {
           </v-btn>
         </v-col>
       </v-row>
-      <v-row class="content--footer" :class="{ 'm-content--footer': isMobile }">
+      <v-row
+        class="content--footer ma-0"
+        :class="{ 'm-content--footer': isMobile }"
+      >
         <v-col
           cols="12"
           md="7"
           :style="{ height: isMobile ? '40%' : 'initial' }"
         >
           <v-row
-            class="footer--text-container white--text"
+            class="footer--text-container white--text ma-0"
             :class="{
               'm-footer--text-container': !isMobile
             }"
@@ -716,7 +722,7 @@ export default {
           md="5"
           class="pr-md-9"
         >
-          <v-row class="footer--logo-wrapper">
+          <v-row class="footer--logo-wrapper ma-0">
             <v-col
               cols="12"
               class="footer--logo-container pa-0"
@@ -724,7 +730,7 @@ export default {
                 'm-footer--logo-container': isMobile
               }"
             >
-              <v-row class="footer--logo-wrapper">
+              <v-row class="footer--logo-wrapper ma-0">
                 <v-col
                   cols="12"
                   class="pa-0 footer--logo-img d-flex justify-center align-center"
@@ -800,7 +806,7 @@ export default {
         <v-divider></v-divider>
         <v-card-text>
           <v-container>
-            <v-row>
+            <v-row class="ma-0">
               <v-col
                 cols="12"
                 class="d-flex flex-column align-center justify-center text-center"
@@ -850,7 +856,7 @@ export default {
                       Beta Program
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
-                      <v-row class="dialog--beta-container">
+                      <v-row class="dialog--beta-container ma-0">
                         <v-col
                           cols="12"
                           class="d-flex flex-column align-center"

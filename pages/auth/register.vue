@@ -110,7 +110,7 @@ export default {
       v-model="f_name"
       label="First Name"
       :rules="[rules.required]"
-      class="auth-input"
+      class="w-90"
       outlined
     >
     </v-text-field>
@@ -119,7 +119,7 @@ export default {
       v-model="s_name"
       label="Last Name"
       :rules="[rules.required]"
-      class="auth-input"
+      class="w-90"
       outlined
     >
     </v-text-field>
@@ -129,7 +129,7 @@ export default {
       label="Email"
       type="email"
       :rules="[rules.required, rules.email]"
-      class="auth-input"
+      class="w-90"
       outlined
     >
     </v-text-field>
@@ -144,7 +144,7 @@ export default {
         () => (!!password && password.length >= 8) || 'Min 8 characters',
         () => (!!password && password.length <= 25) || 'Max 25 characters'
       ]"
-      class="auth-input"
+      class="w-90"
       outlined
       @click:append="show_password = !show_password"
     >
@@ -158,7 +158,7 @@ export default {
         () => (!!domain && domain.length >= 3) || 'Min 3 characters',
         () => (!!domain && domain.length <= 20) || 'Max 20 characters'
       ]"
-      class="auth-input"
+      class="w-90"
       outlined
       @keyup.enter="validateForm()"
     >
@@ -174,7 +174,7 @@ export default {
     </v-btn>
     <v-flex class="mt-2 auth-link d-flex flex-column align-center">
       <span class="caption">Already have an account?</span>
-      <nuxt-link to="/auth/login" class="caption auth-link">Login</nuxt-link>
+      <nuxt-link to="/auth/login" class="caption">Login</nuxt-link>
     </v-flex>
     <v-snackbar v-model="registration_error" color="error">
       {{ response_msg }}
@@ -190,17 +190,3 @@ export default {
     </v-snackbar>
   </v-form>
 </template>
-
-<style lang="scss" scoped>
-.form-wrap {
-  width: 50%;
-}
-
-.auth-input {
-  width: 90%;
-}
-
-.auth-link {
-  color: #777;
-}
-</style>

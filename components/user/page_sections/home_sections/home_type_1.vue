@@ -234,12 +234,14 @@ export default {
       }
     },
     previewUpload(e) {
-      const reader = new FileReader()
-      reader.onload = () => {
-        this.validated_img_url = reader.result
-        this.upload_img_url = reader.result
+      if (e !== null && e !== undefined) {
+        const reader = new FileReader()
+        reader.onload = () => {
+          this.validated_img_url = reader.result
+          this.upload_img_url = reader.result
+        }
+        reader.readAsDataURL(e)
       }
-      reader.readAsDataURL(e)
     },
     scrollDown() {
       const el = document.getElementById('call-to-action')

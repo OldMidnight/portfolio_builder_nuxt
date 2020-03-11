@@ -214,7 +214,9 @@ export default {
     deleteSection(id) {
       this.available_sections.push(this.wizard_layout_list[id])
       // eslint-disable-next-line prettier/prettier
-      this.section_component[this.wizard_layout_list[id].name.toLowerCase() + '_component'] = null
+      this.section_component[
+        this.wizard_layout_list[id].name.toLowerCase() + '_component'
+      ] = null
       for (let i = 0; i < this.available_sections.length; i++) {
         this.available_sections[i].id = i
       }
@@ -288,7 +290,7 @@ export default {
       }
     },
     previewUpload(e) {
-      if (e !== null) {
+      if (e !== null && e !== undefined) {
         const reader = new FileReader()
         reader.onload = () => {
           this.temp_upload_url = reader.result
@@ -687,7 +689,7 @@ export default {
                     mandatory
                   >
                     <v-container>
-                      <v-row>
+                      <v-row class="ma-0">
                         <v-col
                           v-for="component in component_list(section.name)"
                           :key="component.id"
@@ -863,7 +865,7 @@ export default {
         <v-card-title>Upload your resume</v-card-title>
         <v-divider></v-divider>
         <v-card-text>
-          <v-row>
+          <v-row class="ma-0">
             <v-col cols="12">
               <p class="text-center">
                 Use the below box to upload your PDF.
