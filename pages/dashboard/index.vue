@@ -38,10 +38,10 @@ export default {
     },
     user_domain() {
       const url =
-        this.$axios.defaults.baseURL !== 'http://api.kreoh.com'
+        this.$axios.defaults.baseURL !== 'https://api.kreoh.com'
           ? '.localhost:3001/'
           : '.kreoh.com/'
-      return `http://${this.user.domain}${url}`
+      return `https://${this.user.domain}${url}`
     },
     m_website_images() {
       if (this.website_images.length === 3) {
