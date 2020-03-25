@@ -7,7 +7,7 @@ export default {
     }
   },
   created() {
-    this.$root.$on('showError', (ev) => {
+    this.$root.$on('showSuccess', (ev) => {
       this.message = ev.message
       this.model = true
     })
@@ -16,7 +16,7 @@ export default {
 </script>
 
 <template>
-  <v-snackbar v-model="model" bottom color="error">
+  <v-snackbar v-model="model" bottom color="success">
     {{ message }}
     <v-btn dark text @click="model = false">
       Close

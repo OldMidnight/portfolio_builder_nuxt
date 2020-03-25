@@ -9,8 +9,8 @@ export default {
           price: '0.00',
           special: false,
           features: [
-            'Access To All Layouts',
-            'Access To All Themes',
+            'Access To 3 Layouts',
+            'Access To 3 Themes',
             '100MB Storage',
             'Mobile Optimized Website',
             'Unlimited Bandwidth'
@@ -41,15 +41,14 @@ export default {
           features: [
             'Access To All Layouts',
             'Access To All Themes',
-            '300MB',
+            '300MB Storage',
             'Mobile Optimized Website',
             'Priority Response',
             'Feature Requests',
             'Unlimited Bandwidth',
-            'Temporary Site Add-On',
             'Automatic Site Backups (Monthly)',
-            'Connect Your Domain',
-            'Remove Kreoh Branding'
+            'Remove Kreoh Branding',
+            'Built-in visitor and interaction analytics'
           ]
         }
       ]
@@ -62,10 +61,10 @@ export default {
   <v-col
     cols="12"
     class="pricing--content"
-    :class="{ 'm-pricing--content': $vuetify.breakpoint.smAndDown }"
+    :class="{ 'm-pricing--content': $breakpoint.is.smAndDown }"
   >
     <v-row
-      v-if="!$vuetify.breakpoint.smAndDown"
+      v-if="!$breakpoint.is.smAndDown"
       class="pricing--wrapper justify-center ma-0"
     >
       <v-col
@@ -104,7 +103,7 @@ export default {
                 :key="f_index"
                 class="feature pa-2"
               >
-                <p style="font-size: 12px" class="font-weight-bold">
+                <p style="font-size: 16px" class="font-weight-bold">
                   {{ feature }}
                 </p>
               </div>
@@ -155,6 +154,7 @@ export default {
                     v-for="(feature, f_index) in plan.features"
                     :key="f_index"
                     class="my-3 font-weight-bold"
+                    style="font-size: 22px"
                   >
                     {{ feature }}
                   </p>

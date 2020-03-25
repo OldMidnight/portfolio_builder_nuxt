@@ -65,7 +65,7 @@ module.exports = {
   /*
    ** Plugins to load before mounting the App
    */
-  // plugins: ['~/plugins/axios'],
+  plugins: ['~/plugins/breakpoints', '~/plugins/axios'],
   /*
    ** Nuxt.js dev-modules
    */
@@ -95,8 +95,8 @@ module.exports = {
       }
     },
     plugins: [
-      { src: '~/plugins/auth.js', mode: 'client' }
-      // { src: '~/plugins/refAuth.js', mode: 'client' }
+      { src: '~/plugins/auth.js', mode: 'client' },
+      '~/plugins/redirect.js'
     ],
     strategies: {
       local: {
@@ -119,7 +119,8 @@ module.exports = {
       login: '/auth/login',
       home: '/dashboard',
       register: '/auth/register'
-    }
+    },
+    rewriteRedirects: true
   },
   /*
    ** Axios module configuration
@@ -169,9 +170,5 @@ module.exports = {
   pageTransition: {
     enterActiveClass: 'animated fadeIn faster',
     leaveActiveClass: 'animated fadeOut faster'
-  },
-  layoutTransition: {
-    enterActiveClass: 'animated fadeInUp',
-    leaveActiveClass: 'animated fadeOutUp'
   }
 }

@@ -84,9 +84,9 @@ export default {
         </v-col>
       </v-row>
     </v-col>
-    <v-col cols="12" class="messages--content h-90">
-      <v-row class="ma-0 h-100">
-        <v-col cols="3" class="">
+    <v-col cols="12" class="pos-rel pa-0 h-90">
+      <v-row class="ma-0 h-100 pos-abs w-100" align="center">
+        <v-col cols="3" class="h-95 ovfl-y my-2">
           <p class="title mb-4">Your Messages</p>
           <div
             v-for="(message, index) in messages"
@@ -122,7 +122,7 @@ export default {
             </v-hover>
           </div>
         </v-col>
-        <v-col cols="9" class="border-rounded elevation-1">
+        <v-col cols="9" class="border-rounded elevation-1 h-95">
           <transition
             enter-active-class="animated fadeIn faster"
             leave-active-class="animated fadeOut faster"
@@ -142,11 +142,14 @@ export default {
               <p class="font-weight-bold border-bottom" style="font-size: 30px">
                 {{ selected_message.subject }}
               </p>
-              <p class="font-weight-bold" style="font-size: 12px">
+              <p class="font-weight-bold my-2" style="font-size: 12px">
                 Sender: {{ selected_message.sender }} -
                 {{ selected_message.address }}
               </p>
-              <p class="font-weight-bold border-bottom" style="font-size: 12px">
+              <p
+                class="font-weight-bold border-bottom my-2"
+                style="font-size: 12px"
+              >
                 {{ selected_message.time_sent }}
               </p>
               <p style="white-space: pre-wrap">{{ selected_message.body }}</p>

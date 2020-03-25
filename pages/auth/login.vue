@@ -1,5 +1,4 @@
 <script>
-import { mapState, mapActions } from 'vuex'
 export default {
   name: 'Login',
   transitions: {
@@ -23,29 +22,38 @@ export default {
           return pattern.test(value) || 'Invalid e-mail.'
         }
       },
-      formHasErrors: false,
       from_path: '/',
-      login_fail: false,
-      loginFormValid: true,
       loading: false
     }
   },
-  computed: {
-    user() {
-      return {
-        email: this.email,
-        password: this.password
-      }
-    },
-    ...mapState('user_auth', ['status'])
-  },
   methods: {
-    ...mapActions('user_auth', ['login']),
-    validateInfo() {
+    async validateInfo() {
+      this.loading = true
       if (this.$refs.loginForm.validate()) {
-        this.loading = true
-        this.login(this.user)
+        const { data } = await this.$axios
+          .post('/auth/login', { email: this.email, password: this.password })
+          .catch((e) => {
+            const error = JSON.parse(JSON.stringify(e))
+            return error.response
+          })
+        if (data.error) {
+          this.$root.$emit('showError', { message: data.message })
+        } else if (!data.error) {
+          this.$auth.setToken('local', 'Bearer ' + data.access_token)
+          this.$auth.setRefreshToken('local', data.refresh_token)
+          this.$axios.setHeader('Authorization', 'Bearer ' + data.access_token)
+          this.$auth.ctx.app.$axios.setHeader(
+            'Authorization',
+            'Bearer ' + data.access_token
+          )
+          const user = await this.$axios.$get('/auth/user')
+          this.$auth.setUser(user)
+          this.$router.push('/dashboard')
+        } else {
+          this.$root.$emit('showError', { message: data.message })
+        }
       }
+      this.loading = false
     }
   },
   head() {
@@ -59,8 +67,11 @@ export default {
 <template>
   <v-form
     ref="loginForm"
-    v-model="loginFormValid"
-    class="pa-2 d-flex flex-column align-center"
+    :class="
+      `pa-2 ${
+        $breakpoint.is.smAndDown ? '' : 'w-20 elevation-1'
+      } d-flex flex-column align-center text-center rounded`
+    "
   >
     <span class="headline mb-4">Login</span>
     <v-text-field
@@ -99,17 +110,12 @@ export default {
     >
       Submit
     </v-btn>
-    <v-flex class="mt-2 auth-link d-flex flex-column align-center">
+    <v-col cols="12" class="auth-link d-flex flex-column align-center">
       <span class="caption">New to Kreoh?</span>
       <nuxt-link to="/auth/register" class="caption">
         Create an account
       </nuxt-link>
-    </v-flex>
-    <v-snackbar v-model="login_fail" color="error">
-      Incorrect email or password.
-      <v-btn icon @click="login_fail = false">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-snackbar>
+      <nuxt-link to="/" class="caption">Forgot password?</nuxt-link>
+    </v-col>
   </v-form>
 </template>

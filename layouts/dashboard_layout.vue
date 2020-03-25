@@ -1,6 +1,9 @@
 <script>
+import Error from '@/components/helpers/error_component'
+import Success from '@/components/helpers/success_component'
 export default {
   name: 'DashboardLayout',
+  components: { Error, Success },
   async fetch({ store, $axios }) {
     const {
       site_not_created: siteNotCreated,
@@ -13,25 +16,36 @@ export default {
   data() {
     return {
       links: ['Home', 'About Us', 'Team', 'Services', 'Blog', 'Contact Us'],
-      site_screenshot: '',
       menu_drawer: null,
-      isMobile: false
+      showConfirmEmail: false,
+      verifyLoading: false
     }
   },
   beforeMount() {
     this.$vuetify.theme.dark = this.$auth.user.dark_mode
   },
   mounted() {
-    this.isMobile = this.$vuetify.breakpoint.smAndDown
+    if (!this.$auth.user.email_confirmed) {
+      this.showConfirmEmail = true
+    }
   },
   methods: {
-    logout() {
-      this.$auth.logout()
-    },
     async toggleDarkMode() {
       this.$vuetify.theme.dark = !this.$auth.user.dark_mode
       await this.$axios.$put('/helpers/toggle_dark_mode')
       this.$auth.fetchUser()
+    },
+    async resendVerification() {
+      this.verifyLoading = true
+      const { data } = await this.$axios.post('/u/email_verify').catch((e) => {
+        const error = JSON.parse(JSON.stringify(e))
+        return error.response
+      })
+      this.verifyLoading = false
+      this.showConfirmEmail = false
+      this.$root.$emit(data.error ? 'showError' : 'showSuccess', {
+        message: data.message
+      })
     }
   }
 }
@@ -39,7 +53,7 @@ export default {
 
 <template>
   <v-app>
-    <v-app-bar v-if="isMobile" class="px-2" app inverted-scroll>
+    <v-app-bar v-if="$breakpoint.is.smAndDown" class="px-2" app inverted-scroll>
       <v-app-bar-nav-icon
         @click.stop="menu_drawer = !menu_drawer"
       ></v-app-bar-nav-icon>
@@ -66,7 +80,7 @@ export default {
     </v-app-bar>
     <client-only placeholder="Loading Dashboard...">
       <v-row
-        v-if="!isMobile"
+        v-if="!$breakpoint.is.smAndDown"
         :class="
           `w-100 h-100 ma-0 dashboard-container pos-rel justify-center ${
             $vuetify.theme.dark ? '' : 'dashboard--gradient'
@@ -117,9 +131,10 @@ export default {
                   color="error"
                   small
                   outlined
-                  class="mx-2 "
+                  class="mx-2"
+                  nuxt
+                  to="/auth/logout"
                   v-on="on"
-                  @click.stop="logout()"
                 >
                   <v-icon>mdi-power</v-icon>
                 </v-btn>
@@ -168,7 +183,7 @@ export default {
       </v-row>
     </client-only>
     <v-navigation-drawer
-      v-if="isMobile"
+      v-if="$breakpoint.is.smAndDown"
       v-model="menu_drawer"
       app
       bottom
@@ -301,6 +316,21 @@ export default {
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
+    <Error />
+    <Success />
+    <v-snackbar v-model="showConfirmEmail" multi-line color="info" :timeout="0">
+      Check Your email to activate your account.
+      <v-btn
+        color="success"
+        :loading="verifyLoading"
+        @click="resendVerification()"
+      >
+        Resend Link
+      </v-btn>
+      <v-btn icon @click="showConfirmEmail = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
     <!-- <script type="text/javascript">
       var _paq = window._paq || []
       /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
@@ -319,10 +349,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.test {
-  border: 1px solid red;
-}
-
 .dashboard-wrapper {
   padding: 0 !important;
 }

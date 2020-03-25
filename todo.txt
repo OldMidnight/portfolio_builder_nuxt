@@ -38,3 +38,7 @@ TODO Make each site tab have its own page index tracking (Completed 21/01/2020)
       22/01/2020 - START
 
 TODO Split common creator and editor methods and data into mixins (Completed 31/01/2020)
+
+
+TODO MAke sure site_disabed page redirects if site is not disabled.
+TODO fix image hosting on home page.

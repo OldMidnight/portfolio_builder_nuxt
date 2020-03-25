@@ -40,38 +40,30 @@ export function normalizePath(path = '') {
   return result
 }
 
-export default function(ctx) {
+export default function({ route, $auth }) {
   // if (!process.client) {
   //   return
   // }
   // Disable middleware if options: { auth: false } is set on the route
-  if (routeOption(ctx.route, 'auth', false)) {
+  if (routeOption(route, 'auth', false)) {
     return
   }
 
   // Disable middleware if no route was matched to allow 404/error page
   const matches = []
-  const Components = getMatchedComponents(ctx.route, matches)
+  const Components = getMatchedComponents(route, matches)
   if (!Components.length) {
     return
   }
 
-  const { login, register } = ctx.$auth.options.redirect
-  const pageIsInGuestMode = routeOption(ctx.route, 'auth', 'guest')
-  const insidePage = (page) =>
-    normalizePath(ctx.route.path) === normalizePath(page)
-  if (ctx.$auth.$state.loggedIn) {
+  const { login, register } = $auth.options.redirect
+  const insidePage = (page) => normalizePath(route.path) === normalizePath(page)
+  if ($auth.$state.loggedIn) {
     // -- Authorized --
-    if (
-      !login ||
-      insidePage(login) ||
-      !register ||
-      insidePage(register) ||
-      pageIsInGuestMode
-    ) {
-      ctx.$auth.redirect('home')
+    if (!login || insidePage(login) || !register || insidePage(register)) {
+      $auth.redirect('home')
     }
-  } else if (!pageIsInGuestMode && (!register || !insidePage(register))) {
-    ctx.$auth.redirect('login')
+  } else if (!register || !insidePage(register)) {
+    $auth.redirect('login')
   }
 }

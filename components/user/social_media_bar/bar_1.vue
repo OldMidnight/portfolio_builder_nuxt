@@ -133,7 +133,7 @@ export default {
       width="700"
       persistent
       scrollable
-      :fullscreen="$vuetify.breakpoint.smAndDown"
+      :fullscreen="$breakpoint.is.smAndDown"
     >
       <v-card>
         <v-card-title>Edit Social Media Bar</v-card-title>

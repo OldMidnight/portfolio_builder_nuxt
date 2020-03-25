@@ -7,8 +7,9 @@ export const state = () => ({
       leaveActiveClass: 'fadeOut'
     },
     favicon: {
-      use: false,
-      link: null
+      link: true,
+      upload: false,
+      url: '/favicon.ico'
     },
     layout: null,
     navigation: 0,
@@ -212,6 +213,7 @@ export const state = () => ({
   },
   show_next_step: false,
   images_to_upload: [],
+  favicon_to_upload: null,
   project_images_to_upload: [],
   files_to_upload: [],
   user_uploads: [],
@@ -557,8 +559,8 @@ export const mutations = {
     state.site_props.resume_page_inputs.resume_created = true
     state.site_props.resume_page_inputs.resume_layout = payload.layout
   },
-  setFavicon(state, payload) {
-    state.site_props.favicon = payload
+  setFavicon(state, { favicon }) {
+    state.site_props.favicon = favicon
   },
   saveSocialBar(state, payload) {
     state.site_props.social_media_bar = payload.btns
@@ -573,9 +575,6 @@ export const mutations = {
     state.callToActionURL = payload.value
   },
   addImageToUpload(state, payload) {
-    /*
-    Adds an object of data to an array of files to upload
-    */
     const images = state.images_to_upload.filter((img) => {
       return img.url === payload.img_data.url
     })
@@ -584,9 +583,6 @@ export const mutations = {
     }
   },
   addProjectImageToUpload(state, payload) {
-    /*
-    Adds an object of data to an array of files to upload
-    */
     const images = state.project_images_to_upload.filter((img) => {
       return img.url === payload.img_data.url
     })
@@ -595,9 +591,6 @@ export const mutations = {
     }
   },
   addFileToUpload(state, payload) {
-    /*
-    Adds a file to an array of file to be uploaded
-    */
     const files = state.files_to_upload.filter((file) => {
       return file.type === payload.file.type
     })
@@ -640,27 +633,34 @@ export const mutations = {
 }
 
 export const actions = {
-  async registerWebsite(context) {
-    await this.$axios
-      .$post('/create/register_site', {
-        site_props: JSON.stringify(context.state.site_props)
+  async handleWebsite({ state, commit }, { type }) {
+    const { data } = await this.$axios
+      .post(`/create/${type}_site`, {
+        site_props: JSON.stringify(state.site_props)
       })
-      .then(async () => {
-        await this.$axios.$get('/uploads/screenshot/grab')
-        context.commit('resetCreationStep')
-        this.$router.push({ path: '/dashboard' })
+      .catch((e) => {
+        const error = JSON.parse(JSON.stringify(e))
+        return error.response
       })
-  },
-  async updateWebsite(context) {
-    await this.$axios
-      .$post('/create/update_site', {
-        site_props: JSON.stringify(context.state.site_props)
-      })
-      .then(async () => {
-        await this.$axios.$get('/uploads/screenshot/grab')
-        context.commit('resetCreationStep')
-        this.$router.push({ path: '/dashboard' })
-      })
+    this._vm.$emit(
+      data.error ? 'showError' : !data.error ? 'showSuccess' : 'showError',
+      { message: data.message }
+    )
+    if (!data.error) {
+      const { data } = await this.$axios
+        .$get('/uploads/screenshot/grab')
+        .catch((e) => {
+          const error = JSON.parse(JSON.stringify(e))
+          return error.response
+        })
+      this._vm.$emit(
+        data.error ? 'showError' : !data.error ? 'showSuccess' : 'showError',
+        { message: data.message }
+      )
+      commit('resetCreationStep')
+      this.$router.push({ path: '/dashboard' })
+    }
+    return true
   },
   async uploadFiles(context) {
     const config = {
@@ -703,12 +703,20 @@ export const actions = {
       })
     }
   },
-  async fetchUserUploads(context) {
-    const { uploads, storage } = await this.$axios.$get('/uploads/')
-    context.commit('setUserUploads', {
-      uploads,
-      storage
+  async fetchUserUploads(context, { root }) {
+    const { data } = await this.$axios.get('/uploads/').catch((e) => {
+      const error = JSON.parse(JSON.stringify(e))
+      return error.response
     })
+    if (data.error) {
+      root.$emit('showError', { message: data.message })
+    }
+    if (!data.error) {
+      context.commit('setUserUploads', {
+        uploads: data.uploads,
+        storage: data.storage
+      })
+    }
   }
 }
 

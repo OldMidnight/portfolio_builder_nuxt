@@ -84,7 +84,7 @@ export default {
       return this.site_props[this.options.input_dict_name].img_props
     },
     avatar_size() {
-      if (this.$vuetify.breakpoint.smAndDown) {
+      if (this.$breakpoint.is.smAndDown) {
         return '190'
       } else if (this.$vuetify.breakpoint.md) {
         return '160'
@@ -283,7 +283,7 @@ export default {
             'has-border':
               site_props.text_border_color &&
               site_props.selected_theme === null,
-            'img-blur': $vuetify.breakpoint.smAndDown
+            'img-blur': $breakpoint.is.smAndDown
           }"
           class="user-hero-image elevation-2 editable"
           :contain="img_props.contain"
@@ -293,7 +293,7 @@ export default {
           @mouseout="edit_img_tooltip = false"
         >
         </v-img>
-        <div v-if="$vuetify.breakpoint.smAndDown" class="pos-abs w-100">
+        <div v-if="$breakpoint.is.smAndDown" class="pos-abs w-100">
           <v-btn color="info" @click="img_dialog = true">
             <v-icon class="mr-1">mdi-pencil</v-icon>Edit
           </v-btn>
@@ -326,7 +326,7 @@ export default {
     <v-dialog
       v-model="img_dialog"
       width="500"
-      :fullscreen="$vuetify.breakpoint.smAndDown"
+      :fullscreen="$breakpoint.is.smAndDown"
     >
       <v-card>
         <v-card-title>Edit Image</v-card-title>

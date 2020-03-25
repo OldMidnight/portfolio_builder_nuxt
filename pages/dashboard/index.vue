@@ -5,26 +5,27 @@ export default {
   name: 'Dashboard',
   layout: 'dashboard_layout',
   components: { Feedback },
+  async asyncData({ $axios }) {
+    const { messages } = await $axios.$get('/u/status')
+    return {
+      messages,
+      prev_messages: messages.slice(0, 3)
+    }
+  },
   data() {
     return {
-      delete_error: false,
-      delete_success: false,
-      delete_msg: {},
-      temp_messages: [],
-      default_images: ['Home', 'Projects', 'Resume'],
       account_types: {
         0: { title: 'Free', price: '0.00' },
         1: { title: 'Premium', price: '5.00' },
         4: { title: 'Beta Tester', price: '0.00' }
       },
       website_delete_dialog: false,
-      emailNotConfirmed: false,
       messages: [],
       prev_messages: [],
-      activation_resent: false,
       website_images: [],
       slideshow_interval: null,
-      slideshow_index: 0
+      slideshow_index: 0,
+      deleteLoading: false
     }
   },
   computed: {
@@ -42,9 +43,6 @@ export default {
           : '.kreoh.com/'
       return `http://${this.user.domain}${url}`
     },
-    isMobile() {
-      return this.$vuetify.breakpoint.smAndDown
-    },
     m_website_images() {
       if (this.website_images.length === 3) {
         return [this.website_images[this.slideshow_index]]
@@ -61,21 +59,6 @@ export default {
         this.slideshow_index += 1
       }
     }, 4500)
-    this.emailNotConfirmed = !this.user.email_confirmed
-    this.$axios.$get('/u/status').then((response) => {
-      if (!response.email_confirmed) {
-        this.emailNotConfirmed = true
-      }
-      this.messages = response.messages
-    })
-    if (this.messages.length <= 2) {
-      this.prev_messages = this.messages
-    } else {
-      this.prev_messages = this.messages.slice(
-        this.messages.length - 2,
-        this.messages.length
-      )
-    }
   },
   mounted() {
     this.updateStats()
@@ -95,25 +78,19 @@ export default {
       updateStats: 'dashboard/updateStats'
     }),
     async deleteSite() {
-      await this.$axios
-        .$post('/helpers/delete_site', { domain: this.user.domain })
-        .then((response) => {
-          this.delete_msg = response.message
-          this.delete_success = true
+      this.deleteLoading = true
+      const { data } = await this.$axios
+        .post('/helpers/delete_site', { domain: this.user.domain })
+        .catch((e) => {
+          const error = JSON.parse(JSON.stringify(e))
+          return error.response
         })
-        .catch(() => {
-          this.delete_msg = 'Website could not be deleted.'
-          this.delete_error = true
-        })
+      this.deleteLoading = false
       this.website_delete_dialog = false
+      this.$root.$emit(data.error ? 'showError' : 'showSuccess', {
+        message: data.message
+      })
       this.$auth.fetchUser()
-    },
-    async resendVerification() {
-      await this.$axios.$post('/u/email_verify')
-      this.activation_resent = true
-    },
-    openMessage(id) {
-      this.$router.push({ path: `/dashboard/message-center?id=${id}` })
     }
   },
   head() {
@@ -125,8 +102,12 @@ export default {
 </script>
 
 <template>
-  <v-row :class="`ma-0 ${isMobile ? 'h-100' : ''}`">
-    <v-col v-if="!isMobile" cols="12" class="pa-0 h-100 w-100 d-flex">
+  <v-row :class="`ma-0 ${$breakpoint.is.smAndDown ? 'h-100' : ''}`">
+    <v-col
+      v-if="!$breakpoint.is.smAndDown"
+      cols="12"
+      class="pa-0 h-100 w-100 d-flex"
+    >
       <div class="general-settings-container">
         <div
           :class="
@@ -144,7 +125,7 @@ export default {
           >
             <div>
               <v-icon class="gen-setting--icon" color="success">
-                mdi-settings
+                mdi-cogs
               </v-icon>
               <span class="font-weight-bold">Settings</span>
             </div>
@@ -154,17 +135,17 @@ export default {
                 color="info"
                 small
                 nuxt
+                depressed
                 to="/dashboard/site-settings"
-                outlined
               >
                 Site Setings
               </v-btn>
               <v-btn
                 class="my-1 gen-setting-btn--border"
                 color="info"
-                outlined
                 small
                 nuxt
+                depressed
                 to="/dashboard/user-settings"
               >
                 User Setings
@@ -189,7 +170,7 @@ export default {
               class="messages-preview py-2 d-flex flex-column align-center justify-center"
             >
               <nuxt-link
-                v-for="(message, index) in messages"
+                v-for="(message, index) in prev_messages"
                 :key="`msg-${index}`"
                 :class="
                   `messages-container my-1 ${
@@ -216,7 +197,7 @@ export default {
                     <div
                       class="message-icon d-flex flex-column justify-center align-center"
                     >
-                      <v-icon large color="info">
+                      <v-icon large color="#90CAF9">
                         mdi-{{ message.read ? 'email-open' : 'email' }}
                       </v-icon>
                     </div>
@@ -224,11 +205,11 @@ export default {
                 </v-hover>
               </nuxt-link>
               <v-btn
-                class="messages-container my-1 w-auto"
-                color="info"
-                outlined
+                class="mt-4 messages-container w-80"
+                color="success"
                 nuxt
                 small
+                depressed
                 to="/dashboard/message-center?support=true"
               >
                 <span>
@@ -249,8 +230,8 @@ export default {
               class="align-self-center gen-setting-btn--border my-2"
               color="info"
               small
-              outlined
               nuxt
+              depressed
               to="/dashboard/message-center"
             >
               Messages
@@ -282,10 +263,10 @@ export default {
               &euro; {{ user ? account_types[user.account_type].price : '' }}
             </span>
             <v-btn
+              depressed
               disabled
               color="info"
               small
-              outlined
               class="gen-setting-btn--border"
             >
               {{ user.account_type === 0 ? 'Upgrade' : 'Manage' }}
@@ -772,6 +753,7 @@ export default {
                 class="mt-3"
                 color="error"
                 outlined
+                :loading="deleteLoading"
                 @click.stop="deleteSite()"
               >
                 <v-icon>mdi-delete</v-icon> Delete My Website
@@ -789,31 +771,6 @@ export default {
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-snackbar v-model="delete_error" color="error">
-      Error: Site Could Not Be Deleted!
-      <v-btn icon @click="delete_error = false">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-snackbar>
-    <v-snackbar v-model="delete_success" color="success">
-      Website Deleted
-      <v-btn icon @click="delete_success = false">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-snackbar>
-    <v-snackbar v-model="emailNotConfirmed" color="info">
-      Check Your email to activate your account.
-      <v-btn color="success" @click="resendVerification()">Resend Link</v-btn>
-      <v-btn icon @click="emailNotConfirmed = false">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-snackbar>
-    <v-snackbar v-model="activation_resent" color="success">
-      Account verification link has been resent!
-      <v-btn icon @click="activation_resent = false">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-snackbar>
   </v-row>
 </template>
 
@@ -821,15 +778,12 @@ export default {
 .general-settings-container {
   width: 22%;
   height: 100%;
-  // border-right: 1px solid #e6e6e6;
   overflow: auto;
 }
 
 .general-settings-wrapper {
-  // position: absolute;
   background-color: #eceff1;
   height: 100%;
-  // overflow: auto;
 }
 
 .gen-setting-item {
@@ -851,7 +805,6 @@ export default {
 }
 
 .messages {
-  // min-height: 500px;
   max-height: 500px;
   overflow: auto;
 }
@@ -879,13 +832,11 @@ export default {
 .site-stat {
   width: 100%;
   height: 100%;
-  // background-color: #fafafa;
   border-radius: 20px;
 }
 
 .site-name {
   font-size: 24px;
-  // height: 7%;
 }
 
 .website-container {
@@ -910,7 +861,6 @@ export default {
 .website-actions-container {
   height: 10%;
   width: 70%;
-  // border: 1px solid #e6e6e6;
 }
 
 .v-sheet--offset {
@@ -932,7 +882,7 @@ export default {
 }
 
 .message {
-  // height: 100%;
+  height: 100%;
   width: 100%;
   border-radius: 5px;
   cursor: pointer;

@@ -52,47 +52,48 @@ export const mutations = {
 
 export const actions = {
   async updateStats({ commit }) {
-    await this.$axios.$get('/stats/fetch_hourly').then((response) => {
-      commit('updateStatsData', {
-        type: 'hourly',
-        total: response.total,
-        autodraw: true,
-        data: response.values,
-        labels: response.labels,
-        highest: response.highest
-      })
+    const {
+      cta_stats: ctaStats,
+      hourly_stats: hourlyStats,
+      weekly_stats: weeklyStats,
+      monthly_stats: monthlyStats
+    } = await this.$axios.$get('/stats/fetch_stats')
+    commit('updateStatsData', {
+      type: 'hourly',
+      total: hourlyStats.total,
+      autodraw: true,
+      data: hourlyStats.values,
+      labels: hourlyStats.labels,
+      highest: hourlyStats.highest
     })
-    await this.$axios.$get('/stats/fetch_weekly').then((response) => {
-      commit('updateStatsData', {
-        type: 'weekly',
-        total: response.total,
-        autodraw: true,
-        data: response.values,
-        labels: response.labels,
-        highest: response.highest,
-        last_visitor_time: response.last_visitor_time
-      })
+
+    commit('updateStatsData', {
+      type: 'weekly',
+      total: weeklyStats.total,
+      autodraw: true,
+      data: weeklyStats.values,
+      labels: weeklyStats.labels,
+      highest: weeklyStats.highest,
+      last_visitor_time: weeklyStats.last_visitor_time
     })
-    await this.$axios.$get('/stats/fetch_monthly').then((response) => {
-      commit('updateStatsData', {
-        type: 'monthly',
-        total: response.total,
-        autodraw: true,
-        data: response.values,
-        labels: response.labels,
-        highest: response.highest
-      })
+
+    commit('updateStatsData', {
+      type: 'monthly',
+      total: monthlyStats.total,
+      autodraw: true,
+      data: monthlyStats.values,
+      labels: monthlyStats.labels,
+      highest: monthlyStats.highest
     })
-    await this.$axios.$get('/stats/fetch_cta_inter').then((response) => {
-      commit('updateStatsData', {
-        type: 'cta_inter',
-        total: response.total,
-        autodraw: true,
-        data: response.values,
-        labels: response.labels,
-        highest: response.highest,
-        last_visitor_time: response.last_visitor_time
-      })
+
+    commit('updateStatsData', {
+      type: 'cta_inter',
+      total: ctaStats.total,
+      autodraw: true,
+      data: ctaStats.values,
+      labels: ctaStats.labels,
+      highest: ctaStats.highest,
+      last_visitor_time: ctaStats.last_visitor_time
     })
   }
 }

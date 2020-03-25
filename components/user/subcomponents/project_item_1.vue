@@ -74,22 +74,19 @@ export default {
     :style="[check_custom_style]"
     :class="{
       'matrix-border': site_props.selected_theme === 2,
-      'd-flex flex-column justify-center align-center':
-        $vuetify.breakpoint.smAndDown
+      'd-flex flex-column justify-center align-center': $breakpoint.is.smAndDown
     }"
     class="pos-rel w-100 mb-2 mx-auto"
   >
     <v-flex
       v-if="img.use"
       :class="
-        `pa-2 ${
-          $vuetify.breakpoint.smAndDown ? 'w-50' : 'd-flex align-center w-25'
-        }`
+        `pa-2 ${$breakpoint.is.smAndDown ? 'w-50' : 'd-flex align-center w-25'}`
       "
     >
       <v-img
         class="project-img"
-        :style="{ opacity: $vuetify.breakpoint.smAndDown ? '0.5' : '1' }"
+        :style="{ opacity: $breakpoint.is.smAndDown ? '0.5' : '1' }"
         :src="img.url"
         :contain="img.contain"
         lazy-src="/img_lazy.jpeg"
@@ -98,7 +95,7 @@ export default {
     <v-flex
       class="d-flex flex-column project-content-container my-3 pa-2"
       :class="{
-        'm-project-content-container text-center': $vuetify.breakpoint.smAndDown
+        'm-project-content-container text-center': $breakpoint.is.smAndDown
       }"
     >
       <v-flex
@@ -112,7 +109,7 @@ export default {
         </p>
         <v-divider v-if="link.use"></v-divider>
         <v-btn
-          v-if="link.use && $vuetify.breakpoint.smAndDown"
+          v-if="link.use && $breakpoint.is.smAndDown"
           color="info"
           class="caption mt-1 project-link-btn"
         >
@@ -124,7 +121,7 @@ export default {
       </v-flex>
     </v-flex>
     <v-btn
-      :class="`px-3 ${$vuetify.breakpoint.smAndDown ? 'pos-abs top-0' : ''}`"
+      :class="`px-3 ${$breakpoint.is.smAndDown ? 'pos-abs top-0' : ''}`"
       color="info"
       @click.stop="editProject()"
     >

@@ -17,7 +17,11 @@ export default {
   <v-row
     justify="center"
     align="center"
-    :class="`${isMobile ? 'h-90 pos-rel' : 'h-100'} w-100 px-md-9 py-md-5 ma-0`"
+    :class="
+      `${
+        $breakpoint.is.smAndDown ? 'h-90 pos-rel' : 'h-100'
+      } w-100 px-md-9 py-md-5 ma-0`
+    "
   >
     <transition
       appear
@@ -26,16 +30,24 @@ export default {
       mode="out-in"
     >
       <v-col v-if="checkStepCount(0)" key="0" cols="12" class="py-0 h-100 px-3">
-        <div :class="`${isMobile ? 'w-100 h-5' : 'creation-step-header'}`">
+        <div
+          :class="
+            `${$breakpoint.is.smAndDown ? 'w-100 h-5' : 'creation-step-header'}`
+          "
+        >
           <p
             class="text-center ma-0"
-            :style="{ fontSize: isMobile ? '' : '36px' }"
+            :style="{ fontSize: $breakpoint.is.smAndDown ? '' : '36px' }"
           >
-            {{ isMobile ? 'Swipe and' : '' }} Select a layout!
+            {{ $breakpoint.is.smAndDown ? 'Swipe and' : '' }} Select a layout!
           </p>
         </div>
 
-        <v-row v-if="!isMobile" align="center" class="ma-0 h-90 w-100">
+        <v-row
+          v-if="!$vuetify.breakpoint.smAndDownbile"
+          align="center"
+          class="ma-0 h-90 w-100"
+        >
           <v-col
             v-for="(layout, index) in layouts"
             :id="'layout-' + index"
@@ -110,7 +122,7 @@ export default {
       </v-col>
 
       <v-col
-        v-else-if="checkStepCount(1) && isMobile"
+        v-else-if="checkStepCount(1) && $breakpoint.is.smAndDown"
         key="1"
         cols="12"
         class="pa-0 h-100 main-light-theme"
@@ -358,7 +370,7 @@ export default {
       </v-col>
 
       <v-row
-        v-else-if="checkStepCount(1) && !isMobile"
+        v-else-if="checkStepCount(1) && !$breakpoint.is.smAndDown"
         key="2"
         justify="center"
         class="h-100 w-100 ma-0"
@@ -1322,27 +1334,33 @@ export default {
             <div
               :class="
                 `${
-                  isMobile ? 'w-90' : 'w-40'
+                  $breakpoint.is.smAndDown ? 'w-90' : 'w-40'
                 } d-flex flex-column align-center justify-center text-center`
               "
             >
               <p class="subtitle-1 font-weight-bold">Info</p>
-              <p :class="`${isMobile ? 'caption' : ''}`">
+              <p :class="`${$breakpoint.is.smAndDown ? 'caption' : ''}`">
                 Your site name is what appears in a tab when it is opened.
               </p>
-              <p :class="`${isMobile ? 'caption' : ''}`">
+              <p :class="`${$breakpoint.is.smAndDown ? 'caption' : ''}`">
                 The structure of your kreoh site name will be the text you
                 entered above followed by the name of the current tab. These are
                 separated by a hyphen.
               </p>
-              <p :class="`${isMobile ? 'caption' : ''} font-weight-bold`">
+              <p
+                :class="
+                  `${
+                    $breakpoint.is.smAndDown ? 'caption' : ''
+                  } font-weight-bold`
+                "
+              >
                 See below for a preview
               </p>
             </div>
             <v-row
               :class="
                 `creation-name--preview ${
-                  isMobile ? 'w-90' : 'w-60'
+                  $breakpoint.is.smAndDown ? 'w-90' : 'w-60'
                 } ma-0 elevation-1 mt-md-4`
               "
             >
@@ -1594,7 +1612,7 @@ export default {
       </v-toolbar>
     </transition>
     <v-btn
-      v-if="checkStepCount(1) && isMobile"
+      v-if="checkStepCount(1) && $breakpoint.is.smAndDown"
       color="success"
       class="pos-abs bottom-0 w-100"
       @click="show_tools_drawer = true"
@@ -1602,7 +1620,7 @@ export default {
       <v-icon class="mr-2">mdi-cogs</v-icon>Tools
     </v-btn>
     <v-navigation-drawer
-      v-if="isMobile"
+      v-if="$breakpoint.is.smAndDown"
       v-model="show_tools_drawer"
       app
       bottom

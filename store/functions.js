@@ -3,9 +3,18 @@ export const state = () => ({
 })
 
 export const actions = {
-  async deleteFile({ commit }, { url }) {
-    await this.$axios.$delete(`/uploads/user-content/${url}`)
-    commit('creator/fetchUserUploads')
+  async deleteFile({ commit }, { url, root }) {
+    const { data } = await this.$axios
+      .delete(`/uploads/user-content/${url}`)
+      .catch((e) => {
+        const error = JSON.parse(JSON.stringify(e))
+        return error.response
+      })
+    root.$emit(
+      data.error ? 'showError' : !data.error ? 'showSuccess' : 'showError',
+      { message: data.message }
+    )
+    commit('creator/fetchUserUploads', { root })
   }
 }
 

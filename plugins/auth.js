@@ -1,23 +1,34 @@
 const strategy = 'local'
-const FALLBACK_INTERVAL = 1200 * 1000 * 0.75
+const FALLBACK_INTERVAL = 900 * 1000 * 0.75
 
 async function refreshTokenF($auth, $axios, token, refreshToken, redirect) {
   if (refreshToken) {
     try {
-      $axios.setToken('Bearer ' + refreshToken)
-      const response = await $axios.$post('/auth/refresh_token', {
-        token: refreshToken
+      const { data } = await $axios.post('/logout').catch((e) => {
+        const error = JSON.parse(JSON.stringify(e))
+        return error.response
       })
-      token = 'Bearer ' + response.access_token
-      // refreshToken = response.refresh_token
-      $auth.setToken(strategy, token)
-      $auth.setRefreshToken(strategy, refreshToken)
-      $axios.setToken(token)
-      if (process.client) {
-        $auth.fetchUserOnce()
+      if (!data.error) {
+        $axios.setToken('Bearer ' + refreshToken)
+        const {
+          access_token: accessToken
+        } = await $axios.$post('/auth/refresh_token', { token: refreshToken })
+        token = 'Bearer ' + accessToken
+        // refreshToken = response.refresh_token
+        $auth.setToken(strategy, token)
+        $auth.setRefreshToken(strategy, refreshToken)
+        $axios.setToken(token)
+        if (process.client) {
+          $auth.fetchUserOnce()
+        }
+        return decodeToken.call(this, token).exp
       }
-      return decodeToken.call(this, token).exp
+      throw new Error('Error refreshing token')
     } catch (error) {
+      await $axios.$post('/logout').then(async (_) => {
+        $axios.setToken('Bearer ' + refreshToken)
+        await $axios.$post('/logout_refresh')
+      })
       $auth.logout()
       redirect('/auth/login')
       throw new Error('Error refreshing token')
@@ -43,6 +54,7 @@ export default async function({ app, store, redirect }) {
         await refreshTokenF($auth, $axios, token, refreshToken, store, redirect)
         return $axios(err.config)
       } else {
+        await $axios.$post('/logout')
         $auth.logout()
         redirect('/auth/login')
       }
@@ -81,31 +93,17 @@ export default async function({ app, store, redirect }) {
   }, refreshInterval)
 }
 
-function decodeToken(str) {
-  str = str.split('.')[1]
-
-  str = str.replace('/-/g', '+')
-  str = str.replace('/_/g', '/')
-  switch (str.length % 4) {
-    case 0:
-      break
-    case 2:
-      str += '=='
-      break
-    case 3:
-      str += '='
-      break
-    default:
-      throw new Error('Invalid token')
-  }
-
-  str = (str + '===').slice(0, str.length + (str.length % 4))
-  str = str.replace(/-/g, '+').replace(/_/g, '/')
-
-  str = decodeURIComponent(
-    escape(Buffer.from(str, 'base64').toString('binary'))
+function decodeToken(token) {
+  const base64Url = token.split('.')[1]
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split('')
+      .map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+      })
+      .join('')
   )
 
-  str = JSON.parse(str)
-  return str
+  return JSON.parse(jsonPayload)
 }

@@ -277,9 +277,6 @@ export default {
       userStorage: 'creator/userStorage',
       site_props: 'creator/site_props'
     }),
-    isMobile() {
-      return this.$vuetify.breakpoint.smAndDown
-    },
     activeEditor() {
       if (this.activeNav !== 'home') {
         return this.editor
@@ -1037,8 +1034,7 @@ export default {
       setPageTransition: 'creator/setPageTransition'
     }),
     ...mapActions({
-      registerWebsite: 'creator/registerWebsite',
-      updateWebsite: 'creator/updateWebsite',
+      handleWebsite: 'creator/handleWebsite',
       uploadFiles: 'creator/uploadFiles',
       deleteFile: 'functions/deleteFile'
     }),
@@ -1292,16 +1288,15 @@ export default {
         this.show_page_delete_error = true
       }
     },
-    registerSite() {
+    async registerSite() {
       if (this.$refs.editor_site_name_form.validate()) {
         this.validating = true
-        this.uploadFiles().then(() => {
-          if (!this.user.site_created) {
-            this.registerWebsite(this.site_props)
-          } else {
-            this.updateWebsite(this.site_props)
-          }
-        })
+        await this.uploadFiles()
+        if (!this.user.site_created) {
+          await this.handleWebsite({ type: 'register' })
+        } else {
+          await this.handleWebsite({ type: 'update' })
+        }
       }
     },
     showLinkMenu(attrs) {

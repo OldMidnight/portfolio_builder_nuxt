@@ -304,7 +304,7 @@ export default {
         cols="12"
         :class="
           `align-self-center pt-5 ${
-            $vuetify.breakpoint.smAndDown ? 'w-90 mt-3' : 'w-100'
+            $breakpoint.is.smAndDown ? 'w-90 mt-3' : 'w-100'
           }`
         "
       >
@@ -314,7 +314,7 @@ export default {
         cols="12"
         :class="
           `w-100 ${
-            $vuetify.breakpoint.smAndDown ? 'mt-4' : 'mt-2'
+            $breakpoint.is.smAndDown ? 'mt-4' : 'mt-2'
           } d-flex flex-column`
         "
       >
@@ -345,7 +345,7 @@ export default {
     <v-dialog
       v-model="delete_project_dialog"
       width="400"
-      :fullscreen="$vuetify.breakpoint.smAndDown"
+      :fullscreen="$breakpoint.is.smAndDown"
     >
       <v-card>
         <v-card-title>Delete {{ temp_project.title }}?</v-card-title>

@@ -120,7 +120,7 @@ export default {
       }
     },
     isMobile() {
-      return this.$vuetify.breakpoint.smAndDown
+      return this.$breakpoint.is.smAndDown
     }
   },
   created() {
@@ -377,7 +377,7 @@ export default {
       scrollable
       transition="slide-x-transition"
       width="800"
-      :fullscreen="$vuetify.breakpoint.smAndDown"
+      :fullscreen="$breakpoint.is.smAndDown"
     >
       <v-card height="600" class="wizard-dialog">
         <v-card-title class="d-flex flex-column">
@@ -422,7 +422,7 @@ export default {
                     v-if="resume_created && !upload_props.use"
                     :class="
                       `w-100 d-flex ${
-                        isMobile ? 'flex-column' : ''
+                        $breakpoint.is.smAndDown ? 'flex-column' : ''
                       } justify-center align-center mt-5`
                     "
                   >

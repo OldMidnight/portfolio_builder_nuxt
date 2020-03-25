@@ -6,28 +6,24 @@ export default {
   data() {
     return {
       rules: {
-        required: (value) => !!value || 'Required.',
-        email: (value) => {
-          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          return pattern.test(value) || 'Invalid e-mail.'
+        required: (value) => !!value || 'Required',
+        hasDigit: (value) => {
+          const pattern = /\d+/
+          return pattern.test(value) || 'Digit Required'
         },
-        min: (v) => v.length >= 8 || 'Min 8 characters',
-        max: (v) => v.length <= 25 || 'Max 25 characters'
+        hasUppercase: (value) => {
+          const pattern = /[A-Z]+/
+          return pattern.test(value) || 'Uppercase Letter Required'
+        },
+        noWhitespace: (value) =>
+          !(value || '').includes(' ') || 'No spaces are allowed',
+        min: (v) => (v || '').length >= 8 || 'Min 8 characters',
+        max: (v) => (v || '').length <= 128 || 'Max 128 characters'
       },
-      email_form_valid: true,
-      email_valid_snackbar: false,
-      email_error_snackbar: false,
-      new_email: null,
-      email_message: '',
-      email_validating: false,
-      password_form_valid: true,
-      password_valid_snackbar: false,
-      password_error_snackbar: false,
       current_password: '',
       new_password_1: '',
       new_password_2: '',
-      password_message: '',
-      password_validating: false,
+      passwordValidating: false,
       account_delete_dialog: false,
       deletion_confirmation_text: '',
       deletion_btn: false,
@@ -42,7 +38,12 @@ export default {
         'image/x-icon'
       ],
       upload_delete_dialog: false,
-      file_to_del: null
+      file_to_del: null,
+      show: false,
+      show2: false,
+      show3: false,
+      deleteUploadLoading: false,
+      deletionLoading: false
     }
   },
   computed: {
@@ -50,12 +51,6 @@ export default {
       userUploads: 'creator/userUploads',
       userStorage: 'creator/userStorage'
     }),
-    user() {
-      return this.$store.state.auth.user
-    },
-    email_snack_msg() {
-      return this.email_message
-    },
     password_snack_msg() {
       return this.password_message
     },
@@ -69,7 +64,7 @@ export default {
   },
   watch: {
     deletion_confirmation_text(value) {
-      if (value === this.user.domain) {
+      if (value === this.$auth.user.domain) {
         this.deletion_btn = true
       } else {
         this.deletion_btn = false
@@ -77,13 +72,19 @@ export default {
     }
   },
   created() {
-    this.fetchUserUploads()
+    this.fetchUserUploads({ root: this.$root })
   },
   methods: {
     ...mapActions({
       fetchUserUploads: 'creator/fetchUserUploads',
       deleteFile: 'functions/deleteFile'
     }),
+    async deleteUserUpload() {
+      this.deleteUploadLoading = true
+      await this.deleteFile({ url: this.file_to_del, root: this.$root })
+      this.deleteUploadLoading = false
+      this.upload_delete_dialog = false
+    },
     formatBytes(bytes, decimals = 2) {
       if (bytes === 0) return '0 Bytes'
       const k = 1000
@@ -96,66 +97,57 @@ export default {
       const el = document.getElementById(id)
       el.scrollIntoView({ behavior: 'smooth', block: 'start' })
     },
-    validateEmail() {
-      if (this.$refs.emailForm.validate()) {
-        this.email_validating = true
-        this.$axios
-          .post('/u/email_change', {
-            new_email: this.new_email
-          })
-          .then((response) => {
-            this.email_message = response.data.message
-            if (response.status === 200) {
-              this.email_error_snackbar = true
-            } else {
-              this.email_valid_snackbar = true
-            }
-          })
-          .catch(() => {
-            this.email_message = 'An error occured.'
-            this.email_error_snackbar = true
-          })
-          .then(() => {
-            this.email_validating = false
-            this.new_email = null
-            this.email_form_valid = true
-          })
-      }
-    },
     async validatePassword() {
+      this.passwordValidating = true
       if (
-        this.$refs.passwordForm.validate() &&
-        this.new_password_1 === this.new_password_2
+        this.$refs.passwordChangeForm.validate() &&
+        this.new_password_1 === this.new_password_2 &&
+        this.current_password !== this.new_password_1
       ) {
-        this.password_validating = true
-        await this.$axios
+        const { data } = await this.$axios
           .post('/u/password_change', {
+            current_password: this.current_password,
             new_password: this.new_password_1
           })
-          .then((response) => {
-            this.password_message = response.data.message
-            if (response.status === 200) {
-              this.password_error_snackbar = true
-            } else {
-              this.password_valid_snackbar = true
-            }
+          .catch((e) => {
+            const error = JSON.parse(JSON.stringify(e))
+            return error.response
           })
-          .catch(() => {
-            this.password_message = 'An error occured.'
-            this.password_error_snackbar = true
-          })
-        this.password_validating = false
-        this.current_password = ''
-        this.new_password_1 = ''
-        this.new_password_2 = ''
-        this.password_form_valid = true
+        this.$root.$emit(
+          data.error ? 'showError' : !data.error ? 'showSuccess' : 'showError',
+          { message: data.message }
+        )
+        if (!data.error) {
+          this.$refs.passwordChangeForm.reset()
+        }
+      } else {
+        this.$root.$emit('showError', { message: 'Inavlid details.' })
       }
+      this.passwordValidating = false
     },
     async deleteAccount() {
-      if (this.deletion_confirmation_text === this.user.domain) {
-        await this.$axios.post('/u/delete_account')
-        this.$auth.logout()
+      this.deletionLoading = true
+      if (this.deletion_confirmation_text === this.$auth.user.domain) {
+        const { data } = await this.$axios
+          .post('/u/delete_account')
+          .catch((e) => {
+            const error = JSON.parse(JSON.stringify(e))
+            return error.response
+          })
+        if (data.error) {
+          this.$root.$emit('showError', { message: data.message })
+        } else {
+          const refreshToken = this.$auth.getRefreshToken('local')
+          await this.$axios.$post('/logout').then(async (_) => {
+            this.$axios.setToken('Bearer ' + refreshToken)
+            await this.$axios.$post('/logout_refresh')
+          })
+          this.$auth.logout()
+        }
       }
+      this.deletionLoading = false
+      this.account_delete_dialog = false
+      this.deletion_confirmation_text = null
     }
   },
   head() {
@@ -191,17 +183,8 @@ export default {
           Navigation
         </span>
         <v-btn
-          :color="`${user.dark_mode ? '' : '#ECEFF1'}`"
           tile
-          width="100%"
-          class="site-setting-nav-btn pa-9 elevation-0"
-          @click="scrollTo('change_email_section')"
-        >
-          Change Email
-        </v-btn>
-        <v-btn
-          tile
-          :color="`${user.dark_mode ? '' : '#ECEFF1'}`"
+          :color="`${$auth.user.dark_mode ? '' : '#ECEFF1'}`"
           width="100%"
           class="site-setting-nav-btn pa-9 elevation-0"
           @click="scrollTo('change_password_section')"
@@ -209,7 +192,7 @@ export default {
           Change Password
         </v-btn>
         <v-btn
-          :color="`${user.dark_mode ? '' : '#ECEFF1'}`"
+          :color="`${$auth.user.dark_mode ? '' : '#ECEFF1'}`"
           tile
           width="100%"
           class="site-setting-nav-btn pa-9 elevation-0"
@@ -219,7 +202,7 @@ export default {
         </v-btn>
         <v-btn
           tile
-          :color="`${user.dark_mode ? '' : '#ECEFF1'}`"
+          :color="`${$auth.user.dark_mode ? '' : '#ECEFF1'}`"
           width="100%"
           class="site-setting-nav-btn pa-9 elevation-0"
           @click="scrollTo('del_acc_section')"
@@ -230,86 +213,78 @@ export default {
       <div class="flipped-section-content-wrapper px-6">
         <div class="flipped-section-content mb-3 mt-10">
           <span
-            id="change_email_section"
-            class="headline ml-4 my-3 font-weight-light"
-          >
-            Change Email
-          </span>
-          <v-form
-            ref="emailForm"
-            v-model="email_form_valid"
-            class="d-flex flex-column justify-center align-center mt-4"
-          >
-            <v-text-field
-              disabled
-              outlined
-              label="Current Email"
-              :value="user.email"
-            ></v-text-field>
-            <v-text-field
-              v-model="new_email"
-              :rules="[rules.required, rules.email]"
-              outlined
-              label="New Email"
-            ></v-text-field>
-            <v-btn
-              :disabled="!email_form_valid || email_validating"
-              color="success"
-              rounded
-              :loading="email_validating"
-              @click="validateEmail()"
-              @keypress.enter="validateEmail()"
-            >
-              Update Email
-            </v-btn>
-          </v-form>
-        </div>
-        <div class="flipped-section-content mb-3 mt-10">
-          <span
             id="change_password_section"
             class="headline ml-4 my-3 font-weight-light"
           >
             Change Password
           </span>
+          <p class="caption font-weight-bold">
+            Note: Your password must be at least 8 character long and contain
+            the following:
+          </p>
+          <ul>
+            <li class="caption font-weight-bold">At least 1 digit.</li>
+            <li class="caption font-weight-bold">
+              At least 1 uppercase letter.
+            </li>
+          </ul>
           <v-form
-            ref="passwordForm"
-            v-model="password_form_valid"
-            autocomplete="off"
+            ref="passwordChangeForm"
             class="d-flex flex-column justify-center align-center mt-4"
           >
             <v-text-field
               v-model="current_password"
               outlined
-              autocomplete="off"
+              autocomplete="current-password"
               label="Current Password"
-              type="password"
+              :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="show ? 'text' : 'password'"
               :rules="[rules.required, rules.min, rules.max]"
+              @click:append="show = !show"
             ></v-text-field>
             <v-text-field
               v-model="new_password_1"
-              type="password"
-              autocomplete="off"
-              :rules="[rules.required, rules.min, rules.max]"
+              :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="show2 ? 'text' : 'password'"
+              autocomplete="new-password"
+              :rules="[
+                rules.required,
+                rules.min,
+                rules.max,
+                rules.hasDigit,
+                rules.hasUppercase,
+                rules.noWhitespace
+              ]"
               outlined
               label="New Password"
+              @click:append="show2 = !show2"
             ></v-text-field>
             <v-text-field
               v-model="new_password_2"
-              type="password"
-              autocomplete="off"
-              :rules="[rules.required, rules.min, rules.max]"
+              :append-icon="show3 ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="show3 ? 'text' : 'password'"
+              autocomplete="new-password"
+              :rules="[
+                rules.required,
+                rules.min,
+                rules.max,
+                rules.hasDigit,
+                rules.hasUppercase,
+                rules.noWhitespace
+              ]"
               outlined
               label="Confirm New Password"
+              @click:append="show3 = !show3"
             ></v-text-field>
             <v-btn
-              :disabled="!password_form_valid || password_validating"
+              :disabled="passwordValidating"
               color="success"
               rounded
-              :loading="password_validating"
+              :loading="passwordValidating"
               @click="validatePassword()"
               @keypress.enter="validatePassword()"
             >
-              Update Password
+              Change Password
             </v-btn>
           </v-form>
         </div>
@@ -320,7 +295,10 @@ export default {
           >
             Manage Uploads
           </span>
-          <v-row class="ma-0 w-100 rounded elevation-2">
+          <v-row class="ma-0 mt-3 w-100 rounded elevation-2">
+            <v-col cols="12" class="pa-0">
+              <p class="title ma-0">Available space:</p>
+            </v-col>
             <v-col cols="12" class="">
               <v-progress-linear
                 background-color="error"
@@ -393,10 +371,10 @@ export default {
                             target="_blank"
                             v-on="on"
                           >
-                            <v-icon>mdi-download</v-icon>
+                            <v-icon>mdi-eye</v-icon>
                           </v-btn>
                         </template>
-                        <span>Download</span>
+                        <span>View</span>
                       </v-tooltip>
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
@@ -418,6 +396,9 @@ export default {
                       </v-tooltip>
                     </v-col>
                   </v-row>
+                </v-col>
+                <v-col v-if="userUploads.length === 0" cols="12">
+                  <p class="title">No files uploaded.</p>
                 </v-col>
               </v-row>
             </v-col>
@@ -447,7 +428,9 @@ export default {
           <v-container>
             <v-layout class="d-flex flex-column align-center justify-center">
               <span>Type in the following word to delete your account:</span>
-              <span class="font-weight-bold title">{{ user.domain }}</span>
+              <span class="font-weight-bold title">
+                {{ $auth.user.domain }}
+              </span>
               <span class="font-weight-bold subtitle-2">
                 This action is irreversable
               </span>
@@ -459,7 +442,8 @@ export default {
                 label="Enter text..."
               ></v-text-field>
               <v-btn
-                :disabled="!deletion_btn"
+                :disabled="!deletion_btn || deletionLoading"
+                :loading="deletionLoading"
                 color="error"
                 @click.stop="deleteAccount()"
               >
@@ -499,36 +483,17 @@ export default {
           >
             Cancel
           </v-btn>
-          <v-btn color="error" @click.stop="deleteFile({ url: file_to_del })">
+          <v-btn
+            :disabled="deleteUploadLoading"
+            :loading="deleteUploadLoading"
+            color="error"
+            @click.stop="deleteUserUpload()"
+          >
             Yes, Delete This file
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-snackbar v-model="email_valid_snackbar" color="success">
-      {{ email_snack_msg }}
-      <v-btn icon @click="email_valid_snackbar = false">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-snackbar>
-    <v-snackbar v-model="email_error_snackbar" color="error">
-      {{ email_snack_msg }}
-      <v-btn icon @click="email_error_snackbar = false">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-snackbar>
-    <v-snackbar v-model="password_valid_snackbar" color="success">
-      {{ password_snack_msg }}
-      <v-btn icon @click="password_valid_snackbar = false">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-snackbar>
-    <v-snackbar v-model="password_error_snackbar" color="error">
-      {{ password_snack_msg }}
-      <v-btn icon @click="password_error_snackbar = false">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-snackbar>
   </v-layout>
 </template>
 

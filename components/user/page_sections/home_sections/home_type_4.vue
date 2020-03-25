@@ -237,10 +237,10 @@ export default {
     class="ma-0 component-layout h-100 w-100 pos-abs py-3"
   >
     <v-col
-      :cols="$vuetify.breakpoint.smAndDown ? '12' : '6'"
+      :cols="$breakpoint.is.smAndDown ? '12' : '6'"
       :class="
         `border-right pos-rel d-flex justify-center pa-12 ${
-          $vuetify.breakpoint.smAndDown ? 'h-50' : 'h-100'
+          $breakpoint.is.smAndDown ? 'h-50' : 'h-100'
         }`
       "
     >
@@ -254,8 +254,8 @@ export default {
       </v-btn>
     </v-col>
     <v-col
-      :cols="$vuetify.breakpoint.smAndDown ? '12' : '6'"
-      :class="`action--section ${$vuetify.breakpoint.smAndDown ? 'h-50' : ''}`"
+      :cols="$breakpoint.is.smAndDown ? '12' : '6'"
+      :class="`action--section ${$breakpoint.is.smAndDown ? 'h-50' : ''}`"
     >
       <v-row class="ma-0 d-flex flex-column h-100">
         <v-col cols="9" class="content--section d-flex align-center">
@@ -278,7 +278,7 @@ export default {
       v-model="edit_dialog"
       scrollable
       width="700"
-      :fullscreen="$vuetify.breakpoint.smAndDown"
+      :fullscreen="$breakpoint.is.smAndDown"
     >
       <v-card>
         <v-card-title>Call-To-Action Page</v-card-title>
